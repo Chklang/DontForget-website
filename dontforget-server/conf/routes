@@ -1,0 +1,19 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+GET	    /rest/users/me		                        fr.chklang.dontforget.resources.UsersResource.me()
+POST    /rest/users/login                           fr.chklang.dontforget.resources.UsersResource.login()
+POST    /rest/users/disconnect                      fr.chklang.dontforget.resources.UsersResource.disconnect()
+POST    /rest/users/create                          fr.chklang.dontforget.resources.UsersResource.create()
+
+GET		/rest/tasks									fr.chklang.dontforget.resources.TasksResource.findAll()
+POST	/rest/tasks									fr.chklang.dontforget.resources.TasksResource.create()
+DELETE 	/rest/tasks/:id								fr.chklang.dontforget.resources.TasksResource.delete(id:Integer)
+POST	/rest/tasks/:id								fr.chklang.dontforget.resources.TasksResource.update(id:Integer)
+
+GET		/rest/tags									fr.chklang.dontforget.resources.TagsResource.findAll()
+DELETE	/rest/tags/:name							fr.chklang.dontforget.resources.TagsResource.delete(name:String)
+
+GET		/rest/places								fr.chklang.dontforget.resources.PlacesResource.findAll()
+DELETE	/rest/places/:name							fr.chklang.dontforget.resources.PlacesResource.delete(name:String)

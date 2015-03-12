@@ -1,0 +1,71 @@
+<div ng-controller="LoginCtrl" style="padding-left:20px; padding-right:20px; padding-top:20px; padding-bottom:10px;">
+<form class="form-horizontal" id="login_form" ng-submit="submit()" method="POST" action="{{action}}" onsubmit="return false;">
+	<fieldset>
+
+		<!-- Form Name -->
+		<legend ng-style="{'display' : isNewCompte?'none':''}">Identification</legend>
+		<legend ng-style="{'display' : isNewCompte?'':'none'}">Créer un compte</legend>
+
+		<!-- Text input-->
+		<div class="form-group">
+			<label class="col-md-4 control-label" for="login_login">Pseudo</label>
+			<div class="col-md-8">
+				<input id="login_login" name="login_login" type="text" placeholder="Pseudonyme" class="form-control input-md" ng-model="login">
+			</div>
+		</div>
+
+		<!-- Password input-->
+		<div class="form-group">
+			<label class="col-md-4 control-label" for="login_password">Mot de passe</label>
+			<div class="col-md-8">
+				<input id="login_password" name="login_password" type="password" placeholder="Mot de passe" class="form-control input-md" ng-model="password">
+			</div>
+		</div>
+
+		<!-- Text input-->
+		<div class="form-group" ng-style="{'display' : isNewCompte?'':'none'}">
+			<label class="col-md-4 control-label" for="login_password">Confirmez mot de passe</label>
+			<div class="col-md-8">
+				<input id="login_password2" name="login_password2" type="password" placeholder="Mot de passe" class="form-control input-md" ng-model="password2">
+			</div>
+		</div>
+
+		<!-- Text input-->
+		<div class="form-group" ng-style="{'display' : isNewCompte?'':'none'}">
+			<label class="col-md-4 control-label" for="newcompte_mail">E-mail</label>
+			<div class="col-md-8">
+				<input id="newcompte_mail" name="newcompte_mail" type="text" placeholder="e-mail" class="form-control input-md" ng-model="email">
+			</div>
+		</div>
+
+		<!-- Button (Double) -->
+		<div class="form-group" ng-style="{'display' : isNewCompte?'none':''}">
+			<div class="col-md-4">
+				<button type="button" id="login_close" name="login_close" class="btn btn-block btn-danger" ng-click="login_close();">Annuler</button>
+			</div>
+			<div class="col-md-4">
+				<button type="button" id="login_connexion" name="login_connexion" class="btn btn-block btn-success" ng-click="login_submit();">Connection</button>
+			</div>
+			<div class="col-md-4">
+				<button type="button" id="login_newcompte" name="login_newcompte" class="btn btn-block btn-primary" ng-click="login_gotonewcompte();">Créer un compte</button>
+			</div>
+		</div>
+
+		<!-- Button (Double) -->
+		<div class="form-group" ng-style="{'display' : isNewCompte?'':'none'}">
+			<div class="col-md-4">
+				<button type="button" id="newcompte_close" name="newcompte_close" class="btn btn-block btn-danger" ng-click="newcompte_close();">Annuler</button>
+			</div>
+			<div class="col-md-4">
+				<button type="button" id="newcompte_creer" name="newcompte_creer" class="btn btn-block btn-success" ng-click="newcompte_submit();">Créer le compte</button>
+			</div>
+			<div class="col-md-4">
+				<button type="button" id="newcompte_login" name="newcompte_login" class="btn btn-block btn-primary" ng-click="newcompte_gotologin();">J'ai déjà un compte</button>
+			</div>
+		</div>
+		
+		<button class="display:none;"></button>
+
+	</fieldset>
+</form>
+</div>
