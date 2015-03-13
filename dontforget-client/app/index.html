@@ -2,7 +2,7 @@
 <html class="no-js">
 <head>
 <meta charset="utf-8">
-<title>Dont Forget</title>
+<title>Don't Forget</title>
 <meta name="description" content="">
 <meta name="viewport" content="width=device-width">
 <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
@@ -25,9 +25,9 @@
 		<div class="header">
 			<ul class="nav nav-pills pull-right">
 				<li><a ng-href="#/tasks" ng-class="{ 'disabled' : !isConnected}">Mes tâches</a></li>
-				<li><a ng-href="#/" ng-click="login()">{{buttonName}}</a></li>
+				<li><a ng-href="#/" ng-click="login()">{{isConnected?"Deconnexion":"Connexion"}}</a></li>
 			</ul>
-			<h3 class="text-muted">Don't Forget</h3>
+			<a style="text-decoration:initial" ng-href="#/"><h3 class="text-muted">Don't Forget</h3></a>
 		</div>
 
 		<div ui-view=""></div>
@@ -65,9 +65,9 @@
 	<script src="scripts/controllers/main.js"></script>
 	<script src="scripts/controllers/about.js"></script>
 	<script src="scripts/controllers/index.js"></script>
-<script src="scripts/services/connection.js"></script>
-<script src="scripts/services/user.js"></script>
-<script src="scripts/controllers/tasks.js"></script>
+	<script src="scripts/services/connection.js"></script>
+	<script src="scripts/services/user.js"></script>
+	<script src="scripts/controllers/tasks.js"></script>
 	<!-- endbuild -->
 </body>
 </html>

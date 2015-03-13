@@ -2,8 +2,15 @@ body {
   padding: 0;
 }
 
-.disabled {
-	background-color: green;
+a.disabled {
+    color: #AAAAAA;
+    cursor: default;
+    pointer-events: none;
+    text-decoration: none;
+}
+
+a > h3:HOVER {
+	text-decoration: none;
 }
 /* Everything but the jumbotron gets side spacing for mobile first views */
 .header,
