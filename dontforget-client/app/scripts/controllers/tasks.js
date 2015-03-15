@@ -108,7 +108,7 @@
 			addTaskDropdownToggle();
 		};
 		$scope.addTaskKeyDown = function(pEvent) {
-			if ($scope.addTaskDropdownIndexSelected == -1) {
+			if (!$scope.openTaskDropdown) {
 				switch (pEvent.keyCode) {
 				case 13 :
 					//Save the task
