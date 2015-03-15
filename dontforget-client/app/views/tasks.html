@@ -1,1 +1,26 @@
-<p>This is the tasks view.</p>
+<form>
+	<div class="form-group">
+		<label for="addTask">Tâche :</label>
+		<div class="dropdown" ng-class="{open:openTaskDropdown}">
+			<input type="text" ng-click="addTaskClick()" ng-keyup="addTaskKeyUp($event)" ng-keydown="addTaskKeyDown($event)" class="form-control" id="addTask"
+				placeholder="Entrez ici votre tâche" ng-model="addTaskValue" />
+			<ul class="dropdown-menu" role="menu" aria-labelledby="addTask">
+				<li role="presentation" ng-if="currentWord != null">{{currentWord}}</li>
+				<li
+					role="presentation"
+					ng-repeat="(index, element) in addTaskDropdownValue track by $index"
+					ng-class="{selected: addTaskDropdownIndexIsSelected(index), hidden:addTaskDropdownIndexIsHidded(element)}">{{index}} : {{element}}</li>
+			</ul>
+		</div>
+	</div>
+</form>
+<fieldset>
+	<legend>Tâches</legend>
+	<ul>
+		<li ng-repeat="task in allTasks">
+			{{task.text}}<br/>
+			Tags : <span ng-repeat="tag in task.tags">{{tag}} </span><br/>
+			Places : <span ng-repeat="place in task.places">{{place}} </span>
+		</li>
+	</ul>
+</fieldset>

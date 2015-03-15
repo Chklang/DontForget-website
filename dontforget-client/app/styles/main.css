@@ -12,6 +12,12 @@ a.disabled {
 a > h3:HOVER {
 	text-decoration: none;
 }
+li.selected {
+	background-color: #AAA;
+}
+li.hidden {
+	display : none;
+}
 /* Everything but the jumbotron gets side spacing for mobile first views */
 .header,
 .footer {

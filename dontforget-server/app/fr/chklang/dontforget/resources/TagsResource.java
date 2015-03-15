@@ -3,12 +3,8 @@
  */
 package fr.chklang.dontforget.resources;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import play.libs.Json;
 import play.mvc.Result;
@@ -16,10 +12,7 @@ import play.mvc.Result;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import fr.chklang.dontforget.business.Place;
 import fr.chklang.dontforget.business.Tag;
-import fr.chklang.dontforget.business.Task;
-import fr.chklang.dontforget.dto.TaskDTO;
 
 /**
  * @author Chklang

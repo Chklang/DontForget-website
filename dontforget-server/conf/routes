@@ -9,6 +9,7 @@ POST    /rest/users/create                          fr.chklang.dontforget.resour
 
 GET		/rest/tasks									fr.chklang.dontforget.resources.TasksResource.findAll()
 POST	/rest/tasks									fr.chklang.dontforget.resources.TasksResource.create()
+GET		/rest/tasks/:id								fr.chklang.dontforget.resources.TasksResource.get(id:Integer)
 DELETE 	/rest/tasks/:id								fr.chklang.dontforget.resources.TasksResource.delete(id:Integer)
 POST	/rest/tasks/:id								fr.chklang.dontforget.resources.TasksResource.update(id:Integer)
 

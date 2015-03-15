@@ -10,6 +10,7 @@ angular.module('RestModule').service('restRequest', [ '$http', 'rest', function 
 		var url = options.url;
 		var method = options.method;
 		var data = options.data;
+		var contentType = options.contentType;
 		var success = options.success;
 		var error = options.error;
 		var errorsCodes = options.errorsCodes;
@@ -19,6 +20,11 @@ angular.module('RestModule').service('restRequest', [ '$http', 'rest', function 
 		objRequest.url = rest.restPath + url;
 		if (data) {
 			objRequest.data = data;
+		}
+		if (contentType != null) {
+			objRequest.headers = {
+					"Content-Type" : contentType
+			}
 		}
 		var result = $http(objRequest);
 		result.success(function(data, status) {
