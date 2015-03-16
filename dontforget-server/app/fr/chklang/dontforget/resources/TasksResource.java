@@ -9,15 +9,20 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 import play.libs.Json;
 import play.mvc.Result;
 
+
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
 
 import fr.chklang.dontforget.business.Place;
 import fr.chklang.dontforget.business.Tag;
 import fr.chklang.dontforget.business.Task;
+import fr.chklang.dontforget.business.TaskStatus;
 import fr.chklang.dontforget.dto.TaskDTO;
 
 /**
@@ -33,7 +38,7 @@ public class TasksResource extends AbstractRest {
 			Set<Place> lPlaces = new HashSet<>();
 			
 			Pattern lPatternTags = Pattern.compile(" #([^ ]+)");
-			Matcher lMatcher = lPatternTags.matcher(lText);
+			Matcher lMatcher = lPatternTags.matcher(" " + lText);
 			while (lMatcher.find()) {
 				String lTagString = lMatcher.group(1);
 				Tag lTag = Tag.dao.findByTagAndUser(getConnectedUser(), lTagString);
@@ -44,11 +49,11 @@ public class TasksResource extends AbstractRest {
 					lTag.save();
 				}
 				lTags.add(lTag);
-				lText = lText.replace(" #" + lTagString, "");
+				lText = lText.replace("#" + lTagString, "");
 			}
 			
 			Pattern lPatternPlaces = Pattern.compile(" @([^ ]+)");
-			lMatcher = lPatternPlaces.matcher(lText);
+			lMatcher = lPatternPlaces.matcher(" " + lText);
 			while (lMatcher.find()) {
 				String lPlaceString = lMatcher.group(1);
 				Place lPlace = Place.dao.findByPlaceAndUser(getConnectedUser(), lPlaceString);
@@ -59,7 +64,10 @@ public class TasksResource extends AbstractRest {
 					lPlace.save();
 				}
 				lPlaces.add(lPlace);
-				lText = lText.replace(" @" + lPlaceString, "");
+				lText = lText.replace("@" + lPlaceString, "");
+			}
+			while (lText.contains("  ")) {
+				lText = lText.replaceAll("  ",	" ");
 			}
 			
 			lText = lText.trim();
@@ -69,6 +77,7 @@ public class TasksResource extends AbstractRest {
 			lTask.setTags(lTags);
 			lTask.setText(lText);
 			lTask.setUser(getConnectedUser());
+			lTask.setTaskStatus(TaskStatus.OPENED);
 			lTask.save();
 			return ok(new TaskDTO(lTask));
 		});
@@ -118,45 +127,17 @@ public class TasksResource extends AbstractRest {
 				return unauthorized();
 			}
 
-			String lText = request().body().asText();
-			Set<Tag> lTags = new HashSet<>();
-			Set<Place> lPlaces = new HashSet<>();
-			
-			Pattern lPatternTags = Pattern.compile(" #([^ ]+)");
-			Matcher lMatcher = lPatternTags.matcher(lText);
-			while (lMatcher.find()) {
-				String lTagString = lMatcher.group(1);
-				Tag lTag = Tag.dao.findByTagAndUser(getConnectedUser(), lTagString);
-				if (lTag == null) {
-					lTag = new Tag();
-					lTag.setTag(lTagString);
-					lTag.setUser(getConnectedUser());
-					lTag.save();
+			JsonNode lContent = request().body().asJson();
+			JsonNode lStatus = lContent.get("status");
+			if (!lStatus.isNull()) {
+				if (TaskStatus.OPENED.name().equals(lStatus.asText())) {
+					lTask.setTaskStatus(TaskStatus.OPENED);
+				} else if (TaskStatus.FINISHED.name().equals(lStatus.asText())) {
+					lTask.setTaskStatus(TaskStatus.FINISHED);
+				} else if (TaskStatus.DELETED.name().equals(lStatus.asText())) {
+					lTask.setTaskStatus(TaskStatus.DELETED);
 				}
-				lTags.add(lTag);
-				lText = lText.replace(" #" + lTagString, "");
 			}
-			
-			Pattern lPatternPlaces = Pattern.compile(" @([^ ]+)");
-			lMatcher = lPatternPlaces.matcher(lText);
-			while (lMatcher.find()) {
-				String lPlaceString = lMatcher.group(1);
-				Place lPlace = Place.dao.findByPlaceAndUser(getConnectedUser(), lPlaceString);
-				if (lPlace == null) {
-					lPlace = new Place();
-					lPlace.setPlace(lPlaceString);
-					lPlace.setUser(getConnectedUser());
-					lPlace.save();
-				}
-				lPlaces.add(lPlace);
-				lText = lText.replace(" @" + lPlaceString, "");
-			}
-			
-			lText = lText.trim();
-			
-			lTask.setPlaces(lPlaces);
-			lTask.setTags(lTags);
-			lTask.setText(lText);
 			lTask.save();
 			return ok(new TaskDTO(lTask));
 		});

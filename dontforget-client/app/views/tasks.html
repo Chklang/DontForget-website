@@ -16,11 +16,24 @@
 </form>
 <fieldset>
 	<legend>Tâches</legend>
-	<ul>
-		<li ng-repeat="task in allTasks">
-			{{task.text}}<br/>
-			Tags : <span ng-repeat="tag in task.tags">{{tag}} </span><br/>
-			Places : <span ng-repeat="place in task.places">{{place}} </span>
-		</li>
-	</ul>
+	<form>
+		<div class="form-group has-feedback">
+		  <label class="control-label" for="filterAllTasks">Filter by</label>
+		  <div class="input-group">
+			    <a ng-click="allTasksFilter = ''" style="top:0px" class="btn glyphicon glyphicon-remove input-group-addon"></a>
+			    <input type="text" class="form-control" id="filterAllTasks" ng-model="allTasksFilter" />
+		    </div>
+		    <span class="glyphicon glyphicon-search form-control-feedback"></span>
+		</div>
+		<ul class="list-group">
+			<li class="list-group-item" ng-repeat="task in allTasks" ng-if="!allTasksIsHidded(task)">
+				<button class="btn btn-default" ng-click="allTasksFinish(task)">
+					<span class="glyphicon glyphicon-saved"></span>
+				</button>
+				{{task.text}}
+				<span class="badge" ng-repeat="place in task.places" ng-click="allTasksAddToFilters('@' + place)" tooltip="Add to filters">@{{place}} </span>
+				<span class="badge" ng-repeat="tag in task.tags" ng-click="allTasksAddToFilters('#' + tag)" tooltip="Add to filters">#{{tag}} </span>
+			</li>
+		</ul>
+	</form>
 </fieldset>

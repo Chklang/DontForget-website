@@ -15,6 +15,7 @@
 		var lAllTags = [];
 		var lAllPlaces = [];
 		$scope.allTasks = [];
+		$scope.allTasksFilter = "";
 		
 		Tags.getAll(function (pResults) {
 			lAllTags = pResults;
@@ -115,6 +116,30 @@
 					Tasks.create($scope.addTaskValue, function (pResult) {
 						$scope.allTasks.push(pResult);
 						$scope.addTaskValue = "";
+						
+						angular.forEach(pResult.tags, function (pEntry) {
+							var lIsFound = false;
+							angular.forEach(lAllTags, function (pTag) {
+								if (!lIsFound && pTag == pEntry) {
+									lIsFound = true;
+								}
+							});
+							if (!lIsFound) {
+								lAllTags.push(pEntry);
+							}
+						});
+						
+						angular.forEach(pResult.places, function (pEntry) {
+							var lIsFound = false;
+							angular.forEach(lAllPlaces, function (pPlace) {
+								if (!lIsFound && pPlace == pEntry) {
+									lIsFound = true;
+								}
+							});
+							if (!lIsFound) {
+								lAllPlaces.push(pEntry);
+							}
+						});
 					});
 					break;
 				}
@@ -233,5 +258,41 @@
 			setCursorPosition(pElement, lEndText);
 			addTaskDropdownToggle();
 		}
+		
+		var lRegExpAllTasksFilter = null;
+		var lLastValueAllTasksFilter = null;
+		
+		$scope.allTasksIsHidded = function (pTask) {
+			if ($scope.allTasksFilter == null) {
+				return false;
+			}
+			if (lLastValueAllTasksFilter == null || lLastValueAllTasksFilter != $scope.allTasksFilter) {
+				lLastValueAllTasksFilter = $scope.allTasksFilter;
+				lRegExpAllTasksFilter = new RegExp($scope.allTasksFilter);
+			}
+			var lTextTask = pTask.text;
+			angular.forEach(pTask.tags, function (pEntry) {
+				lTextTask += " #" + pEntry;
+			});
+			angular.forEach(pTask.places, function (pEntry) {
+				lTextTask += " @" + pEntry;
+			});
+			return !lRegExpAllTasksFilter.test(lTextTask);
+		};
+		
+		$scope.allTasksAddToFilters = function (pElement) {
+			$scope.allTasksFilter += " " + pElement;
+		};
+		
+		$scope.allTasksFinish = function (pTask) {
+			Tasks.setFinished(pTask.id, function (pResult) {
+				var lNbElements = $scope.allTasks.length;
+				for (var i=0; i<lNbElements; i++) {
+					if ($scope.allTasks[i].id == pResult.id) {
+						$scope.allTasks[i] = pResult;
+					}
+				}
+			});
+		};
 	} ]);
 })();

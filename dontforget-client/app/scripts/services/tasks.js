@@ -55,11 +55,10 @@
 				}
 			});
 		};
-		this.update = function(pId, pText, pSuccessCallback) {
+		this.update = function(pId, pData, pSuccessCallback) {
 			return restRequest.put({
 				url : '/tasks/'+pId,
-				contentType : "text/plain",
-				data : pText,
+				data : pData,
 				success : pSuccessCallback,
 				errorsCodes : {
 					'400' : function(pData) {
@@ -86,6 +85,11 @@
 					}
 				}
 			});
+		};
+		this.setFinished = function (pId, pSuccessCallback) {
+			return this.update(pId, {
+				status : 'FINISHED'
+			}, pSuccessCallback);
 		};
 	} ]);
 })();
