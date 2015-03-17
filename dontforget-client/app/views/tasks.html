@@ -14,14 +14,18 @@
 		</div>
 	</div>
 </form>
+<alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert(alert)">
+{{alert.msg}}
+<button class="btn btn-sucess" ng-click="cancelAction(alert)">Cancel</button>
+</alert>
 <fieldset>
 	<legend>Tâches
-	<div class="btn-group pull-right">
-        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'OPENED'" uncheckable>In progress</label>
-        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'FINISHED'" uncheckable>Finished</label>
-        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'DELETED'" uncheckable>Deleted</label>
-        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'ALL'" uncheckable>All</label>
-    </div>
+		<span class="btn-group pull-right">
+	        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'OPENED'" uncheckable>In progress</label>
+	        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'FINISHED'" uncheckable>Finished</label>
+	        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'DELETED'" uncheckable>Deleted</label>
+	        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'ALL'" uncheckable>All</label>
+	    </span>
     </legend>
 	<form>
 		<div class="form-group has-feedback">
@@ -34,7 +38,7 @@
 		</div>
 		<ul class="list-group">
 			<li class="list-group-item" ng-repeat="task in allTasks" ng-if="!allTasksIsHidded(task)">
-				<button class="btn btn-default" ng-click="allTasksFinish(task)">
+				<button class="btn btn-default" ng-click="allTasksStatusToggle(task)">
 					<span class="glyphicon glyphicon-saved"></span>
 				</button>
 				{{task.text}}

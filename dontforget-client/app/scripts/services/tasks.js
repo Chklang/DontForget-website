@@ -91,5 +91,10 @@
 				status : 'FINISHED'
 			}, pSuccessCallback);
 		};
+		this.setOpened = function (pId, pSuccessCallback) {
+			return this.update(pId, {
+				status : 'OPENED'
+			}, pSuccessCallback);
+		};
 	} ]);
 })();

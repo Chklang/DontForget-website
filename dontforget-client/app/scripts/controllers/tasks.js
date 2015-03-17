@@ -17,6 +17,7 @@
 		$scope.allTasks = [];
 		$scope.allTasksFilter = "";
 		$scope.allTasksModeView = "OPENED";
+		$scope.alerts = [];
 		
 		Tags.getAll(function (pResults) {
 			lAllTags = pResults;
@@ -37,6 +38,24 @@
 		$scope.addTaskDropdownIndexSelected = -1;
 		var addTaskElement = angular.element("#addTask")[0];
 		$scope.currentWord = null;
+		
+		function setActionDone(pMessage, pType, pCancelFunction) {
+			$scope.alerts[0] = {
+					msg : pMessage,
+					type : pType,
+					cancel : pCancelFunction
+			};
+		}
+		
+		$scope.cancelAction = function (pAction) {
+			if (pAction.cancel) {
+				pAction.cancel();
+			}
+		};
+		
+		$scope.closeAlert = function (pAction) {
+			$scope.alerts = [];
+		};
 
 		function getCurrentWord() {
 			var lCurrentPosition = getCursorPosition(addTaskElement);
@@ -288,7 +307,14 @@
 			$scope.allTasksFilter += " " + pElement;
 		};
 		
-		$scope.allTasksFinish = function (pTask) {
+		$scope.allTasksStatusToggle = function (pTask) {
+			if (pTask.status == "OPENED") {
+				allTasksFinished(pTask);
+			} else if (pTask.status == "FINISHED") {
+				allTasksOpened(pTask);
+			}
+		}
+		function allTasksFinished (pTask) {
 			Tasks.setFinished(pTask.id, function (pResult) {
 				var lNbElements = $scope.allTasks.length;
 				for (var i=0; i<lNbElements; i++) {
@@ -296,6 +322,28 @@
 						$scope.allTasks[i] = pResult;
 					}
 				}
+				var lCancelFunction = function() {
+					allTasksOpened(pResult);
+				};
+				var lMsg = "La tâche est marquée terminée."; //TODO TR
+				var lType = "success";
+				setActionDone(lMsg, lType, lCancelFunction);
+			});
+		};
+		function allTasksOpened (pTask) {
+			Tasks.setOpened(pTask.id, function (pResult) {
+				var lNbElements = $scope.allTasks.length;
+				for (var i=0; i<lNbElements; i++) {
+					if ($scope.allTasks[i].id == pResult.id) {
+						$scope.allTasks[i] = pResult;
+					}
+				}
+				var lCancelFunction = function() {
+					allTasksFinished(pResult);
+				};
+				var lMsg = "La tâche est marquée ouverte."; //TODO TR
+				var lType = "success";
+				setActionDone(lMsg, lType, lCancelFunction);
 			});
 		};
 	} ]);
