@@ -96,5 +96,10 @@
 				status : 'OPENED'
 			}, pSuccessCallback);
 		};
+		this.setDeleted = function (pId, pSuccessCallback) {
+			return this.update(pId, {
+				status : 'DELETED'
+			}, pSuccessCallback);
+		};
 	} ]);
 })();

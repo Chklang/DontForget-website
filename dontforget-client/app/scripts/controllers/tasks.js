@@ -307,14 +307,22 @@
 			$scope.allTasksFilter += " " + pElement;
 		};
 		
-		$scope.allTasksStatusToggle = function (pTask) {
-			if (pTask.status == "OPENED") {
-				allTasksFinished(pTask);
-			} else if (pTask.status == "FINISHED") {
-				allTasksOpened(pTask);
+		function cancel(pTo, pTask) {
+			switch (pTo) {
+			case 'OPENED' :
+				$scope.allTasksStatusOpened(pTask);
+				break;
+			case 'FINISHED' :
+				$scope.allTasksStatusFinished(pTask);
+				break;
+			case 'DELETED' :
+				$scope.allTasksStatusDeleted(pTask);
+				break;
 			}
 		}
-		function allTasksFinished (pTask) {
+		
+		$scope.allTasksStatusFinished = function (pTask) {
+			var lOrigin = pTask.status;
 			Tasks.setFinished(pTask.id, function (pResult) {
 				var lNbElements = $scope.allTasks.length;
 				for (var i=0; i<lNbElements; i++) {
@@ -323,14 +331,15 @@
 					}
 				}
 				var lCancelFunction = function() {
-					allTasksOpened(pResult);
+					cancel(lOrigin, pResult);
 				};
 				var lMsg = "La tâche est marquée terminée."; //TODO TR
 				var lType = "success";
 				setActionDone(lMsg, lType, lCancelFunction);
 			});
 		};
-		function allTasksOpened (pTask) {
+		$scope.allTasksStatusOpened = function (pTask) {
+			var lOrigin = pTask.status;
 			Tasks.setOpened(pTask.id, function (pResult) {
 				var lNbElements = $scope.allTasks.length;
 				for (var i=0; i<lNbElements; i++) {
@@ -339,9 +348,26 @@
 					}
 				}
 				var lCancelFunction = function() {
-					allTasksFinished(pResult);
+					cancel(lOrigin, pResult);
 				};
 				var lMsg = "La tâche est marquée ouverte."; //TODO TR
+				var lType = "success";
+				setActionDone(lMsg, lType, lCancelFunction);
+			});
+		};
+		$scope.allTasksStatusDeleted = function (pTask) {
+			var lOrigin = pTask.status;
+			Tasks.setDeleted(pTask.id, function (pResult) {
+				var lNbElements = $scope.allTasks.length;
+				for (var i=0; i<lNbElements; i++) {
+					if ($scope.allTasks[i].id == pResult.id) {
+						$scope.allTasks[i] = pResult;
+					}
+				}
+				var lCancelFunction = function() {
+					cancel(lOrigin, pResult);
+				};
+				var lMsg = "La tâche est supprimée."; //TODO TR
 				var lType = "success";
 				setActionDone(lMsg, lType, lCancelFunction);
 			});

@@ -38,8 +38,14 @@
 		</div>
 		<ul class="list-group">
 			<li class="list-group-item" ng-repeat="task in allTasks" ng-if="!allTasksIsHidded(task)">
-				<button class="btn btn-default" ng-click="allTasksStatusToggle(task)">
-					<span class="glyphicon glyphicon-saved"></span>
+				<button class="btn btn-primary" ng-if="task.status=='OPENED' || task.status=='DELETED'" ng-click="allTasksStatusFinished(task)">
+					<span class="glyphicon glyphicon-ok"></span>
+				</button>
+				<button class="btn btn-primary" ng-if="task.status=='FINISHED'" ng-click="allTasksStatusOpened(task)">
+					<span class="glyphicon glyphicon-refresh"></span>
+				</button>
+				<button class="btn btn-primary" ng-if="task.status=='FINISHED'" ng-click="allTasksStatusDeleted(task)">
+					<span class="glyphicon glyphicon-trash"></span>
 				</button>
 				{{task.text}}
 				<span class="badge" ng-repeat="place in task.places" ng-click="allTasksAddToFilters('@' + place)" tooltip="Add to filters">@{{place}} </span>
