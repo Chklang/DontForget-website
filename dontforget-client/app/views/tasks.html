@@ -15,7 +15,14 @@
 	</div>
 </form>
 <fieldset>
-	<legend>Tâches</legend>
+	<legend>Tâches
+	<div class="btn-group pull-right">
+        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'OPENED'" uncheckable>In progress</label>
+        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'FINISHED'" uncheckable>Finished</label>
+        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'DELETED'" uncheckable>Deleted</label>
+        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'ALL'" uncheckable>All</label>
+    </div>
+    </legend>
 	<form>
 		<div class="form-group has-feedback">
 		  <label class="control-label" for="filterAllTasks">Filter by</label>

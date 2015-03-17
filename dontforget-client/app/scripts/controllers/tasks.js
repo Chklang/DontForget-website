@@ -16,6 +16,7 @@
 		var lAllPlaces = [];
 		$scope.allTasks = [];
 		$scope.allTasksFilter = "";
+		$scope.allTasksModeView = "OPENED";
 		
 		Tags.getAll(function (pResults) {
 			lAllTags = pResults;
@@ -263,6 +264,9 @@
 		var lLastValueAllTasksFilter = null;
 		
 		$scope.allTasksIsHidded = function (pTask) {
+			if ($scope.allTasksModeView != 'ALL' && pTask.status != $scope.allTasksModeView) {
+				return true;
+			}
 			if ($scope.allTasksFilter == null) {
 				return false;
 			}
