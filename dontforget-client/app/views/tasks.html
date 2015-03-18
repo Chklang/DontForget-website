@@ -1,1 +1,50 @@
-<p>This is the tasks view.</p>
+<form>
+	<div class="form-group">
+		<label for="addTask">Tâche :</label>
+		<div class="dropdown" ng-class="{open:openTaskDropdown}">
+			<input type="text" ng-click="addTaskClick()" ng-keyup="addTaskKeyUp($event)" ng-keydown="addTaskKeyDown($event)" class="form-control" id="addTask"
+				placeholder="Entrez ici votre tâche" ng-model="addTaskValue" />
+			<ul class="dropdown-menu" role="menu" aria-labelledby="addTask">
+				<li role="presentation" ng-if="currentWord != null">{{currentWord}}</li>
+				<li
+					role="presentation"
+					ng-repeat="(index, element) in addTaskDropdownValue track by $index"
+					ng-class="{selected: addTaskDropdownIndexIsSelected(index), hidden:addTaskDropdownIndexIsHidded(element)}">{{index}} : {{element}}</li>
+			</ul>
+		</div>
+	</div>
+</form>
+<alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert(alert)">
+{{alert.msg}}
+<button class="btn btn-sucess" ng-click="cancelAction(alert)">Cancel</button>
+</alert>
+<fieldset>
+	<legend>Tâches
+		<span class="btn-group pull-right">
+	        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'OPENED'" uncheckable>In progress</label>
+	        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'FINISHED'" uncheckable>Finished</label>
+	        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'DELETED'" uncheckable>Deleted</label>
+	        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'ALL'" uncheckable>All</label>
+	    </span>
+    </legend>
+	<form>
+		<div class="form-group has-feedback">
+		  <label class="control-label" for="filterAllTasks">Filter by</label>
+		  <div class="input-group">
+			    <a ng-click="allTasksFilter = ''" style="top:0px" class="btn glyphicon glyphicon-remove input-group-addon"></a>
+			    <input type="text" class="form-control" id="filterAllTasks" ng-model="allTasksFilter" />
+		    </div>
+		    <span class="glyphicon glyphicon-search form-control-feedback"></span>
+		</div>
+		<ul class="list-group">
+			<li class="list-group-item" ng-repeat="task in allTasks" ng-if="!allTasksIsHidded(task)">
+				<button class="btn btn-default" ng-click="allTasksStatusToggle(task)">
+					<span class="glyphicon glyphicon-saved"></span>
+				</button>
+				{{task.text}}
+				<span class="badge" ng-repeat="place in task.places" ng-click="allTasksAddToFilters('@' + place)" tooltip="Add to filters">@{{place}} </span>
+				<span class="badge" ng-repeat="tag in task.tags" ng-click="allTasksAddToFilters('#' + tag)" tooltip="Add to filters">#{{tag}} </span>
+			</li>
+		</ul>
+	</form>
+</fieldset>

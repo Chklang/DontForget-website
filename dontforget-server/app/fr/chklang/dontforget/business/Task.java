@@ -8,6 +8,8 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -47,6 +49,10 @@ public class Task extends Model {
 	
 	@ManyToMany(targetEntity=Place.class)
 	private Set<Place> places;
+	
+	@Enumerated(EnumType.STRING)
+	@Column(name="taskStatus", length=8, nullable=false)
+	private TaskStatus taskStatus;
 	
 	public static final TaskDAO dao = new TaskDAO();
 
@@ -118,5 +124,19 @@ public class Task extends Model {
 	 */
 	public void setPlaces(Set<Place> places) {
 		this.places = places;
+	}
+
+	/**
+	 * @return the taskStatus
+	 */
+	public TaskStatus getTaskStatus() {
+		return taskStatus;
+	}
+
+	/**
+	 * @param taskStatus the taskStatus to set
+	 */
+	public void setTaskStatus(TaskStatus taskStatus) {
+		this.taskStatus = taskStatus;
 	}
 }

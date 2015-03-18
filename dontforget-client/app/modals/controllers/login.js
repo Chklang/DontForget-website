@@ -9,9 +9,10 @@
 	var myApp = angular.module('dontforgetApp');
 	myApp.controller('LoginCtrl', [
 			'$scope',
+			'$state',
 			'User',
 			'Connection',
-			function($scope, User, Connection) {
+			function($scope, $state, User, Connection) {
 				$scope.isNewCompte = false;
 				var lLoginIsOK = false;
 
@@ -50,7 +51,7 @@
 							function() {
 								// Connexion OK
 								lLoginIsOK = true;
-								$scope.action = "/#/game";
+								$state.transitionTo('tasks');
 								window.modalInstance.close(true);
 							});
 					return false;

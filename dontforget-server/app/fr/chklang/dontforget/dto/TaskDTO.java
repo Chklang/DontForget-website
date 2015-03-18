@@ -35,5 +35,8 @@ public class TaskDTO extends ObjectNode {
 			lPlaces.add(lPlace.getPlace());
 		}
 		this.put("places", lPlaces);
+		this.put("status", pTask.getTaskStatus().name());
+		
+		this.put("id", pTask.getIdTask());
 	}
 }

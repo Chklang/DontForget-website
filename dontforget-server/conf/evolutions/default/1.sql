@@ -23,6 +23,8 @@ create table T_TASK (
   idTask                    integer not null,
   idUser                    integer,
   text                      varchar(5000) not null,
+  taskStatus                varchar(8) not null,
+  constraint ck_T_TASK_taskStatus check (taskStatus in ('OPENED','FINISHED','DELETED')),
   constraint pk_T_TASK primary key (idTask))
 ;
 
