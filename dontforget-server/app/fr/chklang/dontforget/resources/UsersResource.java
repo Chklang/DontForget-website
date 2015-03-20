@@ -7,13 +7,14 @@ import java.util.concurrent.Callable;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
+import play.libs.Json;
+import play.mvc.Result;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import fr.chklang.dontforget.business.User;
 import fr.chklang.dontforget.helpers.SessionHelper;
-import play.libs.Json;
-import play.mvc.Result;
 
 /**
  * @author Chklang

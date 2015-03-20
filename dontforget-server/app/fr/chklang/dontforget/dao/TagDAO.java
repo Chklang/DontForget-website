@@ -8,6 +8,9 @@ import fr.chklang.dontforget.business.User;
 
 public class TagDAO extends Finder<Integer, Tag> {
 
+	/** SVUID */
+	private static final long serialVersionUID = 31535730751549435L;
+
 	public TagDAO() {
 		super(Integer.class, Tag.class);
 	}

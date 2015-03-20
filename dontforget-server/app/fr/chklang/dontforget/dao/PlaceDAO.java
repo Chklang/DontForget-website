@@ -8,6 +8,9 @@ import fr.chklang.dontforget.business.User;
 
 public class PlaceDAO extends Finder<Integer, Place> {
 
+	/** SVUID */
+	private static final long serialVersionUID = -1645532994969895002L;
+
 	public PlaceDAO() {
 		super(Integer.class, Place.class);
 	}
