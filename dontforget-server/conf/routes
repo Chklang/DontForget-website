@@ -18,3 +18,5 @@ DELETE	/rest/tags/:name							fr.chklang.dontforget.resources.TagsResource.delet
 
 GET		/rest/places								fr.chklang.dontforget.resources.PlacesResource.findAll()
 DELETE	/rest/places/:name							fr.chklang.dontforget.resources.PlacesResource.delete(name:String)
+
+GET		/rest/tasksCategories						fr.chklang.dontforget.resources.TasksCategoriesResource.findAll()
