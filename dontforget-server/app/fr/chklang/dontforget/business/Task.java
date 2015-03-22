@@ -15,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import play.db.ebean.Model;
@@ -48,10 +49,14 @@ public class Task extends Model {
 	
 	@ManyToMany(targetEntity=Place.class)
 	private Set<Place> places;
+
+	@ManyToOne(targetEntity=Category.class)
+	@Column(name="idCategory")
+	private Category category;
 	
 	@Enumerated(EnumType.STRING)
-	@Column(name="taskStatus", length=8, nullable=false)
-	private TaskStatus taskStatus;
+	@Column(name="status", length=8, nullable=false)
+	private TaskStatus status;
 	
 	public static final TaskDAO dao = new TaskDAO();
 
@@ -126,16 +131,30 @@ public class Task extends Model {
 	}
 
 	/**
-	 * @return the taskStatus
+	 * @return the status
 	 */
-	public TaskStatus getTaskStatus() {
-		return taskStatus;
+	public TaskStatus getStatus() {
+		return status;
 	}
 
 	/**
-	 * @param taskStatus the taskStatus to set
+	 * @param status the status to set
 	 */
-	public void setTaskStatus(TaskStatus taskStatus) {
-		this.taskStatus = taskStatus;
+	public void setStatus(TaskStatus status) {
+		this.status = status;
+	}
+
+	/**
+	 * @return the category
+	 */
+	public Category getCategory() {
+		return category;
+	}
+
+	/**
+	 * @param category the category to set
+	 */
+	public void setCategory(Category category) {
+		this.category = category;
 	}
 }

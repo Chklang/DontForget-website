@@ -1,6 +1,3 @@
-/**
- * 
- */
 package fr.chklang.dontforget.business;
 
 import javax.persistence.Column;
@@ -14,34 +11,33 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import play.db.ebean.Model;
-import fr.chklang.dontforget.dao.TagDAO;
+import fr.chklang.dontforget.dao.CategoryDAO;
 
-/**
- * @author Chklang
- *
- */
 @Entity
-@Table(name="T_TAG", uniqueConstraints={
+@Table(name="T_TASK_CATEGORY", uniqueConstraints={
 		@UniqueConstraint(columnNames={"idUser", "name"})
 })
-public class Tag extends Model {
-
+public class Category extends Model {
 	/** SVUID */
-	private static final long serialVersionUID = 956798745364L;
+	private static final long serialVersionUID = 56789876434L;
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
+	@Column(name="id")
 	private int id;
 	
 	@ManyToOne(targetEntity=User.class)
 	@JoinColumn(name="idUser")
 	private User user;
-	
-	@ManyToOne(targetEntity=String.class)
-	@Column(name="name")
+
+	@Column(name="name", unique=true)
 	private String name;
 	
-	public static final TagDAO dao = new TagDAO();
+	public static final CategoryDAO dao = new CategoryDAO();
+
+	public Category() {
+		super();
+	}
 
 	/**
 	 * @return the id

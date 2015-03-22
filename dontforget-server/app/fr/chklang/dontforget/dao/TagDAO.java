@@ -20,6 +20,6 @@ public class TagDAO extends Finder<Integer, Tag> {
 	}
 	
 	public Tag findByTagAndUser(User pUser, String pTag) {
-		return this.where().eq("user", pUser).eq("tag", pTag).findUnique();
+		return this.where().eq("user", pUser).eq("name", pTag).findUnique();
 	}
 }

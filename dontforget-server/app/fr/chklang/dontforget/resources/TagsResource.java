@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import fr.chklang.dontforget.business.Tag;
+import fr.chklang.dontforget.dto.TagDTO;
 
 /**
  * @author Chklang
@@ -29,7 +30,7 @@ public class TagsResource extends AbstractRest {
 				ObjectNode lFactory = Json.newObject();
 				ArrayNode lResults = lFactory.arrayNode();
 				for(Tag lTag : lTags) {
-					lResults.add(lTag.getTag());
+					lResults.add(new TagDTO(lTag));
 				}
 				return ok(lResults);
 			}

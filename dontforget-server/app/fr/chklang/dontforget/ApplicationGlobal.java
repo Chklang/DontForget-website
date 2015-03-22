@@ -15,9 +15,8 @@ import play.libs.F.Promise;
 import play.mvc.Http.RequestHeader;
 import play.mvc.Result;
 import play.mvc.Results;
-import fr.chklang.dontforget.business.TaskCategorie;
-import fr.chklang.dontforget.business.DefaultTasksCategoriesManager;
 import fr.chklang.dontforget.exceptions.WebException;
+import fr.chklang.dontforget.managers.CategoriesManager;
 import fr.chklang.dontforget.managers.LangsManager;
 
 /**
@@ -36,7 +35,7 @@ public class ApplicationGlobal extends GlobalSettings {
 		@SuppressWarnings("unchecked")
 		Map<String, List<String>> lTasksCategories = (Map<String, List<String>>) lTasksCategoriesObject;
 		
-		DefaultTasksCategoriesManager lTasksCategoriesManager = DefaultTasksCategoriesManager.getInstance();
+		CategoriesManager lTasksCategoriesManager = CategoriesManager.getInstance();
 		
 		for (Entry<String, List<String>> lEntry : lTasksCategories.entrySet()) {
 			String lLanguage = lEntry.getKey();
@@ -49,9 +48,9 @@ public class ApplicationGlobal extends GlobalSettings {
 		
 		for (Entry<String, List<String>> lEntry : lTasksCategories.entrySet()) {
 			Lang lLang = Lang.forCode(lEntry.getKey());
-			List<TaskCategorie> lTasksList = lTasksCategoriesManager.getTasks(lLang);
-			for (TaskCategorie lTaskCategorie : lTasksList) {
-				Logger.debug("For lang " + lLang + ", key : " + lTaskCategorie.getName() + ", index = " + lTaskCategorie.getId());
+			List<String> lTasksList = lTasksCategoriesManager.getTasks(lLang);
+			for (String lTaskCategorie : lTasksList) {
+				Logger.debug("For lang " + lLang + ", key : " + lTaskCategorie);
 			}
 		}
     }

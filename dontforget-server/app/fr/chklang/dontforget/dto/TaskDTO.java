@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import fr.chklang.dontforget.business.Category;
 import fr.chklang.dontforget.business.Place;
 import fr.chklang.dontforget.business.Tag;
 import fr.chklang.dontforget.business.Task;
@@ -22,21 +23,21 @@ public class TaskDTO extends ObjectNode {
 	public TaskDTO(Task pTask) {
 		super(mapper.getNodeFactory());
 
+		this.put("id", pTask.getIdTask());
 		this.put("text", pTask.getText());
+		this.put("status", pTask.getStatus().name());
 		
 		ArrayNode lTags = this.arrayNode();
 		for (Tag lTag : pTask.getTags()) {
-			lTags.add(lTag.getTag());
+			lTags.add(new TagDTO(lTag));
 		}
 		this.put("tags", lTags);
 		
 		ArrayNode lPlaces = this.arrayNode();
 		for (Place lPlace : pTask.getPlaces()) {
-			lPlaces.add(lPlace.getPlace());
+			lPlaces.add(new PlaceDTO(lPlace));
 		}
-		this.put("places", lPlaces);
-		this.put("status", pTask.getTaskStatus().name());
 		
-		this.put("id", pTask.getIdTask());
+		this.put("category", pTask.getCategory().getName());
 	}
 }

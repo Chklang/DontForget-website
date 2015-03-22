@@ -3,6 +3,7 @@
  */
 package fr.chklang.dontforget.resources;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -13,8 +14,10 @@ import play.mvc.Result;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import fr.chklang.dontforget.business.Category;
 import fr.chklang.dontforget.business.User;
 import fr.chklang.dontforget.helpers.SessionHelper;
+import fr.chklang.dontforget.managers.CategoriesManager;
 
 /**
  * @author Chklang
@@ -43,6 +46,17 @@ public class UsersResource extends AbstractRest {
 				lUser.save();
 				
 				SessionHelper.setPlayerId(session(), lUser);
+				
+				//Create categories
+				CategoriesManager lCategoriesManager = CategoriesManager.getInstance();
+				List<String> lDefaultCategories = lCategoriesManager.getTasks(request().acceptLanguages());
+				for (String lDefaultCategory : lDefaultCategories) {
+					Category lCategory = new Category();
+					lCategory.setName(lDefaultCategory);
+					lCategory.setUser(lUser);
+					lCategory.save();
+				}
+				
 				return ok();
 			}
 		});

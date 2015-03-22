@@ -1,4 +1,4 @@
-package fr.chklang.dontforget.dao;
+package fr.chklang.dontforget.rest;
 import java.util.List;
 
 import org.junit.Assert;

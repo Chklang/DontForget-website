@@ -89,4 +89,14 @@ public abstract class AbstractRest extends Controller {
 		User lUser = User.dao.byId(SessionHelper.getUserId(session()));
 		return lUser;
 	}
+	
+	
+    // -- CONFLICT
+
+    /**
+     * Generates a 409 CONFLICT simple result.
+     */
+	protected static Status conflict() {
+        return new Status(play.core.j.JavaResults.Conflict());
+    }
 }
