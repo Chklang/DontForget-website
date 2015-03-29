@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="connection_url">Serveur</string>
+    <string name="connection_port">Port</string>
+    <string name="connection_login">Identifiant</string>
+    <string name="connection_password">Mot de passe</string>
+    <string name="connection_send">Connexion</string>
+
+    <string name="categories_all">Toutes</string>
+    <string name="drawer_open">drawer_open</string>
+    <string name="drawer_close">drawer_close</string>
+</resources>
