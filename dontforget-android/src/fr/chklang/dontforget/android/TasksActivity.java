@@ -13,14 +13,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import fr.chklang.dontforget.android.dto.CategoryDTO;
 import fr.chklang.dontforget.android.dto.TaskDTO;
+import fr.chklang.dontforget.android.dto.TaskStatus;
 import fr.chklang.dontforget.android.services.AbstractService.Result;
 import fr.chklang.dontforget.android.services.CategoriesService;
 import fr.chklang.dontforget.android.services.TasksService;
@@ -35,17 +38,22 @@ public class TasksActivity extends Activity {
 
 	private BaseAdapter tasksAdapter;
 	private BaseAdapter categoriesAdapter;
-
+	private TaskStatus currentStatus;
+	private CategoryDTO currentCategory;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_tasks);
 
 		categories_ALL = getResources().getString(R.string.categories_all);
+		currentStatus = TaskStatus.OPENED;
 
-		setCategoriesAdapter();
-		setTasksAdapter();
+		initializeActionsButtons();
+		initializeCategoriesAdapter();
+		initializeTasksAdapter();
 		refreshCategories();
+		actualiseTasksList();
 	}
 
 	private void refreshCategories() {
@@ -55,6 +63,58 @@ public class TasksActivity extends Activity {
 		tasks.clear();
 		tasks.addAll(TasksService.getAll().get());
 		categoriesAdapter.notifyDataSetChanged();
+	}
+	
+	private void initializeActionsButtons() {
+		ImageView lButtonInprogress = (ImageView) findViewById(R.id.tasks_inprogress);
+		ImageView lButtonFinished = (ImageView) findViewById(R.id.tasks_finished);
+		ImageView lButtonDeleted = (ImageView) findViewById(R.id.tasks_deleted);
+		ImageView lButtonAll = (ImageView) findViewById(R.id.tasks_all);
+		lButtonInprogress.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				currentStatus = TaskStatus.OPENED;
+				actualiseTasksList();
+			}
+		});
+		lButtonFinished.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				currentStatus = TaskStatus.FINISHED;
+				actualiseTasksList();
+			}
+		});
+		lButtonDeleted.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				currentStatus = TaskStatus.DELETED;
+				actualiseTasksList();
+			}
+		});
+		lButtonAll.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				currentStatus = null;
+				actualiseTasksList();
+			}
+		});
+	}
+	
+	private void actualiseTasksList() {
+		currentTasks.clear();
+		for (TaskDTO lTask : tasks) {
+			if (currentCategory == null || currentCategory.getName().equals(lTask.getCategoryName())) {
+				if (currentStatus == null) {
+					currentTasks.add(lTask);
+					continue;
+				}
+				if (currentStatus == lTask.getStatus()) {
+					currentTasks.add(lTask);
+					continue;
+				}
+			}
+		}
+		tasksAdapter.notifyDataSetChanged();
 	}
 
 	/* Called whenever we call invalidateOptionsMenu() */
@@ -67,7 +127,7 @@ public class TasksActivity extends Activity {
 		return super.onPrepareOptionsMenu(menu);
 	}
 
-	private void setTasksAdapter() {
+	private void initializeTasksAdapter() {
 		tasksAdapter = new BaseAdapter() {
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
@@ -114,7 +174,7 @@ public class TasksActivity extends Activity {
 		tasks_view.setAdapter(tasksAdapter);
 	}
 
-	private void setCategoriesAdapter() {
+	private void initializeCategoriesAdapter() {
 		categoriesAdapter = new BaseAdapter() {
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
@@ -198,17 +258,13 @@ public class TasksActivity extends Activity {
 	}
 
 	private void changeCategory(int pIndex) {
-		currentTasks.clear();
 		if (pIndex == 0) {
+			currentCategory = null;
 			currentTasks.addAll(tasks);
 		} else {
 			CategoryDTO lCategory = categories.get(pIndex - 1);
-			for (TaskDTO lTask : tasks) {
-				if (lCategory.getName().equals(lTask.getCategoryName())) {
-					currentTasks.add(lTask);
-				}
-			}
+			currentCategory = lCategory;
 		}
-		tasksAdapter.notifyDataSetChanged();
+		actualiseTasksList();
 	}
 }
