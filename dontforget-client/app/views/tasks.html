@@ -1,4 +1,7 @@
 <tabset>
+    <tab active="category_all" select="changeCurrentCategory(null)">
+    	<tab-heading>Toutes</tab-heading>
+    </tab>
     <tab ng-repeat="category in categories" active="category.active" select="changeCurrentCategory(category)">
     	<tab-heading>{{category.name}}</tab-heading>
     </tab>
@@ -53,8 +56,8 @@
 					<span class="glyphicon glyphicon-trash"></span>
 				</button>
 				{{task.text}}
-				<span class="badge" ng-repeat="place in task.places" ng-click="allTasksAddToFilters('@' + place)" tooltip="Add to filters">@{{place.name}} </span>
-				<span class="badge" ng-repeat="tag in task.tags" ng-click="allTasksAddToFilters('#' + tag)" tooltip="Add to filters">#{{tag.name}} </span>
+				<span class="badge" ng-repeat="place in task.places" ng-click="allTasksAddToFilters('@' + place.name)" tooltip="Add to filters">@{{place.name}} </span>
+				<span class="badge" ng-repeat="tag in task.tags" ng-click="allTasksAddToFilters('#' + tag.name)" tooltip="Add to filters">#{{tag.name}} </span>
 			</li>
 		</ul>
 	</form>

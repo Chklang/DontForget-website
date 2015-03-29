@@ -20,6 +20,7 @@
 		$scope.allTasksFilter = "";
 		$scope.allTasksModeView = "OPENED";
 		$scope.alerts = [];
+		$scope.category_all = false;
 		
 		Tags.getAll(function (pResults) {
 			lAllTags = pResults;
@@ -38,6 +39,12 @@
 			pResults[0].active = true;
 		});
 		$scope.changeCurrentCategory = function (pCategory) {
+			if (pCategory == null) {
+				$scope.currentCategory = null;
+				$scope.category_all = true;
+			} else {
+				$scope.category_all = false;
+			}
 			$scope.currentCategory = pCategory.name;
 			angular.forEach($scope.categories, function (pEntry) {
 				pEntry.active = $scope.currentCategory == pEntry.name;
@@ -154,6 +161,10 @@
 					if ($scope.addTaskValue.trim() == "") {
 						return;
 					}
+					if ($scope.currentCategory == null) {
+						alert("Veuillez choisir une catégorie");
+						return;
+					}
 					Tasks.create($scope.currentCategory, $scope.addTaskValue, function (pResult) {
 						$scope.allTasks.push(pResult);
 						$scope.addTaskValue = "";
@@ -190,6 +201,11 @@
 			case 13://Enter
 				if ($scope.addTaskDropdownIndexSelected >= 0) {
 					//Put the selection into text
+					if ($scope.addTaskDropdownIndexSelected == 0) {
+						$scope.addTaskValue += " ";
+						addTaskDropdownToggle();
+						return;
+					}
 					replaceCurrentWord(addTaskElement, lCurrentPrefix + $scope.addTaskDropdownValue[$scope.addTaskDropdownIndexSelected]);
 				}
 				break;
@@ -304,7 +320,7 @@
 		var lLastValueAllTasksFilter = null;
 		
 		$scope.allTasksIsShowed = function (pTask) {
-			if ($scope.currentCategory != pTask.category) {
+			if ($scope.currentCategory != null && $scope.currentCategory != pTask.category) {
 				return false;
 			}
 			if ($scope.allTasksModeView != 'ALL' && pTask.status != $scope.allTasksModeView) {
