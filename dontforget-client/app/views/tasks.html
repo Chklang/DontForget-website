@@ -5,6 +5,9 @@
     <tab ng-repeat="category in categories" active="category.active" select="changeCurrentCategory(category)">
     	<tab-heading>{{category.name}}</tab-heading>
     </tab>
+    <tab active="false">
+    	<tab-heading><img src="images/add-icon.png" style="height:16px;" /></tab-heading>
+    </tab>
 </tabset>
 <form>
 	<div class="form-group">

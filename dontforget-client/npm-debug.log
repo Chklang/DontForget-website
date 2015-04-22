@@ -1,0 +1,57 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'C:\\Program Files\\nodejs\\\\node.exe',
+1 verbose cli   'C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js',
+1 verbose cli   'install',
+1 verbose cli   'grunt-responsive-images',
+1 verbose cli   '--save-dev' ]
+2 info using npm@2.7.0
+3 info using node@v0.12.0
+4 verbose node symlink C:\Program Files\nodejs\\node.exe
+5 warn package.json karma-phantomjs-launcher@0.1.4 No README data
+6 silly cache add args [ 'grunt-responsive-images', null ]
+7 verbose cache add spec grunt-responsive-images
+8 silly cache add parsed spec { raw: 'grunt-responsive-images',
+8 silly cache add   scope: null,
+8 silly cache add   name: 'grunt-responsive-images',
+8 silly cache add   rawSpec: '',
+8 silly cache add   spec: '*',
+8 silly cache add   type: 'range' }
+9 verbose addNamed grunt-responsive-images@*
+10 silly addNamed semver.valid null
+11 silly addNamed semver.validRange *
+12 silly addNameRange { name: 'grunt-responsive-images', range: '*', hasData: false }
+13 silly mapToRegistry name grunt-responsive-images
+14 silly mapToRegistry using default registry
+15 silly mapToRegistry registry http://126.9.101.19:8082/nexus/content/groups/PublicNpmRepo/
+16 silly mapToRegistry uri http://126.9.101.19:8082/nexus/content/groups/PublicNpmRepo/grunt-responsive-images
+17 verbose addNameRange registry:http://126.9.101.19:8082/nexus/content/groups/PublicNpmRepo/grunt-responsive-images not in flight; fetching
+18 verbose request uri http://126.9.101.19:8082/nexus/content/groups/PublicNpmRepo/grunt-responsive-images
+19 verbose request no auth needed
+20 info attempt registry request try #1 at 13:43:36
+21 verbose request id dd26cf85d1318629
+22 http request GET http://126.9.101.19:8082/nexus/content/groups/PublicNpmRepo/grunt-responsive-images
+23 info retry will retry, error on last attempt: Error: read ECONNRESET
+24 info attempt registry request try #2 at 13:43:46
+25 http request GET http://126.9.101.19:8082/nexus/content/groups/PublicNpmRepo/grunt-responsive-images
+26 info retry will retry, error on last attempt: Error: read ECONNRESET
+27 info attempt registry request try #3 at 13:44:46
+28 http request GET http://126.9.101.19:8082/nexus/content/groups/PublicNpmRepo/grunt-responsive-images
+29 verbose stack Error: read ECONNRESET
+29 verbose stack     at exports._errnoException (util.js:746:11)
+29 verbose stack     at TCP.onread (net.js:550:26)
+30 verbose cwd D:\DONNEES\s0075724\Documents\travail\workspace\DontForget-website\dontforget-client
+31 error Windows_NT 6.1.7601
+32 error argv "C:\\Program Files\\nodejs\\\\node.exe" "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js" "install" "grunt-responsive-images" "--save-dev"
+33 error node v0.12.0
+34 error npm  v2.7.0
+35 error code ECONNRESET
+36 error errno ECONNRESET
+37 error syscall read
+38 error network read ECONNRESET
+38 error network This is most likely not a problem with npm itself
+38 error network and is related to network connectivity.
+38 error network In most cases you are behind a proxy or have bad network settings.
+38 error network
+38 error network If you are behind a proxy, please make sure that the
+38 error network 'proxy' config is set properly.  See: 'npm help config'
+39 verbose exit [ 1, true ]
