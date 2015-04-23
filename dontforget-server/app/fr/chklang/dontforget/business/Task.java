@@ -57,6 +57,9 @@ public class Task extends Model {
 	@Column(name="status", length=8, nullable=false)
 	private TaskStatus status;
 	
+	@Column(name="lastUpdate", nullable=false)
+	private long lastUpdate;
+	
 	public static final TaskDAO dao = new TaskDAO();
 
 	/**
@@ -155,5 +158,19 @@ public class Task extends Model {
 	 */
 	public void setCategory(Category category) {
 		this.category = category;
+	}
+
+	/**
+	 * @return the lastUpdate
+	 */
+	public long getLastUpdate() {
+		return lastUpdate;
+	}
+
+	/**
+	 * @param lastUpdate the lastUpdate to set
+	 */
+	public void setLastUpdate(long lastUpdate) {
+		this.lastUpdate = lastUpdate;
 	}
 }

@@ -33,6 +33,9 @@ public class Category extends Model {
 	@Column(name="name", unique=true)
 	private String name;
 	
+	@Column(name="lastUpdate", nullable=false)
+	private long lastUpdate;
+	
 	public static final CategoryDAO dao = new CategoryDAO();
 
 	public Category() {
@@ -81,4 +84,17 @@ public class Category extends Model {
 		this.name = name;
 	}
 
+	/**
+	 * @return the lastUpdate
+	 */
+	public long getLastUpdate() {
+		return lastUpdate;
+	}
+
+	/**
+	 * @param lastUpdate the lastUpdate to set
+	 */
+	public void setLastUpdate(long lastUpdate) {
+		this.lastUpdate = lastUpdate;
+	}
 }

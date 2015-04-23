@@ -1,5 +1,6 @@
 package fr.chklang.dontforget.dao;
 
+import java.util.Collection;
 import java.util.Set;
 
 import play.db.ebean.Model.Finder;
@@ -21,5 +22,9 @@ public class CategoryDAO extends Finder<Integer, Category> {
 	
 	public Category findByNameAndUser(String pName, User pUser) {
 		return this.where().eq("name", pName).eq("user", pUser).findUnique();
+	}
+	
+	public Collection<Category> findByLastUpdate(long pLastUpdate, User pUser) {
+		return this.where().ge("lastUpdate", pLastUpdate).eq("user", pUser).findList();
 	}
 }

@@ -41,6 +41,9 @@ public class Place extends Model {
 	@Column(name="name")
 	private String name;
 	
+	@Column(name="lastUpdate", nullable=false)
+	private long lastUpdate;
+	
 	public static final PlaceDAO dao = new PlaceDAO();
 
 	/**
@@ -83,5 +86,19 @@ public class Place extends Model {
 	 */
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	/**
+	 * @return the lastUpdate
+	 */
+	public long getLastUpdate() {
+		return lastUpdate;
+	}
+
+	/**
+	 * @param lastUpdate the lastUpdate to set
+	 */
+	public void setLastUpdate(long lastUpdate) {
+		this.lastUpdate = lastUpdate;
 	}
 }

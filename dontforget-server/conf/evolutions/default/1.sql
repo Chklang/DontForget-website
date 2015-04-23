@@ -7,6 +7,7 @@ create table T_TASK_CATEGORY (
   id                        integer not null,
   idUser                    integer,
   name                      varchar(255),
+  lastUpdate                bigint not null,
   constraint uq_T_TASK_CATEGORY_name unique (name),
   constraint uq_T_TASK_CATEGORY_1 unique (idUser,name),
   constraint pk_T_TASK_CATEGORY primary key (id))
@@ -16,6 +17,7 @@ create table T_PLACE (
   id                        integer not null,
   idUser                    integer,
   name                      varchar(255),
+  lastUpdate                bigint not null,
   constraint uq_T_PLACE_1 unique (idUser,name),
   constraint pk_T_PLACE primary key (id))
 ;
@@ -24,6 +26,7 @@ create table T_TAG (
   id                        integer not null,
   idUser                    integer,
   name                      varchar(255),
+  lastUpdate                bigint not null,
   constraint uq_T_TAG_1 unique (idUser,name),
   constraint pk_T_TAG primary key (id))
 ;
@@ -34,6 +37,7 @@ create table T_TASK (
   text                      varchar(5000) not null,
   category_id               integer,
   status                    varchar(8) not null,
+  lastUpdate                bigint not null,
   constraint ck_T_TASK_status check (status in ('OPENED','FINISHED','DELETED')),
   constraint pk_T_TASK primary key (idTask))
 ;
@@ -43,6 +47,7 @@ create table T_USER (
   pseudo                    varchar(32) not null,
   password                  varchar(40) not null,
   dateInscription           bigint not null,
+  lastUpdate                bigint not null,
   constraint pk_T_USER primary key (idUser))
 ;
 

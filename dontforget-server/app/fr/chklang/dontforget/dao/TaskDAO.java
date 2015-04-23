@@ -1,5 +1,6 @@
 package fr.chklang.dontforget.dao;
 
+import java.util.Collection;
 import java.util.Set;
 
 import play.db.ebean.Model.Finder;
@@ -22,5 +23,9 @@ public class TaskDAO extends Finder<Integer, Task> {
 	
 	public Set<Task> findByCategoryAndUser(Category pCategory, User pUser) {
 		return this.where().eq("category", pCategory).eq("user", pUser).findSet();
+	}
+	
+	public Collection<Task> findByLastUpdate(long pLastUpdate, User pUser) {
+		return this.where().ge("lastUpdate", pLastUpdate).eq("user", pUser).findList();
 	}
 }

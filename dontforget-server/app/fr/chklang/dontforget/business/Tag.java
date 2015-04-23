@@ -41,6 +41,9 @@ public class Tag extends Model {
 	@Column(name="name")
 	private String name;
 	
+	@Column(name="lastUpdate", nullable=false)
+	private long lastUpdate;
+	
 	public static final TagDAO dao = new TagDAO();
 
 	/**
@@ -85,4 +88,17 @@ public class Tag extends Model {
 		this.name = name;
 	}
 
+	/**
+	 * @return the lastUpdate
+	 */
+	public long getLastUpdate() {
+		return lastUpdate;
+	}
+
+	/**
+	 * @param lastUpdate the lastUpdate to set
+	 */
+	public void setLastUpdate(long lastUpdate) {
+		this.lastUpdate = lastUpdate;
+	}
 }
