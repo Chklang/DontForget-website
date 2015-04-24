@@ -173,7 +173,7 @@
 						angular.forEach(pResult.tags, function (pEntry) {
 							var lIsFound = false;
 							angular.forEach(lAllTags, function (pTag) {
-								if (!lIsFound && pTag == pEntry) {
+								if (!lIsFound && pTag.name == pEntry.name) {
 									lIsFound = true;
 								}
 							});
@@ -185,7 +185,7 @@
 						angular.forEach(pResult.places, function (pEntry) {
 							var lIsFound = false;
 							angular.forEach(lAllPlaces, function (pPlace) {
-								if (!lIsFound && pPlace == pEntry) {
+								if (!lIsFound && pPlace.name == pEntry.name) {
 									lIsFound = true;
 								}
 							});
@@ -202,12 +202,7 @@
 			case 13://Enter
 				if ($scope.addTaskDropdownIndexSelected >= 0) {
 					//Put the selection into text
-					if ($scope.addTaskDropdownIndexSelected == 0) {
-						$scope.addTaskValue += " ";
-						addTaskDropdownToggle();
-						return;
-					}
-					replaceCurrentWord(addTaskElement, lCurrentPrefix + $scope.addTaskDropdownValue[$scope.addTaskDropdownIndexSelected]);
+					replaceCurrentWord(addTaskElement, lCurrentPrefix + $scope.addTaskDropdownValue[$scope.addTaskDropdownIndexSelected].name);
 				}
 				break;
 			case 38://up

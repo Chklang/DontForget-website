@@ -20,7 +20,7 @@
 				<li
 					role="presentation"
 					ng-repeat="(index, element) in addTaskDropdownValue track by $index"
-					ng-class="{selected: addTaskDropdownIndexIsSelected(index), hidden:!addTaskDropdownIndexIsShowed(element)}">{{index}} : {{element}}</li>
+					ng-class="{selected: addTaskDropdownIndexIsSelected(index), hidden:!addTaskDropdownIndexIsShowed(element)}">{{index}} : {{element.name}}</li>
 			</ul>
 		</div>
 	</div>
