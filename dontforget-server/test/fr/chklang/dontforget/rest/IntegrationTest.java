@@ -43,6 +43,13 @@ public class IntegrationTest {
 			lTestRequestHelper.post("users/create", lUserCreate);
 			Assert.assertEquals("La création de l'utilisateur a échoué", 200, lTestRequestHelper.getStatus());
 			
+			//Récupération des types de base
+			lTestRequestHelper.get("categories");
+			Assert.assertEquals("La création de l'utilisateur devrait échouer", 200, lTestRequestHelper.getStatus());
+			JsonNode lCategoriesJson = lTestRequestHelper.getBodyAsJson();
+			Assert.assertTrue("Au moins une categorie doit avoir été trouvée, pas " + lCategoriesJson.size(), lCategoriesJson.size() > 0);
+			String lFirstCategory = lCategoriesJson.get(0).get("name").asText();
+			
 			lTestRequestHelper.post("users/create", lUserCreate);
 			Assert.assertEquals("La création de l'utilisateur devrait échouer", 409, lTestRequestHelper.getStatus());
 			
@@ -56,7 +63,7 @@ public class IntegrationTest {
 			Assert.assertEquals("Il ne doit y avoir aucune tâche pour l'instant", 0, lResponse.size());
 			
 			String lTaskString = "Nouvelle tâche #test @maison";
-			lTestRequestHelper.post("tasks", lTaskString);
+			lTestRequestHelper.post("tasks/"+lFirstCategory, lTaskString);
 			Assert.assertEquals("La création de la tâche a échoué", 200, lTestRequestHelper.getStatus());
 			lResponse = lTestRequestHelper.getBodyAsJson();
 			Assert.assertTrue("Le résultat doit être un objet", lResponse.isObject());
@@ -64,10 +71,10 @@ public class IntegrationTest {
 			Assert.assertEquals("Un tag doit avoit été trouvé", 1, lResponse.get("tags").size());
 			Assert.assertEquals("Un lieu doit avoit été trouvé", 1, lResponse.get("places").size());
 			lResponse.get("tags").forEach((lEntry) -> {
-				Assert.assertEquals("Le tag renvoyé n'est pas bon", "test", lEntry.asText());
+				Assert.assertEquals("Le tag renvoyé n'est pas bon", "test", lEntry.get("name").asText());
 			});
 			lResponse.get("places").forEach((lEntry) -> {
-				Assert.assertEquals("Le lieu renvoyé n'est pas bon", "maison", lEntry.asText());
+				Assert.assertEquals("Le lieu renvoyé n'est pas bon", "maison", lEntry.get("name").asText());
 			});
 			
 			lTestRequestHelper.get("tags");
@@ -76,7 +83,7 @@ public class IntegrationTest {
 			Assert.assertTrue("Le résultat doit être un tableau", lResponse.isArray());
 			Assert.assertEquals("Un tag doit avoit été trouvé", 1, lResponse.size());
 			lResponse.forEach((lEntry) -> {
-				Assert.assertEquals("Le tag renvoyé n'est pas bon", "test", lEntry.asText());
+				Assert.assertEquals("Le tag renvoyé n'est pas bon", "test", lEntry.get("name").asText());
 			});
 			
 			lTestRequestHelper.get("places");
@@ -85,7 +92,7 @@ public class IntegrationTest {
 			Assert.assertTrue("Le résultat doit être un tableau", lResponse.isArray());
 			Assert.assertEquals("Un lieu doit avoit été trouvé", 1, lResponse.size());
 			lResponse.forEach((lEntry) -> {
-				Assert.assertEquals("Le lieu renvoyé n'est pas bon", "maison", lEntry.asText());
+				Assert.assertEquals("Le lieu renvoyé n'est pas bon", "maison", lEntry.get("name").asText());
 			});
 			
 			lTestRequestHelper.post("users/disconnect");
