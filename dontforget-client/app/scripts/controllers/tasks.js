@@ -42,6 +42,7 @@
 			if (pCategory == null) {
 				$scope.currentCategory = null;
 				$scope.category_all = true;
+				return;
 			} else {
 				$scope.category_all = false;
 			}
@@ -320,7 +321,7 @@
 		var lLastValueAllTasksFilter = null;
 		
 		$scope.allTasksIsShowed = function (pTask) {
-			if ($scope.currentCategory != null && $scope.currentCategory != pTask.category) {
+			if ($scope.currentCategory != null && $scope.currentCategory != pTask.category.name) {
 				return false;
 			}
 			if ($scope.allTasksModeView != 'ALL' && pTask.status != $scope.allTasksModeView) {
