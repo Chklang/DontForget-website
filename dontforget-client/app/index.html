@@ -22,12 +22,14 @@
 
 	<!-- Add your site or application content here -->
 	<div class="container" ng-controller="IndexCtrl">
-		<div class="header">
+		<div class="header" style="margin-bottom:0px;">
 			<ul class="nav nav-pills pull-right">
 				<li><a ng-href="#/tasks" ng-class="{ 'disabled' : !isConnected}">Mes tâches</a></li>
 				<li><a ng-href="#/" ng-click="login()">{{isConnected?"Deconnexion":"Connexion"}}</a></li>
 			</ul>
-			<a style="text-decoration:initial" ng-href="#/"><h3 class="text-muted">Don't Forget</h3></a>
+			<a style="text-decoration:initial" ng-href="#/">
+				<h3 class="text-muted" style="padding-bottom:0px;">Don't Forget</h3>
+			</a>
 		</div>
 
 		<div ui-view=""></div>
@@ -71,6 +73,7 @@
 <script src="scripts/services/tags.js"></script>
 <script src="scripts/services/tasks.js"></script>
 <script src="scripts/services/places.js"></script>
+<script src="scripts/services/categories.js"></script>
 	<!-- endbuild -->
 </body>
 </html>

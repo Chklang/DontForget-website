@@ -22,7 +22,7 @@ import fr.chklang.dontforget.dao.PlaceDAO;
  */
 @Entity
 @Table(name="T_PLACE", uniqueConstraints={
-		@UniqueConstraint(columnNames={"idUser", "place"})
+		@UniqueConstraint(columnNames={"idUser", "name"})
 })
 public class Place extends Model {
 
@@ -31,30 +31,33 @@ public class Place extends Model {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
-	private int idPlace;
+	private int id;
 	
 	@ManyToOne(targetEntity=User.class)
 	@JoinColumn(name="idUser")
 	private User user;
 	
 	@ManyToOne(targetEntity=String.class)
-	@Column(name="place")
-	private String place;
+	@Column(name="name")
+	private String name;
+	
+	@Column(name="lastUpdate", nullable=false)
+	private long lastUpdate;
 	
 	public static final PlaceDAO dao = new PlaceDAO();
 
 	/**
-	 * @return the idPlace
+	 * @return the id
 	 */
-	public int getIdPlace() {
-		return idPlace;
+	public int getId() {
+		return id;
 	}
 
 	/**
-	 * @param idPlace the idPlace to set
+	 * @param id the id to set
 	 */
-	public void setIdPlace(int idPlace) {
-		this.idPlace = idPlace;
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	/**
@@ -72,16 +75,30 @@ public class Place extends Model {
 	}
 
 	/**
-	 * @return the place
+	 * @return the name
 	 */
-	public String getPlace() {
-		return place;
+	public String getName() {
+		return name;
 	}
 
 	/**
-	 * @param place the place to set
+	 * @param name the name to set
 	 */
-	public void setPlace(String place) {
-		this.place = place;
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/**
+	 * @return the lastUpdate
+	 */
+	public long getLastUpdate() {
+		return lastUpdate;
+	}
+
+	/**
+	 * @param lastUpdate the lastUpdate to set
+	 */
+	public void setLastUpdate(long lastUpdate) {
+		this.lastUpdate = lastUpdate;
 	}
 }

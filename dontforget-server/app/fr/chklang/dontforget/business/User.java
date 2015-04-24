@@ -35,6 +35,9 @@ public class User extends Model {
 	@Column(name="dateInscription", nullable=false)
 	private long dateInscription;
 	
+	@Column(name="lastUpdate", nullable=false)
+	private long lastUpdate;
+	
 	public static final UserDAO dao = new UserDAO();
 
 	/**
@@ -91,5 +94,19 @@ public class User extends Model {
 	 */
 	public void setDateInscription(long dateInscription) {
 		this.dateInscription = dateInscription;
+	}
+
+	/**
+	 * @return the lastUpdate
+	 */
+	public long getLastUpdate() {
+		return lastUpdate;
+	}
+
+	/**
+	 * @param lastUpdate the lastUpdate to set
+	 */
+	public void setLastUpdate(long lastUpdate) {
+		this.lastUpdate = lastUpdate;
 	}
 }

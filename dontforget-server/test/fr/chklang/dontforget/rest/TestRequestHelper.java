@@ -1,7 +1,7 @@
 /**
  * 
  */
-package fr.chklang.dontforget.dao;
+package fr.chklang.dontforget.rest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

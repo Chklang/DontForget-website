@@ -3,17 +3,20 @@
  */
 package fr.chklang.dontforget.resources;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import fr.chklang.dontforget.business.User;
-import fr.chklang.dontforget.helpers.SessionHelper;
-import play.libs.Json;
 import play.mvc.Result;
+
+import com.fasterxml.jackson.databind.JsonNode;
+
+import fr.chklang.dontforget.business.Category;
+import fr.chklang.dontforget.business.User;
+import fr.chklang.dontforget.dto.UserDTO;
+import fr.chklang.dontforget.helpers.SessionHelper;
+import fr.chklang.dontforget.managers.CategoriesManager;
 
 /**
  * @author Chklang
@@ -42,6 +45,17 @@ public class UsersResource extends AbstractRest {
 				lUser.save();
 				
 				SessionHelper.setPlayerId(session(), lUser);
+				
+				//Create categories
+				CategoriesManager lCategoriesManager = CategoriesManager.getInstance();
+				List<String> lDefaultCategories = lCategoriesManager.getTasks(request().acceptLanguages());
+				for (String lDefaultCategory : lDefaultCategories) {
+					Category lCategory = new Category();
+					lCategory.setName(lDefaultCategory);
+					lCategory.setUser(lUser);
+					lCategory.save();
+				}
+				
 				return ok();
 			}
 		});
@@ -78,11 +92,7 @@ public class UsersResource extends AbstractRest {
 	public static Result me() {
 		return executeAndVerifyConnect(() -> {
 			User lUser = getConnectedUser();
-			
-			ObjectNode lResponse = Json.newObject();
-			lResponse.put("pseudo", lUser.getPseudo());
-			lResponse.put("idUser", lUser.getIdUser());
-			return ok(lResponse);
+			return ok(new UserDTO(lUser));
 		});
 	}
 

@@ -15,6 +15,7 @@ module.exports = function(grunt) {
 	// Time how long tasks take. Can help when optimizing build times
 	require('time-grunt')(grunt);
 	grunt.loadNpmTasks('grunt-connect-proxy');
+	grunt.loadNpmTasks('grunt-responsive-images');
 
 	// Configurable paths for the application
 	var appConfig = {
@@ -154,7 +155,7 @@ module.exports = function(grunt) {
 						files : [ {
 							dot : true,
 							src : [ '.tmp', '<%= yeoman.dist %>/{,*/}*',
-									'!<%= yeoman.dist %>/.git{,*/}*' ]
+									'!<%= yeoman.dist %>/.git{,*/}*','<%= yeoman.app %>/images/{,*/}*' ]
 						} ]
 					},
 					server : '.tmp'
@@ -208,6 +209,29 @@ module.exports = function(grunt) {
 							}
 						}
 					}
+				},
+				responsive_images: {
+					generic: {
+						// Target-specific file lists and/or options go here.
+						options: {
+							sizes: [{
+								name: "icon",
+								width: 48
+							},{
+								name: "small",
+								width: 480
+							},{
+								name: "large",
+								width: 1024
+							}]
+						},
+						files: [{
+							expand: true,
+							src: ['**.{jpg,gif,png}'],
+							cwd: 'app/images.src/',
+							dest: 'app/images'
+						}]
+					},
 				},
 
 				// Renames files for browser caching purposes
@@ -412,7 +436,7 @@ module.exports = function(grunt) {
 							.run([ 'build', 'connect:dist:keepalive' ]);
 				}
 
-				grunt.task.run([ 'clean:server', 'wiredep',
+				grunt.task.run([ 'clean:server', 'responsive_images', 'wiredep',
 						'concurrent:server', 'autoprefixer:server', 'configureProxies:server',
 						'connect:livereload', 'watch' ]);
 			});
@@ -430,10 +454,12 @@ module.exports = function(grunt) {
 	grunt.registerTask('test', [ 'clean:server', 'wiredep', 'concurrent:test',
 			'autoprefixer', 'connect:test', 'karma' ]);
 
-	grunt.registerTask('build', [ 'clean:dist', 'wiredep', 'useminPrepare',
+	grunt.registerTask('build', [ 'clean:dist', 'responsive_images', 'wiredep', 'useminPrepare',
 			'concurrent:dist', 'autoprefixer', 'concat', 'ngAnnotate',
 			'copy:dist', 'cdnify', 'cssmin', 'uglify', 'filerev', 'usemin',
 			'htmlmin' ]);
 
 	grunt.registerTask('default', [ 'newer:jshint', 'test', 'build' ]);
+
+	grunt.registerTask('resp', [ 'clean:dist', 'responsive_images' ]);
 };

@@ -23,6 +23,21 @@
 				}
 			});
 		};
+		this.getAllByCategory = function(pCategoryName, pSuccessCallback) {
+			return restRequest.get({
+				url : '/tasks/' + pCategoryName,
+				success : pSuccessCallback,
+				errorsCodes : {
+					'400' : function(pData) {
+						alert("Problème de paramètres : " + pData);// TODO TR
+					},
+					'default' : function(pData) {
+						alert("Impossible de récupérer la liste des tâches. Erreur inconnue : " + pData);// TODO
+						// TR
+					}
+				}
+			});
+		};
 		this.get = function(pId, pSuccessCallback) {
 			return restRequest.get({
 				url : '/tasks/' + pId,
@@ -38,9 +53,9 @@
 				}
 			});
 		};
-		this.create = function(pText, pSuccessCallback) {
+		this.create = function(pCategoryName, pText, pSuccessCallback) {
 			return restRequest.post({
-				url : '/tasks',
+				url : '/tasks/' + pCategoryName,
 				contentType : "text/plain",
 				data : pText,
 				success : pSuccessCallback,
@@ -94,6 +109,11 @@
 		this.setOpened = function (pId, pSuccessCallback) {
 			return this.update(pId, {
 				status : 'OPENED'
+			}, pSuccessCallback);
+		};
+		this.setDeleted = function (pId, pSuccessCallback) {
+			return this.update(pId, {
+				status : 'DELETED'
 			}, pSuccessCallback);
 		};
 	} ]);

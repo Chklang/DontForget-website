@@ -7,17 +7,20 @@
 	 * @description # TasksCtrl Controller of the dontforgetApp
 	 */
 	var myApp = angular.module('dontforgetApp');
-	myApp.controller('TasksCtrl', [ '$scope', '$state', 'Tags', 'Places', 'Tasks', function($scope, $state, Tags, Places, Tasks) {
+	myApp.controller('TasksCtrl', [ '$scope', '$state', 'Tags', 'Places', 'Categories', 'Tasks', function($scope, $state, Tags, Places, Categories, Tasks) {
 		$scope.openTaskDropdown = false;
 		if (!$scope.isConnected) {
 			$state.transitionTo('main');
 		}
 		var lAllTags = [];
 		var lAllPlaces = [];
+		$scope.categories = [];
+		$scope.currentCategory = null;
 		$scope.allTasks = [];
 		$scope.allTasksFilter = "";
 		$scope.allTasksModeView = "OPENED";
 		$scope.alerts = [];
+		$scope.category_all = false;
 		
 		Tags.getAll(function (pResults) {
 			lAllTags = pResults;
@@ -26,6 +29,28 @@
 		Places.getAll(function (pResults) {
 			lAllPlaces = pResults;
 		});
+		
+		Categories.getAll(function (pResults) {
+			$scope.categories = pResults;
+			angular.forEach(pResults, function (pEntry) {
+				pEntry.active = false;
+			});
+			$scope.currentCategory = pResults[0].name;
+			pResults[0].active = true;
+		});
+		$scope.changeCurrentCategory = function (pCategory) {
+			if (pCategory == null) {
+				$scope.currentCategory = null;
+				$scope.category_all = true;
+				return;
+			} else {
+				$scope.category_all = false;
+			}
+			$scope.currentCategory = pCategory.name;
+			angular.forEach($scope.categories, function (pEntry) {
+				pEntry.active = $scope.currentCategory == pEntry.name;
+			});
+		};
 		
 		Tasks.getAll(function (pResults) {
 			$scope.allTasks = pResults;
@@ -129,11 +154,19 @@
 			addTaskDropdownToggle();
 		};
 		$scope.addTaskKeyDown = function(pEvent) {
+			window.here = $scope;
 			if (!$scope.openTaskDropdown) {
 				switch (pEvent.keyCode) {
 				case 13 :
 					//Save the task
-					Tasks.create($scope.addTaskValue, function (pResult) {
+					if ($scope.addTaskValue.trim() == "") {
+						return;
+					}
+					if ($scope.currentCategory == null) {
+						alert("Veuillez choisir une catégorie");
+						return;
+					}
+					Tasks.create($scope.currentCategory, $scope.addTaskValue, function (pResult) {
 						$scope.allTasks.push(pResult);
 						$scope.addTaskValue = "";
 						
@@ -169,6 +202,11 @@
 			case 13://Enter
 				if ($scope.addTaskDropdownIndexSelected >= 0) {
 					//Put the selection into text
+					if ($scope.addTaskDropdownIndexSelected == 0) {
+						$scope.addTaskValue += " ";
+						addTaskDropdownToggle();
+						return;
+					}
 					replaceCurrentWord(addTaskElement, lCurrentPrefix + $scope.addTaskDropdownValue[$scope.addTaskDropdownIndexSelected]);
 				}
 				break;
@@ -224,15 +262,15 @@
 		
 		var lLastRegexp = null;
 		var lWordOfRegexp = null;
-		$scope.addTaskDropdownIndexIsHidded = function(pValue) {
+		$scope.addTaskDropdownIndexIsShowed = function(pValue) {
 			if ($scope.currentWord == null || $scope.currentWord == "") {
-				return false;
+				return true;
 			}
 			if (lLastRegexp == null || lWordOfRegexp != $scope.currentWord) {
 				lWordOfRegexp = $scope.currentWord;
 				lLastRegexp = new RegExp($scope.currentWord);
 			}
-			return ! (lLastRegexp.test(pValue));
+			return lLastRegexp.test(pValue);
 		}
 		
 		function replaceCurrentWord(pElement, pNewWord) {
@@ -282,12 +320,15 @@
 		var lRegExpAllTasksFilter = null;
 		var lLastValueAllTasksFilter = null;
 		
-		$scope.allTasksIsHidded = function (pTask) {
+		$scope.allTasksIsShowed = function (pTask) {
+			if ($scope.currentCategory != null && $scope.currentCategory != pTask.category.name) {
+				return false;
+			}
 			if ($scope.allTasksModeView != 'ALL' && pTask.status != $scope.allTasksModeView) {
-				return true;
+				return false;
 			}
 			if ($scope.allTasksFilter == null) {
-				return false;
+				return true;
 			}
 			if (lLastValueAllTasksFilter == null || lLastValueAllTasksFilter != $scope.allTasksFilter) {
 				lLastValueAllTasksFilter = $scope.allTasksFilter;
@@ -295,26 +336,34 @@
 			}
 			var lTextTask = pTask.text;
 			angular.forEach(pTask.tags, function (pEntry) {
-				lTextTask += " #" + pEntry;
+				lTextTask += " #" + pEntry.name;
 			});
 			angular.forEach(pTask.places, function (pEntry) {
-				lTextTask += " @" + pEntry;
+				lTextTask += " @" + pEntry.name;
 			});
-			return !lRegExpAllTasksFilter.test(lTextTask);
+			return lRegExpAllTasksFilter.test(lTextTask);
 		};
 		
 		$scope.allTasksAddToFilters = function (pElement) {
 			$scope.allTasksFilter += " " + pElement;
 		};
 		
-		$scope.allTasksStatusToggle = function (pTask) {
-			if (pTask.status == "OPENED") {
-				allTasksFinished(pTask);
-			} else if (pTask.status == "FINISHED") {
-				allTasksOpened(pTask);
+		function cancel(pTo, pTask) {
+			switch (pTo) {
+			case 'OPENED' :
+				$scope.allTasksStatusOpened(pTask);
+				break;
+			case 'FINISHED' :
+				$scope.allTasksStatusFinished(pTask);
+				break;
+			case 'DELETED' :
+				$scope.allTasksStatusDeleted(pTask);
+				break;
 			}
 		}
-		function allTasksFinished (pTask) {
+		
+		$scope.allTasksStatusFinished = function (pTask) {
+			var lOrigin = pTask.status;
 			Tasks.setFinished(pTask.id, function (pResult) {
 				var lNbElements = $scope.allTasks.length;
 				for (var i=0; i<lNbElements; i++) {
@@ -323,14 +372,15 @@
 					}
 				}
 				var lCancelFunction = function() {
-					allTasksOpened(pResult);
+					cancel(lOrigin, pResult);
 				};
 				var lMsg = "La tâche est marquée terminée."; //TODO TR
 				var lType = "success";
 				setActionDone(lMsg, lType, lCancelFunction);
 			});
 		};
-		function allTasksOpened (pTask) {
+		$scope.allTasksStatusOpened = function (pTask) {
+			var lOrigin = pTask.status;
 			Tasks.setOpened(pTask.id, function (pResult) {
 				var lNbElements = $scope.allTasks.length;
 				for (var i=0; i<lNbElements; i++) {
@@ -339,9 +389,26 @@
 					}
 				}
 				var lCancelFunction = function() {
-					allTasksFinished(pResult);
+					cancel(lOrigin, pResult);
 				};
 				var lMsg = "La tâche est marquée ouverte."; //TODO TR
+				var lType = "success";
+				setActionDone(lMsg, lType, lCancelFunction);
+			});
+		};
+		$scope.allTasksStatusDeleted = function (pTask) {
+			var lOrigin = pTask.status;
+			Tasks.setDeleted(pTask.id, function (pResult) {
+				var lNbElements = $scope.allTasks.length;
+				for (var i=0; i<lNbElements; i++) {
+					if ($scope.allTasks[i].id == pResult.id) {
+						$scope.allTasks[i] = pResult;
+					}
+				}
+				var lCancelFunction = function() {
+					cancel(lOrigin, pResult);
+				};
+				var lMsg = "La tâche est supprimée."; //TODO TR
 				var lType = "success";
 				setActionDone(lMsg, lType, lCancelFunction);
 			});

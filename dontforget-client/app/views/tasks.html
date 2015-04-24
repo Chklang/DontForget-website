@@ -1,6 +1,17 @@
+<tabset>
+    <tab active="category_all" select="changeCurrentCategory(null)">
+    	<tab-heading>Toutes</tab-heading>
+    </tab>
+    <tab ng-repeat="category in categories" active="category.active" select="changeCurrentCategory(category)">
+    	<tab-heading>{{category.name}}</tab-heading>
+    </tab>
+    <tab active="false">
+    	<tab-heading><img src="images/add-icon.png" style="height:16px;" /></tab-heading>
+    </tab>
+</tabset>
 <form>
 	<div class="form-group">
-		<label for="addTask">Tâche :</label>
+		<label for="addTask">Nouvelle tâche :</label>
 		<div class="dropdown" ng-class="{open:openTaskDropdown}">
 			<input type="text" ng-click="addTaskClick()" ng-keyup="addTaskKeyUp($event)" ng-keydown="addTaskKeyDown($event)" class="form-control" id="addTask"
 				placeholder="Entrez ici votre tâche" ng-model="addTaskValue" />
@@ -9,7 +20,7 @@
 				<li
 					role="presentation"
 					ng-repeat="(index, element) in addTaskDropdownValue track by $index"
-					ng-class="{selected: addTaskDropdownIndexIsSelected(index), hidden:addTaskDropdownIndexIsHidded(element)}">{{index}} : {{element}}</li>
+					ng-class="{selected: addTaskDropdownIndexIsSelected(index), hidden:!addTaskDropdownIndexIsShowed(element)}">{{index}} : {{element}}</li>
 			</ul>
 		</div>
 	</div>
@@ -19,12 +30,12 @@
 <button class="btn btn-sucess" ng-click="cancelAction(alert)">Cancel</button>
 </alert>
 <fieldset>
-	<legend>Tâches
+	<legend>Tâches enregistées
 		<span class="btn-group pull-right">
-	        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'OPENED'" uncheckable>In progress</label>
-	        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'FINISHED'" uncheckable>Finished</label>
-	        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'DELETED'" uncheckable>Deleted</label>
-	        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'ALL'" uncheckable>All</label>
+	        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'OPENED'" >In progress</label>
+	        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'FINISHED'" >Finished</label>
+	        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'DELETED'" >Deleted</label>
+	        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'ALL'" >All</label>
 	    </span>
     </legend>
 	<form>
@@ -37,13 +48,19 @@
 		    <span class="glyphicon glyphicon-search form-control-feedback"></span>
 		</div>
 		<ul class="list-group">
-			<li class="list-group-item" ng-repeat="task in allTasks" ng-if="!allTasksIsHidded(task)">
-				<button class="btn btn-default" ng-click="allTasksStatusToggle(task)">
-					<span class="glyphicon glyphicon-saved"></span>
+			<li class="list-group-item" ng-repeat="task in allTasks" ng-if="allTasksIsShowed(task)">
+				<button class="btn btn-primary" ng-if="task.status=='OPENED' || task.status=='DELETED'" ng-click="allTasksStatusFinished(task)">
+					<span class="glyphicon glyphicon-ok"></span>
+				</button>
+				<button class="btn btn-primary" ng-if="task.status=='FINISHED'" ng-click="allTasksStatusOpened(task)">
+					<span class="glyphicon glyphicon-refresh"></span>
+				</button>
+				<button class="btn btn-primary" ng-if="task.status=='FINISHED'" ng-click="allTasksStatusDeleted(task)">
+					<span class="glyphicon glyphicon-trash"></span>
 				</button>
 				{{task.text}}
-				<span class="badge" ng-repeat="place in task.places" ng-click="allTasksAddToFilters('@' + place)" tooltip="Add to filters">@{{place}} </span>
-				<span class="badge" ng-repeat="tag in task.tags" ng-click="allTasksAddToFilters('#' + tag)" tooltip="Add to filters">#{{tag}} </span>
+				<span class="badge" ng-repeat="place in task.places" ng-click="allTasksAddToFilters('@' + place.name)" tooltip="Add to filters">@{{place.name}} </span>
+				<span class="badge" ng-repeat="tag in task.tags" ng-click="allTasksAddToFilters('#' + tag.name)" tooltip="Add to filters">#{{tag.name}} </span>
 			</li>
 		</ul>
 	</form>

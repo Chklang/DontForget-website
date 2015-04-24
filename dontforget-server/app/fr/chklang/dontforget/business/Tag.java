@@ -22,7 +22,7 @@ import fr.chklang.dontforget.dao.TagDAO;
  */
 @Entity
 @Table(name="T_TAG", uniqueConstraints={
-		@UniqueConstraint(columnNames={"idUser", "tag"})
+		@UniqueConstraint(columnNames={"idUser", "name"})
 })
 public class Tag extends Model {
 
@@ -31,30 +31,33 @@ public class Tag extends Model {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
-	private int idTag;
+	private int id;
 	
 	@ManyToOne(targetEntity=User.class)
 	@JoinColumn(name="idUser")
 	private User user;
 	
 	@ManyToOne(targetEntity=String.class)
-	@Column(name="tag")
-	private String tag;
+	@Column(name="name")
+	private String name;
+	
+	@Column(name="lastUpdate", nullable=false)
+	private long lastUpdate;
 	
 	public static final TagDAO dao = new TagDAO();
 
 	/**
-	 * @return the idTag
+	 * @return the id
 	 */
-	public int getIdTag() {
-		return idTag;
+	public int getId() {
+		return id;
 	}
 
 	/**
-	 * @param idTag the idTag to set
+	 * @param id the id to set
 	 */
-	public void setIdTag(int idTag) {
-		this.idTag = idTag;
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	/**
@@ -72,17 +75,30 @@ public class Tag extends Model {
 	}
 
 	/**
-	 * @return the tag
+	 * @return the name
 	 */
-	public String getTag() {
-		return tag;
+	public String getName() {
+		return name;
 	}
 
 	/**
-	 * @param tag the tag to set
+	 * @param name the name to set
 	 */
-	public void setTag(String tag) {
-		this.tag = tag;
+	public void setName(String name) {
+		this.name = name;
 	}
 
+	/**
+	 * @return the lastUpdate
+	 */
+	public long getLastUpdate() {
+		return lastUpdate;
+	}
+
+	/**
+	 * @param lastUpdate the lastUpdate to set
+	 */
+	public void setLastUpdate(long lastUpdate) {
+		this.lastUpdate = lastUpdate;
+	}
 }

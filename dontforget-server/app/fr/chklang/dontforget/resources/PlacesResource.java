@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import fr.chklang.dontforget.business.Place;
+import fr.chklang.dontforget.dto.PlaceDTO;
 
 /**
  * @author Chklang
@@ -29,7 +30,7 @@ public class PlacesResource extends AbstractRest {
 				ObjectNode lFactory = Json.newObject();
 				ArrayNode lResults = lFactory.arrayNode();
 				for(Place lPlace : lPlaces) {
-					lResults.add(lPlace.getPlace());
+					lResults.add(new PlaceDTO(lPlace));
 				}
 				return ok(lResults);
 			}

@@ -5,7 +5,6 @@ package fr.chklang.dontforget.business;
 
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -49,10 +48,17 @@ public class Task extends Model {
 	
 	@ManyToMany(targetEntity=Place.class)
 	private Set<Place> places;
+
+	@ManyToOne(targetEntity=Category.class)
+	@Column(name="idCategory")
+	private Category category;
 	
 	@Enumerated(EnumType.STRING)
-	@Column(name="taskStatus", length=8, nullable=false)
-	private TaskStatus taskStatus;
+	@Column(name="status", length=8, nullable=false)
+	private TaskStatus status;
+	
+	@Column(name="lastUpdate", nullable=false)
+	private long lastUpdate;
 	
 	public static final TaskDAO dao = new TaskDAO();
 
@@ -127,16 +133,44 @@ public class Task extends Model {
 	}
 
 	/**
-	 * @return the taskStatus
+	 * @return the status
 	 */
-	public TaskStatus getTaskStatus() {
-		return taskStatus;
+	public TaskStatus getStatus() {
+		return status;
 	}
 
 	/**
-	 * @param taskStatus the taskStatus to set
+	 * @param status the status to set
 	 */
-	public void setTaskStatus(TaskStatus taskStatus) {
-		this.taskStatus = taskStatus;
+	public void setStatus(TaskStatus status) {
+		this.status = status;
+	}
+
+	/**
+	 * @return the category
+	 */
+	public Category getCategory() {
+		return category;
+	}
+
+	/**
+	 * @param category the category to set
+	 */
+	public void setCategory(Category category) {
+		this.category = category;
+	}
+
+	/**
+	 * @return the lastUpdate
+	 */
+	public long getLastUpdate() {
+		return lastUpdate;
+	}
+
+	/**
+	 * @param lastUpdate the lastUpdate to set
+	 */
+	public void setLastUpdate(long lastUpdate) {
+		this.lastUpdate = lastUpdate;
 	}
 }
