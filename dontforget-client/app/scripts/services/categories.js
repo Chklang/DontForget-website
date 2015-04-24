@@ -22,5 +22,60 @@
 				}
 			});
 		};
+		this.create = function(pName, pSuccessCallback) {
+			return restRequest.post({
+				url : '/categories',
+				data : pName,
+				contentType : 'text/plain',
+				success : pSuccessCallback,
+				errorsCodes : {
+					'400' : function(pData) {
+						alert("Problème de paramètres : " + pData);// TODO TR
+					},'409' : function(pData) {
+						alert("Le nom " + pNom + " existe déjà.");// TODO TR
+					},
+					'default' : function(pData) {
+						alert("Impossible de créer la catégorie. Erreur inconnue : " + pData);// TODO
+						// TR
+					}
+				}
+			});
+		};
+		this.update = function(pName, pNewName, pSuccessCallback) {
+			return restRequest.put({
+				url : '/categories/'+pName,
+				data : pNewName,
+				contentType : 'text/plain',
+				success : pSuccessCallback,
+				errorsCodes : {
+					'400' : function(pData) {
+						alert("Problème de paramètres : " + pData);// TODO TR
+					},'409' : function(pData) {
+						alert("Le nom " + pNom + " existe déjà.");// TODO TR
+					},
+					'default' : function(pData) {
+						alert("Impossible de modifier la catégorie. Erreur inconnue : " + pData);// TODO
+						// TR
+					}
+				}
+			});
+		};
+		this.remove = function(pName, pSuccessCallback) {
+			return restRequest.del({
+				url : '/categories/'+pName,
+				data : pName,
+				contentType : 'text/plain',
+				success : pSuccessCallback,
+				errorsCodes : {
+					'400' : function(pData) {
+						alert("Problème de paramètres : " + pData);// TODO TR
+					},
+					'default' : function(pData) {
+						alert("Impossible de supprimer la catégorie. Erreur inconnue : " + pData);// TODO
+						// TR
+					}
+				}
+			});
+		};
 	}]);
 })()

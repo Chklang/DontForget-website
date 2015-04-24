@@ -2,12 +2,22 @@
     <tab active="category_all" select="changeCurrentCategory(null)">
     	<tab-heading>Toutes</tab-heading>
     </tab>
-    <tab ng-repeat="category in categories" active="category.active" select="changeCurrentCategory(category)">
-    	<tab-heading>{{category.name}}</tab-heading>
+    <tab ng-repeat="category in categories" active="category.active" select="changeCurrentCategory(category)" class="no-padding-right">
+    	<tab-heading dropdown>
+    		{{category.name}}
+    		<button type="button" class="btn dropdown-toggle" dropdown-toggle style="background-color:transparent; padding:0px 10px;">
+				<span class="caret"></span>
+				<span class="sr-only">Split button!</span>
+			</button>
+			<ul class="dropdown-menu dropdown-menu-right" role="menu" style="min-width:10px;">
+				<li><a href="#/tasks" ng-click="updateCategogy(category)" class="btn btn-default">Modifier <span class="glyphicon glyphicon-edit"></span></a></li>
+				<li><a href="#/tasks" ng-click="deleteCategogy(category)" class="btn btn-default">Supprimer <span class="glyphicon glyphicon-trash"></span></a></li>
+			</ul>
+		</tab-heading>
     </tab>
-    <tab active="false">
-    	<tab-heading><img src="images/add-icon.png" style="height:16px;" /></tab-heading>
-    </tab>
+    <a href="#/tasks" ng-click="ajouterCategorie()" class="btn">
+	  <img src="images/add-icon.png" style="height:24px;" class="pull-left"/>
+	</a>
 </tabset>
 <form>
 	<div class="form-group">
