@@ -27,3 +27,10 @@ DELETE	/rest/categories/:name						fr.chklang.dontforget.resources.CategoriesRes
 
 GET		/rest/synchronization/:lastUpdate			fr.chklang.dontforget.resources.SynchronizationResource.getUpdates(lastUpdate:Long)
 POST	/rest/synchronization						fr.chklang.dontforget.resources.SynchronizationResource.setUpdates()
+
+
+# Map static resources from the /public folder to the /assets URL path
+GET		/							controllers.Assets.at(path="/public", file="index.html")
+GET		/*file						controllers.Assets.at(path="/public", file)
+POST	/							controllers.Assets.at(path="/public", file="index.html")
+POST	/*file						controllers.Assets.at(path="/public", file)
