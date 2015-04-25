@@ -22,6 +22,54 @@
 		$scope.alerts = [];
 		$scope.category_all = false;
 		
+		$scope.ajouterCategorie = function () {
+			var lNom = prompt("Entrez le nom de la nouvelle catégorie");
+			if (lNom) {
+				//Création de la catégorie et ajout
+				Categories.create(lNom, function (pCategoryDto) {
+					$scope.categories.push(pCategoryDto);
+				});
+			}
+		};
+		
+		$scope.updateCategogy = function (pCategory) {
+			var lNom = prompt("Entrez le nouveau nom de la catégorie " + pCategory.name);
+			if (lNom) {
+				//Modification de la catégorie et ajout
+				Categories.update(pCategory.name, lNom, function (pCategoryDto) {
+					var lOldName = pCategory.name;
+					pCategory.name = pCategoryDto.name;
+					//Update all tasks which use this category
+					angular.forEach($scope.allTasks, function (element) {
+						if (element.category.id == pCategoryDto.id) {
+							element.category = pCategoryDto;
+						}
+					});
+					
+					if ($scope.currentCategory != null && $scope.currentCategory == lOldName) {
+						$scope.currentCategory = pCategoryDto.name;
+					}
+				});
+				
+			}
+		};
+		
+		$scope.deleteCategogy = function (pCategory) {
+			var lConfirm = confirm("Êtes-vous sûr de vouloir supprimer la catégorie " + pCategory.name + "?");
+			if (lConfirm) {
+				//Modification de la catégorie et ajout
+				Categories.remove(pCategory.name, function (pCategoryDto) {
+					var lNewCategoriesList = [];
+					angular.forEach($scope.categories, function (element) {
+						if (element.name != pCategory.name) {
+							lNewCategoriesList.push(element);
+						}
+					});
+					$scope.categories = lNewCategoriesList;
+				});
+			}
+		};
+		
 		Tags.getAll(function (pResults) {
 			lAllTags = pResults;
 		});
@@ -173,7 +221,7 @@
 						angular.forEach(pResult.tags, function (pEntry) {
 							var lIsFound = false;
 							angular.forEach(lAllTags, function (pTag) {
-								if (!lIsFound && pTag == pEntry) {
+								if (!lIsFound && pTag.name == pEntry.name) {
 									lIsFound = true;
 								}
 							});
@@ -185,7 +233,7 @@
 						angular.forEach(pResult.places, function (pEntry) {
 							var lIsFound = false;
 							angular.forEach(lAllPlaces, function (pPlace) {
-								if (!lIsFound && pPlace == pEntry) {
+								if (!lIsFound && pPlace.name == pEntry.name) {
 									lIsFound = true;
 								}
 							});
@@ -202,12 +250,7 @@
 			case 13://Enter
 				if ($scope.addTaskDropdownIndexSelected >= 0) {
 					//Put the selection into text
-					if ($scope.addTaskDropdownIndexSelected == 0) {
-						$scope.addTaskValue += " ";
-						addTaskDropdownToggle();
-						return;
-					}
-					replaceCurrentWord(addTaskElement, lCurrentPrefix + $scope.addTaskDropdownValue[$scope.addTaskDropdownIndexSelected]);
+					replaceCurrentWord(addTaskElement, lCurrentPrefix + $scope.addTaskDropdownValue[$scope.addTaskDropdownIndexSelected].name);
 				}
 				break;
 			case 38://up

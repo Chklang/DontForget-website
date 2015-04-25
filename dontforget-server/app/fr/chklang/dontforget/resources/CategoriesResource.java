@@ -5,6 +5,8 @@ package fr.chklang.dontforget.resources;
 
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+
 import play.libs.Json;
 import play.mvc.Result;
 
@@ -66,14 +68,13 @@ public class CategoriesResource extends AbstractRest {
 				return notFound();
 			}
 
-			JsonNode lContent = request().body().asJson();
-			JsonNode lName = lContent.get("name");
-			if (!lName.isNull() && !lCategoryDB.getName().equals(pTaskCategoryName)) {
-				Category lCategoryDB2 = Category.dao.findByNameAndUser(lName.asText(), getConnectedUser());
+			String lName = request().body().asText();
+			if (!StringUtils.isEmpty(lName) && !lCategoryDB.getName().equals(lName)) {
+				Category lCategoryDB2 = Category.dao.findByNameAndUser(lName, getConnectedUser());
 				if (lCategoryDB2 != null) {
 					return conflict();
 				}
-				lCategoryDB.setName(lName.asText());
+				lCategoryDB.setName(lName);
 			}
 			lCategoryDB.save();
 			return ok(new CategoryDTO(lCategoryDB));

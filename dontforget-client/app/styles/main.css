@@ -9,6 +9,10 @@ a.disabled {
     text-decoration: none;
 }
 
+li.no-padding-right > a {
+	padding-right:0px;
+}
+
 a > h3:HOVER {
 	text-decoration: none;
 }
