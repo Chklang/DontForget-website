@@ -92,6 +92,9 @@ public class UsersResource extends AbstractRest {
 	public static Result me() {
 		return executeAndVerifyConnect(() -> {
 			User lUser = getConnectedUser();
+			if (lUser == null) {
+				return status(401);
+			}
 			return ok(new UserDTO(lUser));
 		});
 	}
