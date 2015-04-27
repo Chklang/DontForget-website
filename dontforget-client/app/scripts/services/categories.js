@@ -60,8 +60,8 @@
 				}
 			});
 		};
-		this.remove = function(pName, pSuccessCallback) {
-			return restRequest.del({
+		this.delete = function(pName, pSuccessCallback) {
+			return restRequest.delete({
 				url : '/categories/'+pName,
 				data : pName,
 				contentType : 'text/plain',

@@ -68,7 +68,7 @@ angular.module('RestModule').service('restRequest', [ '$http', 'rest', function 
 		options.method = 'PUT';
 		return this.base(options);
 	};
-	this.del = function(options) {
+	this.delete = function(options) {
 		options.method = 'DELETE';
 		return this.base(options);
 	};

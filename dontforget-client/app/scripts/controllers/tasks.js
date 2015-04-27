@@ -58,7 +58,7 @@
 			var lConfirm = confirm("Êtes-vous sûr de vouloir supprimer la catégorie " + pCategory.name + "?");
 			if (lConfirm) {
 				//Modification de la catégorie et ajout
-				Categories.remove(pCategory.name, function (pCategoryDto) {
+				Categories.delete(pCategory.name, function (pCategoryDto) {
 					var lNewCategoriesList = [];
 					angular.forEach($scope.categories, function (element) {
 						if (element.name != pCategory.name) {
@@ -454,6 +454,22 @@
 				var lMsg = "La tâche est supprimée."; //TODO TR
 				var lType = "success";
 				setActionDone(lMsg, lType, lCancelFunction);
+			});
+		};
+		$scope.allTasksStatusDeletedDefinitivly = function (pTask) {
+			var lOrigin = pTask.status;
+			Tasks.delete(pTask.id, function (pResult) {
+				var lNbElements = $scope.allTasks.length;
+				var lNewTaskList = [];
+				angular.forEach($scope.allTasks, function (element) {
+					if (element.id != pTask.id) {
+						lNewTaskList.push(element);
+					}
+				});
+				$scope.allTasks = lNewTaskList;
+				var lMsg = "La tâche est supprimée définitivement."; //TODO TR
+				var lType = "success";
+				setActionDone(lMsg, lType, null);
 			});
 		};
 	} ]);
