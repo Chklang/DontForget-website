@@ -39,7 +39,8 @@ module.exports = function(grunt) {
 					},
 					js : {
 
-						files : [ '<%= yeoman.app %>/scripts/{,*/}*.js', '<%= yeoman.app %>/modals/{,*/}*.js', '<%= yeoman.app %>/i18n/{,*/}*.json',
+						files : [ '<%= yeoman.app %>/scripts/{,*/}*.js', '<%= yeoman.app %>/modals/{,*/}*.js',
+						          '<%= yeoman.app %>/plugins/{,*/}*.js', '<%= yeoman.app %>/i18n/{,*/}*.json',
 								'<%= yeoman.app %>/i18n/langs.js', '<%= yeoman.app %>/plugins/{,*/}*.js' ],
 						tasks : [ 'newer:jshint:all' ],
 						options : {
@@ -247,7 +248,8 @@ module.exports = function(grunt) {
 							'<%= yeoman.dist %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
 							'<%= yeoman.dist %>/styles/fonts/*',
 							'<%= yeoman.dist %>/views/*.html',
-							'<%= yeoman.dist %>/modals/views/*.html'
+							'<%= yeoman.dist %>/modals/{,*/}*.html',
+							'<%= yeoman.dist %>/plugins/**/*.html'
 						]
 					}
 				},
@@ -285,11 +287,13 @@ module.exports = function(grunt) {
 								'<%= yeoman.dist %>/views',
 								'<%= yeoman.dist %>/styles',
 								'<%= yeoman.dist %>/modals',
+								'<%= yeoman.dist %>/plugins',
 								'<%= yeoman.dist %>/i18n'],
 								patterns : {
 									js : [ [ /(i18n\/[a-z]+\.json)/gm, 'Replacing reference to langs.json' ],
 											[ /(views\/[a-z]+\.html)/gm, 'Replacing references to html files' ],
-											[ /(modals\/views\/[a-z]+\.html)/gm, 'Replacing references to html files' ]
+											[ /(modals\/views\/[a-z]+\.html)/gm, 'Replacing references to html files' ],
+											[ /(plugins\/[a-z]+\/views\/[a-z]+\.html)/gm, 'Replacing references to html files' ]
 									]
 								}
 					}
@@ -395,6 +399,7 @@ module.exports = function(grunt) {
 									cwd : '<%= yeoman.app %>',
 									dest : '<%= yeoman.dist %>',
 									src : [ '*.{ico,png,txt}', '.htaccess',
+									        'plugins/**/*.html',
 											'*.html', 'views/{,*/}*.html','modals/{,*/}*.html',
 											'images/{,*/}*.{webp}',
 											'styles/fonts/{,*/}*.*' ]

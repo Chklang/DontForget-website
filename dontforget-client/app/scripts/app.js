@@ -10,8 +10,8 @@
 	var myApp = angular.module('dontforgetApp', [ 'ngAnimate', 'ngAria',
 			'ngCookies', 'ngMessages', 'ngResource', 'ngRoute', 'ngSanitize',
 			'ngTouch', 'ui.bootstrap', 'ui.router', 'RestModule',
-			'WaitingModule', 'pascalprecht.translate' ]);
-	myApp.config(function($stateProvider, $urlRouterProvider, restProvider,
+			'WaitingModule', 'pascalprecht.translate', 'DialogsModule' ]);
+	myApp.config(['$stateProvider', '$urlRouterProvider', 'restProvider', '$translateProvider', function($stateProvider, $urlRouterProvider, restProvider,
 			$translateProvider) {
 
 		$translateProvider.useLoader('i18nFilerevLoader');
@@ -34,8 +34,8 @@
 		});
 
 		restProvider.restPath('/rest');
-	});
-	myApp.factory('i18nFilerevLoader', function($http, $q) {
+	}]);
+	myApp.factory('i18nFilerevLoader', ['$http', '$q', function($http, $q) {
 		return function(options) {
 			var deferred = $q.defer();
 
@@ -50,8 +50,8 @@
 
 			return deferred.promise;
 		}
-	});
-	myApp.filter('time', function() {
+	}]);
+	myApp.filter('time', [function() {
 		return function(pInput) {
 			var days = parseInt(pInput / 86400, 10);
 			pInput -= days * 86400;
@@ -79,5 +79,5 @@
 			}
 			return lResult;
 		};
-	});
+	}]);
 })();

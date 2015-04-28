@@ -139,6 +139,9 @@ public class TasksResource extends AbstractRest {
 			if (!lTask.getUser().equals(getConnectedUser())) {
 				return unauthorized();
 			}
+			lTask.getPlaces().clear();
+			lTask.getTags().clear();
+			lTask.save();
 			lTask.delete();
 			return ok();
 		});

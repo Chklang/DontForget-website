@@ -7,7 +7,9 @@
 	 * @description # TasksCtrl Controller of the dontforgetApp
 	 */
 	var myApp = angular.module('dontforgetApp');
-	myApp.controller('TasksCtrl', [ '$scope', '$state', 'Tags', 'Places', 'Categories', 'Tasks', function($scope, $state, Tags, Places, Categories, Tasks) {
+	myApp.controller('TasksCtrl', [ '$scope', '$state', 'Dialog', 'Tags', 'Places', 'Categories', 'Tasks', function($scope, $state, Dialog, Tags, Places, Categories, Tasks) {
+		var execute = function (f) { f();};
+		
 		$scope.openTaskDropdown = false;
 		if (!$scope.isConnected) {
 			$state.transitionTo('main');
@@ -21,22 +23,24 @@
 		$scope.allTasksModeView = "OPENED";
 		$scope.alerts = [];
 		$scope.category_all = false;
+		$scope.addTaskValue = "";
+		$scope.addTaskDropdownValue = [];
+		$scope.addTaskDropdownIndexSelected = -1;
+		$scope.currentWord = null;
 		
 		$scope.ajouterCategorie = function () {
-			var lNom = prompt("Entrez le nom de la nouvelle catégorie");
-			if (lNom) {
+			Dialog.prompt("dontforget.tasks.modals.create_category.title", "dontforget.tasks.modals.create_category.text", "dontforget.tasks.modals.create_category.placeholder").then(function (pNom) {
 				//Création de la catégorie et ajout
-				Categories.create(lNom, function (pCategoryDto) {
+				Categories.create(pNom, function (pCategoryDto) {
 					$scope.categories.push(pCategoryDto);
 				});
-			}
+			});
 		};
 		
 		$scope.updateCategogy = function (pCategory) {
-			var lNom = prompt("Entrez le nouveau nom de la catégorie " + pCategory.name);
-			if (lNom) {
+			Dialog.prompt("dontforget.tasks.modals.update_category.title", "dontforget.tasks.modals.update_category.text", "dontforget.tasks.modals.update_category.placeholder", pCategory.name).then(function (pNom) {
 				//Modification de la catégorie et ajout
-				Categories.update(pCategory.name, lNom, function (pCategoryDto) {
+				Categories.update(pCategory.name, pNom, function (pCategoryDto) {
 					var lOldName = pCategory.name;
 					pCategory.name = pCategoryDto.name;
 					//Update all tasks which use this category
@@ -50,15 +54,12 @@
 						$scope.currentCategory = pCategoryDto.name;
 					}
 				});
-				
-			}
+			});
 		};
 		
 		$scope.deleteCategogy = function (pCategory) {
-			var lConfirm = confirm("Êtes-vous sûr de vouloir supprimer la catégorie " + pCategory.name + "?");
-			if (lConfirm) {
-				//Modification de la catégorie et ajout
-				Categories.remove(pCategory.name, function (pCategoryDto) {
+			Dialog.confirm("dontforget.tasks.modals.delete_category.title", "dontforget.tasks.modals.delete_category.text" + pCategory.name + "?").then(function (pValue) {
+	        	Categories.delete(pCategory.name, function (pCategoryDto) {
 					var lNewCategoriesList = [];
 					angular.forEach($scope.categories, function (element) {
 						if (element.name != pCategory.name) {
@@ -67,7 +68,7 @@
 					});
 					$scope.categories = lNewCategoriesList;
 				});
-			}
+			});
 		};
 		
 		Tags.getAll(function (pResults) {
@@ -105,12 +106,8 @@
 		});
 
 		var lCurrentPrefix = null;
-
-		$scope.addTaskValue = "";
-		$scope.addTaskDropdownValue = [];
-		$scope.addTaskDropdownIndexSelected = -1;
 		var addTaskElement = angular.element("#addTask")[0];
-		$scope.currentWord = null;
+
 		
 		function setActionDone(pMessage, pType, pCancelFunction) {
 			$scope.alerts[0] = {
@@ -190,9 +187,6 @@
 
 			if ($scope.openTaskDropdown) {
 				$scope.addTaskDropdownValue = lElementsList;
-				if ($scope.addTaskDropdownIndexSelected == -1) {
-					$scope.addTaskDropdownIndexSelected = 0;
-				}
 			}
 		}
 		$scope.addTaskClick = function() {
@@ -211,7 +205,7 @@
 						return;
 					}
 					if ($scope.currentCategory == null) {
-						alert("Veuillez choisir une catégorie");
+						Dialog.alert("dontforget.tasks.modals.no_category_selected.title", "dontforget.tasks.modals.no_category_selected.text");
 						return;
 					}
 					Tasks.create($scope.currentCategory, $scope.addTaskValue, function (pResult) {
@@ -250,11 +244,17 @@
 			case 13://Enter
 				if ($scope.addTaskDropdownIndexSelected >= 0) {
 					//Put the selection into text
-					replaceCurrentWord(addTaskElement, lCurrentPrefix + $scope.addTaskDropdownValue[$scope.addTaskDropdownIndexSelected].name);
+					if ($scope.addTaskDropdownIndexSelected < $scope.addTaskDropdownValue.length) {
+						replaceCurrentWord(addTaskElement, lCurrentPrefix + $scope.addTaskDropdownValue[$scope.addTaskDropdownIndexSelected].name);
+					} else {
+						replaceCurrentWord(addTaskElement, null);
+					}
+				} else {
+					replaceCurrentWord(addTaskElement, null);
 				}
 				break;
 			case 38://up
-				if ($scope.addTaskDropdownIndexSelected > 0) {
+				if ($scope.addTaskDropdownIndexSelected > -1) {
 					$scope.addTaskDropdownIndexSelected--;
 				}
 				pEvent.preventDefault()
@@ -265,6 +265,10 @@
 				}
 				pEvent.preventDefault();
 				return false;
+			default :
+				//Another key was pressed, refresh addTaskDropdownIndexSelected
+				console.log($scope.currentWord);
+				break;
 			}
 		};
 
@@ -303,18 +307,28 @@
 			return pIndex==$scope.addTaskDropdownIndexSelected || ($scope.addTaskDropdownIndexSelected>$scope.addTaskDropdownValue.length && pIndex == ($scope.addTaskDropdownValue.length-1));
 		}
 		
-		var lLastRegexp = null;
-		var lWordOfRegexp = null;
-		$scope.addTaskDropdownIndexIsShowed = function(pValue) {
-			if ($scope.currentWord == null || $scope.currentWord == "") {
-				return true;
-			}
-			if (lLastRegexp == null || lWordOfRegexp != $scope.currentWord) {
-				lWordOfRegexp = $scope.currentWord;
-				lLastRegexp = new RegExp($scope.currentWord);
-			}
-			return lLastRegexp.test(pValue);
-		}
+		//Autocomplete list for add tag/place/...
+		execute(function () {
+			var lLastRegexp = null;
+			var lWordOfRegexp = null;
+			$scope.addTaskDropdownIndexIsShowed = function(pValue, pIndex) {
+				if ($scope.currentWord == null || $scope.currentWord == "") {
+					return true;
+				}
+				if (lLastRegexp == null || lWordOfRegexp != $scope.currentWord) {
+					lWordOfRegexp = $scope.currentWord;
+					lLastRegexp = new RegExp($scope.currentWord);
+				}
+				var lIsShown = lLastRegexp.test(pValue.name);
+				if (!lIsShown && pIndex == $scope.addTaskDropdownIndexSelected) {
+					$scope.addTaskDropdownIndexSelected++;
+					if ($scope.addTaskDropdownIndexSelected >= $scope.addTaskDropdownValue.length) {
+						$scope.addTaskDropdownIndexSelected = -1;
+					}
+				}
+				return lIsShown;
+			};
+		});
 		
 		function replaceCurrentWord(pElement, pNewWord) {
 			var lCurrentPosition = getCursorPosition(addTaskElement);
@@ -336,11 +350,14 @@
 			while (lStartText > 0 && lText[lStartText] != " ") {
 				lStartText--;
 			}
+			
 			if (lText[lStartText] == " ") {
 				lStartText++;
 			}
 			var lEndText = lStartText;
+			var lOriginalWord = "";
 			while (lText[lEndText] != " " && lEndText < lText.length) {
+				lOriginalWord += lText[lEndText];
 				lEndText++;
 			}
 			
@@ -348,7 +365,7 @@
 			if (lStartText > 0) {
 				lNewText += $scope.addTaskValue.slice(0, lStartText);
 			}
-			lNewText += pNewWord;
+			lNewText += pNewWord==null?lOriginalWord:pNewWord;
 			if (lEndText < $scope.addTaskValue.length) {
 				lNewText += $scope.addTaskValue.slice(lEndText);
 			} else {
@@ -417,7 +434,7 @@
 				var lCancelFunction = function() {
 					cancel(lOrigin, pResult);
 				};
-				var lMsg = "La tâche est marquée terminée."; //TODO TR
+				var lMsg = "dontforget.tasks.changeState.to_finish";
 				var lType = "success";
 				setActionDone(lMsg, lType, lCancelFunction);
 			});
@@ -434,7 +451,7 @@
 				var lCancelFunction = function() {
 					cancel(lOrigin, pResult);
 				};
-				var lMsg = "La tâche est marquée ouverte."; //TODO TR
+				var lMsg = "dontforget.tasks.changeState.to_open";
 				var lType = "success";
 				setActionDone(lMsg, lType, lCancelFunction);
 			});
@@ -451,9 +468,25 @@
 				var lCancelFunction = function() {
 					cancel(lOrigin, pResult);
 				};
-				var lMsg = "La tâche est supprimée."; //TODO TR
+				var lMsg = "dontforget.tasks.changeState.to_delete";
 				var lType = "success";
 				setActionDone(lMsg, lType, lCancelFunction);
+			});
+		};
+		$scope.allTasksStatusDeletedDefinitivly = function (pTask) {
+			var lOrigin = pTask.status;
+			Tasks.delete(pTask.id, function (pResult) {
+				var lNbElements = $scope.allTasks.length;
+				var lNewTaskList = [];
+				angular.forEach($scope.allTasks, function (element) {
+					if (element.id != pTask.id) {
+						lNewTaskList.push(element);
+					}
+				});
+				$scope.allTasks = lNewTaskList;
+				var lMsg = "dontforget.tasks.changeState.to_trash";
+				var lType = "success";
+				setActionDone(lMsg, lType, null);
 			});
 		};
 	} ]);

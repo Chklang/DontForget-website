@@ -1,17 +1,16 @@
 <tabset>
     <tab active="category_all" select="changeCurrentCategory(null)">
-    	<tab-heading>Toutes</tab-heading>
+    	<tab-heading translate>dontforget.tasks.categories_all</tab-heading>
     </tab>
     <tab ng-repeat="category in categories" active="category.active" select="changeCurrentCategory(category)" class="no-padding-right">
     	<tab-heading dropdown>
     		{{category.name}}
     		<button type="button" class="btn dropdown-toggle" dropdown-toggle style="background-color:transparent; padding:0px 10px;">
 				<span class="caret"></span>
-				<span class="sr-only">Split button!</span>
 			</button>
 			<ul class="dropdown-menu dropdown-menu-right" role="menu" style="min-width:10px;">
-				<li><a href="#/tasks" ng-click="updateCategogy(category)" class="btn btn-default">Modifier <span class="glyphicon glyphicon-edit"></span></a></li>
-				<li><a href="#/tasks" ng-click="deleteCategogy(category)" class="btn btn-default">Supprimer <span class="glyphicon glyphicon-trash"></span></a></li>
+				<li><a href="#/tasks" ng-click="updateCategogy(category)" class="btn btn-default"><span translate>dontforget.tasks.categories_buttons_update</span> <span class="glyphicon glyphicon-edit"></span></a></li>
+				<li><a href="#/tasks" ng-click="deleteCategogy(category)" class="btn btn-default"><span translate>dontforget.tasks.categories_buttons_delete</span> <span class="glyphicon glyphicon-trash"></span></a></li>
 			</ul>
 		</tab-heading>
     </tab>
@@ -21,36 +20,37 @@
 </tabset>
 <form>
 	<div class="form-group">
-		<label for="addTask">Nouvelle tâche :</label>
+		<label for="addTask" translate>dontforget.tasks.new_task</label>
 		<div class="dropdown" ng-class="{open:openTaskDropdown}">
 			<input type="text" ng-click="addTaskClick()" ng-keyup="addTaskKeyUp($event)" ng-keydown="addTaskKeyDown($event)" class="form-control" id="addTask"
-				placeholder="Entrez ici votre tâche" ng-model="addTaskValue" />
+				placeholder="{{'dontforget.tasks.new_task_placeholder' | translate}}" ng-model="addTaskValue" />
 			<ul class="dropdown-menu" role="menu" aria-labelledby="addTask">
-				<li role="presentation" ng-if="currentWord != null">{{currentWord}}</li>
+				<li ng-class="{selected: addTaskDropdownIndexIsSelected(-1)}" role="presentation" ng-if="currentWord != null">{{currentWord}}</li>
 				<li
 					role="presentation"
 					ng-repeat="(index, element) in addTaskDropdownValue track by $index"
-					ng-class="{selected: addTaskDropdownIndexIsSelected(index), hidden:!addTaskDropdownIndexIsShowed(element)}">{{index}} : {{element.name}}</li>
+					ng-class="{selected: addTaskDropdownIndexIsSelected(index), hidden:!addTaskDropdownIndexIsShowed(element, index)}">{{index}} : {{element.name}}</li>
 			</ul>
 		</div>
 	</div>
 </form>
 <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert(alert)">
 {{alert.msg}}
-<button class="btn btn-sucess" ng-click="cancelAction(alert)">Cancel</button>
+<button class="btn btn-sucess" ng-click="cancelAction(alert)" ng-show="alert.cancel != null" translate>dontforget.tasks.action_cancel</button>
 </alert>
 <fieldset>
-	<legend>Tâches enregistées
+	<legend>
+		<span translate>dontforget.tasks.saved_tasks</span>
 		<span class="btn-group pull-right">
-	        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'OPENED'" >In progress</label>
-	        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'FINISHED'" >Finished</label>
-	        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'DELETED'" >Deleted</label>
-	        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'ALL'" >All</label>
+	        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'OPENED'"><span translate>dontforget.tasks.saved_tasks_buttons_inprogress</span></label>
+	        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'FINISHED'"><span translate>dontforget.tasks.saved_tasks_buttons_finished</span></label>
+	        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'DELETED'"><span translate>dontforget.tasks.saved_tasks_buttons_deleted</span></label>
+	        <label class="btn btn-success" ng-model="allTasksModeView" btn-radio="'ALL'"><span translate>dontforget.tasks.saved_tasks_buttons_all</span></label>
 	    </span>
     </legend>
 	<form>
 		<div class="form-group has-feedback">
-		  <label class="control-label" for="filterAllTasks">Filter by</label>
+		  <label class="control-label" for="filterAllTasks" translate>dontforget.tasks.saved_tasks_filter_by</label>
 		  <div class="input-group">
 			    <a ng-click="allTasksFilter = ''" style="top:0px" class="btn glyphicon glyphicon-remove input-group-addon"></a>
 			    <input type="text" class="form-control" id="filterAllTasks" ng-model="allTasksFilter" />
@@ -68,9 +68,12 @@
 				<button class="btn btn-primary" ng-if="task.status=='FINISHED'" ng-click="allTasksStatusDeleted(task)">
 					<span class="glyphicon glyphicon-trash"></span>
 				</button>
+				<button class="btn btn-danger" ng-if="task.status=='DELETED'" ng-click="allTasksStatusDeletedDefinitivly(task)">
+					<span class="glyphicon glyphicon-trash"></span>
+				</button>
 				{{task.text}}
-				<span class="badge" ng-repeat="place in task.places" ng-click="allTasksAddToFilters('@' + place.name)" tooltip="Add to filters">@{{place.name}} </span>
-				<span class="badge" ng-repeat="tag in task.tags" ng-click="allTasksAddToFilters('#' + tag.name)" tooltip="Add to filters">#{{tag.name}} </span>
+				<span class="badge" ng-repeat="place in task.places" ng-click="allTasksAddToFilters('@' + place.name)" tooltip="{{'dontforget.tasks.saved_tasks_button_add_to_filter' | translate}}">@{{place.name}} </span>
+				<span class="badge" ng-repeat="tag in task.tags" ng-click="allTasksAddToFilters('#' + tag.name)" tooltip="{{'dontforget.tasks.saved_tasks_button_add_to_filter' | translate}}">#{{tag.name}} </span>
 			</li>
 		</ul>
 	</form>

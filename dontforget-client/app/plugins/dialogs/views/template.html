@@ -1,0 +1,6 @@
+<fieldset>
+	<legend translate>{{title}}</legend>
+	<div translate>{{textContent}}</div>
+	<div compile="htmlContent"></div>
+	<span ng-repeat="button in buttons" ng-click="button.action(api)" translate class="btn btn-primary pull-right">{{button.title}}</span>
+</fieldset>
