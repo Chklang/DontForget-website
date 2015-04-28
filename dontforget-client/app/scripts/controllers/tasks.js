@@ -7,7 +7,7 @@
 	 * @description # TasksCtrl Controller of the dontforgetApp
 	 */
 	var myApp = angular.module('dontforgetApp');
-	myApp.controller('TasksCtrl', [ '$scope', '$state', 'Tags', 'Places', 'Categories', 'Tasks', function($scope, $state, Tags, Places, Categories, Tasks) {
+	myApp.controller('TasksCtrl', [ '$scope', '$state', 'Dialog', 'Tags', 'Places', 'Categories', 'Tasks', function($scope, $state, Dialog, Tags, Places, Categories, Tasks) {
 		var execute = function (f) { f();};
 		
 		$scope.openTaskDropdown = false;
@@ -29,20 +29,18 @@
 		$scope.currentWord = null;
 		
 		$scope.ajouterCategorie = function () {
-			var lNom = prompt("Entrez le nom de la nouvelle catégorie");
-			if (lNom) {
+			Dialog.prompt("Créer une catégorie", "Entrez le nom de la nouvelle catégorie", "Entrez le nom ici").then(function (pNom) {
 				//Création de la catégorie et ajout
-				Categories.create(lNom, function (pCategoryDto) {
+				Categories.create(pNom, function (pCategoryDto) {
 					$scope.categories.push(pCategoryDto);
 				});
-			}
+			});
 		};
 		
 		$scope.updateCategogy = function (pCategory) {
-			var lNom = prompt("Entrez le nouveau nom de la catégorie " + pCategory.name);
-			if (lNom) {
+			Dialog.prompt("Modifier une catégorie", "Entrez le nouveau nom de la catégorie", "Entrez le nom ici", pCategory.name).then(function (pNom) {
 				//Modification de la catégorie et ajout
-				Categories.update(pCategory.name, lNom, function (pCategoryDto) {
+				Categories.update(pCategory.name, pNom, function (pCategoryDto) {
 					var lOldName = pCategory.name;
 					pCategory.name = pCategoryDto.name;
 					//Update all tasks which use this category
@@ -56,15 +54,12 @@
 						$scope.currentCategory = pCategoryDto.name;
 					}
 				});
-				
-			}
+			});
 		};
 		
 		$scope.deleteCategogy = function (pCategory) {
-			var lConfirm = confirm("Êtes-vous sûr de vouloir supprimer la catégorie " + pCategory.name + "?");
-			if (lConfirm) {
-				//Modification de la catégorie et ajout
-				Categories.delete(pCategory.name, function (pCategoryDto) {
+			Dialog.confirm("Suppression d'une catégorie", "Êtes-vous sûr de vouloir supprimer la catégorie " + pCategory.name + "?").then(function (pValue) {
+	        	Categories.delete(pCategory.name, function (pCategoryDto) {
 					var lNewCategoriesList = [];
 					angular.forEach($scope.categories, function (element) {
 						if (element.name != pCategory.name) {
@@ -73,7 +68,7 @@
 					});
 					$scope.categories = lNewCategoriesList;
 				});
-			}
+			});
 		};
 		
 		Tags.getAll(function (pResults) {
@@ -210,7 +205,7 @@
 						return;
 					}
 					if ($scope.currentCategory == null) {
-						alert("Veuillez choisir une catégorie");
+						Dialog.alert("Veuillez choisir une catégorie");
 						return;
 					}
 					Tasks.create($scope.currentCategory, $scope.addTaskValue, function (pResult) {
