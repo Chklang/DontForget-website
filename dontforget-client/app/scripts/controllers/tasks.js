@@ -29,7 +29,7 @@
 		$scope.currentWord = null;
 		
 		$scope.ajouterCategorie = function () {
-			Dialog.prompt("Créer une catégorie", "Entrez le nom de la nouvelle catégorie", "Entrez le nom ici").then(function (pNom) {
+			Dialog.prompt("dontforget.tasks.modals.create_category.title", "dontforget.tasks.modals.create_category.text", "dontforget.tasks.modals.create_category.placeholder").then(function (pNom) {
 				//Création de la catégorie et ajout
 				Categories.create(pNom, function (pCategoryDto) {
 					$scope.categories.push(pCategoryDto);
@@ -38,7 +38,7 @@
 		};
 		
 		$scope.updateCategogy = function (pCategory) {
-			Dialog.prompt("Modifier une catégorie", "Entrez le nouveau nom de la catégorie", "Entrez le nom ici", pCategory.name).then(function (pNom) {
+			Dialog.prompt("dontforget.tasks.modals.update_category.title", "dontforget.tasks.modals.update_category.text", "dontforget.tasks.modals.update_category.placeholder", pCategory.name).then(function (pNom) {
 				//Modification de la catégorie et ajout
 				Categories.update(pCategory.name, pNom, function (pCategoryDto) {
 					var lOldName = pCategory.name;
@@ -58,7 +58,7 @@
 		};
 		
 		$scope.deleteCategogy = function (pCategory) {
-			Dialog.confirm("Suppression d'une catégorie", "Êtes-vous sûr de vouloir supprimer la catégorie " + pCategory.name + "?").then(function (pValue) {
+			Dialog.confirm("dontforget.tasks.modals.delete_category.title", "dontforget.tasks.modals.delete_category.text" + pCategory.name + "?").then(function (pValue) {
 	        	Categories.delete(pCategory.name, function (pCategoryDto) {
 					var lNewCategoriesList = [];
 					angular.forEach($scope.categories, function (element) {
@@ -205,7 +205,7 @@
 						return;
 					}
 					if ($scope.currentCategory == null) {
-						Dialog.alert("Veuillez choisir une catégorie");
+						Dialog.alert("dontforget.tasks.modals.no_category_selected.title", "dontforget.tasks.modals.no_category_selected.text");
 						return;
 					}
 					Tasks.create($scope.currentCategory, $scope.addTaskValue, function (pResult) {
@@ -434,7 +434,7 @@
 				var lCancelFunction = function() {
 					cancel(lOrigin, pResult);
 				};
-				var lMsg = "La tâche est marquée terminée."; //TODO TR
+				var lMsg = "dontforget.tasks.changeState.to_finish";
 				var lType = "success";
 				setActionDone(lMsg, lType, lCancelFunction);
 			});
@@ -451,7 +451,7 @@
 				var lCancelFunction = function() {
 					cancel(lOrigin, pResult);
 				};
-				var lMsg = "La tâche est marquée ouverte."; //TODO TR
+				var lMsg = "dontforget.tasks.changeState.to_open";
 				var lType = "success";
 				setActionDone(lMsg, lType, lCancelFunction);
 			});
@@ -468,7 +468,7 @@
 				var lCancelFunction = function() {
 					cancel(lOrigin, pResult);
 				};
-				var lMsg = "La tâche est supprimée."; //TODO TR
+				var lMsg = "dontforget.tasks.changeState.to_delete";
 				var lType = "success";
 				setActionDone(lMsg, lType, lCancelFunction);
 			});
@@ -484,7 +484,7 @@
 					}
 				});
 				$scope.allTasks = lNewTaskList;
-				var lMsg = "La tâche est supprimée définitivement."; //TODO TR
+				var lMsg = "dontforget.tasks.changeState.to_trash";
 				var lType = "success";
 				setActionDone(lMsg, lType, null);
 			});

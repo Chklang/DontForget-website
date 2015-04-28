@@ -21,7 +21,33 @@
 			"categories_buttons_update" : "Modifier",
 			"categories_buttons_delete" : "Supprimer",
 			"action_cancel" : "Annuler",
-			"saved_tasks_button_add_to_filter" : "Ajouter aux filtres"
+			"saved_tasks_button_add_to_filter" : "Ajouter aux filtres",
+			"modals" : {
+				"create_category" : {
+					"title" : "Créer une nouvelle catégorie",
+					"text" : "Entrez le nom de la nouvelle catégorie :",
+					"placeholder" : "Entrez le nom ici"
+				},
+				"update_category" : {
+					"title" : "Modifier une catégorie",
+					"text" : "Entrez le nouveau nom de la catégorie :",
+					"placeholder" : "Entrez le nom ici"
+				},
+				"delete_category" : {
+					"title" : "Suppression d'une catégorie",
+					"text" : "Êtes-vous sûr de vouloir supprimer la catégorie {}?"
+				},
+				"no_category_selected" : {
+					"title" : "Pas de catégorie sélectionnée",
+					"text" : "Veuillez choisir une catégorie."
+				}
+			},
+			"changeState" : {
+				"to_finish" : "La tâche est marquée terminée.",
+				"to_open" : "La tâche est marquée ouverte.",
+				"to_delete" : "La tâche est supprimée.",
+				"to_trash" : "La tâche est supprimée définitivement."
+			}
 		}
 	}
 }

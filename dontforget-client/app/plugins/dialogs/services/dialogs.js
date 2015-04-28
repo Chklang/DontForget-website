@@ -27,6 +27,7 @@ angular.module('DialogsModule').service('Dialog', [ '$rootScope', '$modal', 'dia
 		var lTemplate = opts.template || dialogConfig.template;
 		var lSubScope = opts.scope || {};
 		
+		lButtons = lButtons.reverse();
 		//Create scope
 		var lScope = $rootScope.$new(true);
 		
@@ -92,7 +93,7 @@ angular.module('DialogsModule').service('Dialog', [ '$rootScope', '$modal', 'dia
 	};
 	
 	this.prompt = function (pTitle, pMessage, pPlaceholder, pDefaultValue) {
-		var lContent = '<span translate>{{question}}</span> : <input type="text" ng-model="value" placeholder="{{placeholder}}" />';
+		var lContent = '<span translate>{{question|translate}}</span> : <input type="text" ng-model="value" placeholder="{{placeholder|translate}}" />';
 		return new Promise(function (resolve, reject) {
 			internal({
 				title : pTitle,
