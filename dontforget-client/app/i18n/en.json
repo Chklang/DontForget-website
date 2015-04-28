@@ -1,0 +1,27 @@
+{
+	"dontforget" : {
+		"menu" : {
+			"my_tasks" : "My tasks",
+			"logout" : "Logout",
+			"login" : "Login"
+		},
+		"main" : {
+			"disclaimer" : "Don't forget is an application to help you for any daily tasks. Write-it everything that comes into your brain, it will allow you to never forget anything!"
+		},
+		"tasks" : {
+			"categories_all" : "All",
+			"new_task" : "New task:",
+			"new_task_placeholder" : "Put here your task",
+			"saved_tasks" : "Saved tasks",
+			"saved_tasks_filter_by" : "Filter by:",
+			"saved_tasks_buttons_inprogress" : "In progress",
+			"saved_tasks_buttons_finished" : "Finished",
+			"saved_tasks_buttons_deleted" : "Deleted",
+			"saved_tasks_buttons_all" : "All",
+			"categories_buttons_update" : "Update",
+			"categories_buttons_delete" : "Delete",
+			"action_cancel" : "Cancel",
+			"saved_tasks_button_add_to_filter" : "Add to filters"
+		}
+	}
+}

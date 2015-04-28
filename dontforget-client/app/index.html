@@ -24,8 +24,9 @@
 	<div class="container" ng-controller="IndexCtrl">
 		<div class="header" style="margin-bottom:0px;">
 			<ul class="nav nav-pills pull-right">
-				<li><a ng-href="#/tasks" ng-class="{ 'disabled' : !isConnected}">Mes tâches</a></li>
-				<li><a ng-href="#/" ng-click="login()">{{isConnected?"Deconnexion":"Connexion"}}</a></li>
+				<li><a ng-href="#/tasks" ng-class="{ 'disabled' : !isConnected}" translate>dontforget.menu.my_tasks</a></li>
+				<li ng-show="isConnected"><a ng-href="#/" ng-click="login()" translate>dontforget.menu.logout</a></li>
+				<li ng-show="!isConnected"><a ng-href="#/" ng-click="login()" translate>dontforget.menu.login</a></li>
 			</ul>
 			<a style="text-decoration:initial" ng-href="#/">
 				<h3 class="text-muted" style="padding-bottom:0px;">Don't Forget</h3>
