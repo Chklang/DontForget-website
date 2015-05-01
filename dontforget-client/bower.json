@@ -16,7 +16,8 @@
     "angular-ui-router": "^0.2.13",
     "angular-translate": "^2.5.2",
     "angular-ui": "~0.4.0",
-    "angular-rest": "*"
+    "angular-rest": "*",
+    "angular-dialog": "*"
   },
   "devDependencies": {
     "angular-mocks": "^1.3.0",
