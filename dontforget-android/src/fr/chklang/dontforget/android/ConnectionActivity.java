@@ -34,7 +34,7 @@ public class ConnectionActivity extends Activity {
 		connection_send = (Button) this.findViewById(R.id.connection_send);
 
 		// Default values
-		connection_url.setText("192.168.43.186");
+		connection_url.setText("192.168.0.11");
 		connection_port.setText("9000");
 		connection_login.setText("Chklang");
 		connection_password.setText("password");

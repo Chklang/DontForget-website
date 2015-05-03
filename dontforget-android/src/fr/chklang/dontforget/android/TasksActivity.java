@@ -17,7 +17,9 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -132,18 +134,34 @@ public class TasksActivity extends Activity {
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
 				LayoutInflater mInflater = (LayoutInflater)TasksActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		        View view;
-		        TextView text;
+		        LinearLayout linearLayout;
+		        TextView title = null;
+		        ImageButton lValidateButton = null;
+		        ImageButton lTrashButton = null;
+		        ImageButton lDeleteButton = null;
 
 		        if (convertView == null) {
-		            view = mInflater.inflate(R.layout.activity_tasks_menu_entry, parent, false);
+		        	View view = mInflater.inflate(R.layout.activity_tasks_entry, parent, false);
+		        	linearLayout = (LinearLayout) view;
 		        } else {
-		            view = convertView;
+		            View view = convertView;
+		            linearLayout = (LinearLayout) view;
 		        }
 
 		        try {
 	                //  Otherwise, find the TextView field within the layout
-	                text = (TextView) view;
+		        	for (int i=0; i<linearLayout.getChildCount(); i++) {
+		        		View lChild = linearLayout.getChildAt(i);
+		        		if (lChild.getId() == R.id.title_task) {
+		        			title = (TextView) lChild;
+		        		} else if (lChild.getId() == R.id.validate) {
+		        			lValidateButton = (ImageButton) lChild;
+		        		} else if (lChild.getId() == R.id.trash) {
+		        			lTrashButton = (ImageButton) lChild;
+		        		} else if (lChild.getId() == R.id.delete) {
+		        			lDeleteButton = (ImageButton) lChild;
+		        		}
+		        	}
 		        } catch (ClassCastException e) {
 		            Log.e("ArrayAdapter", "You must supply a resource ID for a TextView");
 		            throw new IllegalStateException(
@@ -151,8 +169,8 @@ public class TasksActivity extends Activity {
 		        }
 
 		        String item = getItem(position);
-	            text.setText(item);
-				return text;
+	            title.setText(item);
+				return linearLayout;
 			}
 
 			@Override
