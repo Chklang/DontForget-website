@@ -1,0 +1,44 @@
+<fieldset>
+	<legend translate>dontforget.myaccount.title</legend>
+	<form class="form-horizontal" ng-submit="submit()" onsubmit="return false;">
+
+		<!-- Text input-->
+		<div class="form-group">
+			<label class="col-md-4 control-label" for="myaccount_pseudo"
+				translate>dontforget.myaccount.pseudo</label>
+			<div class="col-md-8">
+				<input id="myaccount_pseudo" name="myaccount_pseudo" type="text"
+					placeholder="{{'dontforget.myaccount.pseudo'|translate}}"
+					class="form-control input-md" ng-model="pseudo" />
+			</div>
+		</div>
+
+		<!-- Password input-->
+		<div class="form-group">
+			<label class="col-md-4 control-label" for="myaccount_pass" translate>dontforget.myaccount.pass</label>
+			<div class="col-md-8">
+				<input id="myaccount_pass" name="myaccount_pass" type="password"
+					placeholder="{{'dontforget.myaccount.pass'|translate}}"
+					class="form-control input-md" ng-model="pass" />
+			</div>
+		</div>
+
+		<!-- Text input-->
+		<div class="form-group">
+			<label class="col-md-4 control-label" for="myaccount_mail" translate>dontforget.myaccount.mail</label>
+			<div class="col-md-8">
+				<input id="myaccount_mail" name="myaccount_mail" type="text"
+					placeholder="{{'dontforget.myaccount.mail'|translate}}"
+					class="form-control input-md" ng-model="mail" />
+			</div>
+		</div>
+
+		<!-- Button -->
+		<div class="form-group">
+			<div class="col-md-8">
+				<button id="myaccount_update" name="myaccount_update"
+					class="btn btn-primary" translate>dontforget.myaccount.update</button>
+			</div>
+		</div>
+	</form>
+</fieldset>

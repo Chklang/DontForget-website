@@ -9,13 +9,12 @@
 	 */
 	var myApp = angular.module('dontforgetApp', [ 'ngAnimate', 'ngAria',
 			'ngCookies', 'ngMessages', 'ngResource', 'ngRoute', 'ngSanitize',
-			'ngTouch', 'ui.bootstrap', 'ui.router', 'RestModule',
+			'ngTouch', 'ui.bootstrap', 'ui.router', 'ngFlag', 'RestModule',
 			'WaitingModule', 'pascalprecht.translate', 'DialogsModule' ]);
 	myApp.config(['$stateProvider', '$urlRouterProvider', 'restProvider', '$translateProvider', function($stateProvider, $urlRouterProvider, restProvider,
 			$translateProvider) {
 
 		$translateProvider.useLoader('i18nFilerevLoader');
-		$translateProvider.preferredLanguage('fr');
 
 		$urlRouterProvider.when("", "/main");
 		$urlRouterProvider.when("/", "/main");
@@ -31,6 +30,10 @@
 			url : '/tasks',
 			templateUrl : 'views/tasks.html',
 			controller : 'TasksCtrl'
+		}).state('myaccount', {
+			url : '/myaccount',
+			templateUrl : 'views/myaccount.html',
+			controller : 'MyAccountCtrl'
 		});
 
 		restProvider.restPath('/rest');

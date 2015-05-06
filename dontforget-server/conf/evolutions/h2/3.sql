@@ -1,0 +1,7 @@
+# --- !Ups
+
+ALTER TABLE T_USER ADD mail VARCHAR(255) DEFAULT '' NOT NULL;
+
+# --- !Downs
+
+ALTER TABLE T_USER DROP COLUMN mail;

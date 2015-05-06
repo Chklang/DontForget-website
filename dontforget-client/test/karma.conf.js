@@ -33,6 +33,8 @@ module.exports = function(config) {
       'bower_components/angular-touch/angular-touch.js',
       'bower_components/angular-ui-router/release/angular-ui-router.js',
       'bower_components/angular-translate/angular-translate.js',
+      'bower_components/angular-rest/dist/rest-min.js',
+      'bower_components/angular-dialog/dist/dialogs-min.js',
       'bower_components/angular-mocks/angular-mocks.js',
       'bower_components/angular-scenario/angular-scenario.js',
       // endbower

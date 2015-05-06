@@ -1,6 +1,7 @@
 {
 	"dontforget" : {
 		"menu" : {
+			"my_account" : "Mon compte",
 			"my_tasks" : "Mes tâches",
 			"logout" : "Deconnexion",
 			"login" : "Connexion"
@@ -35,7 +36,7 @@
 				},
 				"delete_category" : {
 					"title" : "Suppression d'une catégorie",
-					"text" : "Êtes-vous sûr de vouloir supprimer la catégorie {}?"
+					"text" : "Êtes-vous sûr de vouloir supprimer la catégorie {{name}}?"
 				},
 				"no_category_selected" : {
 					"title" : "Pas de catégorie sélectionnée",
@@ -48,6 +49,13 @@
 				"to_delete" : "La tâche est supprimée.",
 				"to_trash" : "La tâche est supprimée définitivement."
 			}
+		},
+		"myaccount" : {
+			"title" : "Mon compte",
+			"pseudo" : "Pseudonyme :",
+			"pass" : "Mot de passe :",
+			"mail" : "E-Mail :",
+			"update" : "Mettre à jour mon compte"
 		}
 	}
 }

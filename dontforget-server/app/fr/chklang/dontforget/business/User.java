@@ -32,6 +32,9 @@ public class User extends Model {
 	@Column(name="password", length=40, nullable=false)
 	private String password;
 	
+	@Column(name="mail", length=255, nullable=false)
+	private String mail;
+	
 	@Column(name="dateInscription", nullable=false)
 	private long dateInscription;
 	
@@ -80,6 +83,14 @@ public class User extends Model {
 	 */
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public String getMail() {
+		return mail;
+	}
+
+	public void setMail(String mail) {
+		this.mail = mail;
 	}
 
 	/**

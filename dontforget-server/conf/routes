@@ -6,6 +6,7 @@ GET	    /rest/users/me		                        fr.chklang.dontforget.resources.
 POST    /rest/users/login                           fr.chklang.dontforget.resources.UsersResource.login()
 POST    /rest/users/disconnect                      fr.chklang.dontforget.resources.UsersResource.disconnect()
 POST    /rest/users/create                          fr.chklang.dontforget.resources.UsersResource.create()
+PUT    	/rest/users/update		                    fr.chklang.dontforget.resources.UsersResource.update()
 
 GET		/rest/tasks									fr.chklang.dontforget.resources.TasksResource.findAll()
 GET		/rest/tasks/:id<[0-9]+>						fr.chklang.dontforget.resources.TasksResource.get(id:Integer)
