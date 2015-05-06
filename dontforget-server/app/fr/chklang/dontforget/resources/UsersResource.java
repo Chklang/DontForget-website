@@ -31,6 +31,7 @@ public class UsersResource extends AbstractRest {
 				JsonNode lJson = request().body().asJson();
 				String lPseudo = getMandatoryValueAsString(lJson, "pseudo");
 				String lPassword = getMandatoryValueAsString(lJson, "password");
+				String lMail = getMandatoryValueAsString(lJson, "mail");
 				lPassword = DigestUtils.sha1Hex(lPassword);
 				
 				User lUser = User.dao.findByPseudo(lPseudo);
@@ -42,6 +43,7 @@ public class UsersResource extends AbstractRest {
 				lUser.setPseudo(lPseudo);
 				lUser.setPassword(lPassword);
 				lUser.setDateInscription(System.currentTimeMillis());
+				lUser.setMail(lMail);
 				lUser.save();
 				
 				SessionHelper.setPlayerId(session(), lUser);
