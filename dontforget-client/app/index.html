@@ -13,6 +13,7 @@
 <!-- endbuild -->
 <!-- build:css(.tmp) styles/main.css -->
 <link rel="stylesheet" href="styles/main.css">
+<link rel="stylesheet" href="styles/flags32.css">
 <!-- endbuild -->
 </head>
 <body ng-app="dontforgetApp">
@@ -28,12 +29,25 @@
 				<li><a ng-href="#/tasks" ng-class="{ 'disabled' : !isConnected}" translate>dontforget.menu.my_tasks</a></li>
 				<li ng-show="isConnected"><a ng-href="#/" ng-click="login()" translate>dontforget.menu.logout</a></li>
 				<li ng-show="!isConnected"><a ng-href="#/" ng-click="login()" translate>dontforget.menu.login</a></li>
+				<li>
+					<div class="btn-group f32" dropdown>
+						<button type="button" class="btn btn-primary dropdown-toggle" style="padding:0px;" dropdown-toggle>
+							<span class="flag {{language}}"></span>
+							<span class="caret" style="margin-top:19px;"></span>
+						</button>
+						<ul class="dropdown-menu" role="menu" style="width:40px;min-width:0px;">
+							<li ng-repeat="country in countries">
+								<span style="cursor: pointer;" class="flag {{country}}" ng-click="changeLanguage(country)"></span>
+							</li>
+						</ul>
+					</div>
+				</li>
 			</ul>
 			<a style="text-decoration:initial" ng-href="#/">
 				<h3 class="text-muted" style="padding-bottom:0px;">Don't Forget</h3>
 			</a>
 		</div>
-
+		
 		<div ui-view=""></div>
 
 		<div class="footer"></div>
