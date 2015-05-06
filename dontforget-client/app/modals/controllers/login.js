@@ -16,8 +16,8 @@
 				$scope.isNewCompte = false;
 				var lLoginIsOK = false;
 
-				$scope.login = "";
-				$scope.password = "";
+				$scope.login = angular.element("#fake_login_login").val();
+				$scope.password = angular.element("#fake_login_password").val();
 				$scope.password2 = "";
 				$scope.email = "";
 				$scope.action = "";
@@ -51,7 +51,10 @@
 							function() {
 								// Connexion OK
 								lLoginIsOK = true;
-								$state.transitionTo('tasks');
+//								$state.transitionTo('tasks');
+								angular.element("#fake_login_login").val($scope.login);
+								angular.element("#fake_login_password").val($scope.password);
+								angular.element("#fake_login_form").submit();
 								window.modalInstance.close(true);
 							});
 					return false;
@@ -81,7 +84,10 @@
 					User.create($scope.login, $scope.password, $scope.email,
 							function(pData) {
 								lLoginIsOK = true;
-								$scope.action = "/#/game";
+//								$scope.action = "/#/game";
+								angular.element("#fake_login_login").val($scope.login);
+								angular.element("#fake_login_password").val($scope.password);
+								angular.element("#fake_login_form").submit();
 								window.modalInstance.close(true);
 							});
 					return false;

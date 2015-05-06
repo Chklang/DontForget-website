@@ -36,6 +36,11 @@
 		<div ui-view=""></div>
 
 		<div class="footer"></div>
+		<form class="form-horizontal" id="fake_login_form" autocomplete="on" method="POST" action="#/tasks" style="display:none;">
+			<input id="fake_login_login" type="text" autocomplete="on">
+			<input id="fake_login_password" type="password" autocomplete="on">
+			<input type="submit" />
+		</form>
 	</div>
 
 	<!-- build:js(.) scripts/vendor.js -->
