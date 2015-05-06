@@ -31,6 +31,10 @@
 			url : '/tasks',
 			templateUrl : 'views/tasks.html',
 			controller : 'TasksCtrl'
+		}).state('myaccount', {
+			url : '/myaccount',
+			templateUrl : 'views/myaccount.html',
+			controller : 'MyAccountCtrl'
 		});
 
 		restProvider.restPath('/rest');

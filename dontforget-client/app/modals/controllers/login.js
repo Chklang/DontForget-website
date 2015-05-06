@@ -51,7 +51,6 @@
 							function() {
 								// Connexion OK
 								lLoginIsOK = true;
-//								$state.transitionTo('tasks');
 								angular.element("#fake_login_login").val($scope.login);
 								angular.element("#fake_login_password").val($scope.password);
 								angular.element("#fake_login_form").submit();
@@ -84,7 +83,6 @@
 					User.create($scope.login, $scope.password, $scope.email,
 							function(pData) {
 								lLoginIsOK = true;
-//								$scope.action = "/#/game";
 								angular.element("#fake_login_login").val($scope.login);
 								angular.element("#fake_login_password").val($scope.password);
 								angular.element("#fake_login_form").submit();

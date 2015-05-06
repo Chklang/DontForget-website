@@ -1,6 +1,7 @@
 {
 	"dontforget" : {
 		"menu" : {
+			"my_account" : "My account",
 			"my_tasks" : "My tasks",
 			"logout" : "Logout",
 			"login" : "Login"
@@ -21,7 +22,40 @@
 			"categories_buttons_update" : "Update",
 			"categories_buttons_delete" : "Delete",
 			"action_cancel" : "Cancel",
-			"saved_tasks_button_add_to_filter" : "Add to filters"
+			"saved_tasks_button_add_to_filter" : "Add to filters",
+			"modals" : {
+				"create_category" : {
+					"title" : "Create a new category",
+					"text" : "Put here name of the new category:",
+					"placeholder" : "Put the name here"
+				},
+				"update_category" : {
+					"title" : "Update a category",
+					"text" : "Put here new name of the category :",
+					"placeholder" : "Put the name here"
+				},
+				"delete_category" : {
+					"title" : "Delete a category",
+					"text" : "Are you sure to want to delete category {}?"
+				},
+				"no_category_selected" : {
+					"title" : "No category selected",
+					"text" : "Please select a category."
+				}
+			},
+			"changeState" : {
+				"to_finish" : "The task is finished.",
+				"to_open" : "The task is open.",
+				"to_delete" : "The task is deleted.",
+				"to_trash" : "The task is definitively deleted."
+			}
+		},
+		"myaccount" : {
+			"title" : "My account",
+			"pseudo" : "Login:",
+			"pass" : "Password:",
+			"mail" : "E-Mail :",
+			"update" : "Update my account"
 		}
 	}
 }

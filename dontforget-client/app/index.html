@@ -24,6 +24,7 @@
 	<div class="container" ng-controller="IndexCtrl">
 		<div class="header" style="margin-bottom:0px;">
 			<ul class="nav nav-pills pull-right">
+				<li><a ng-href="#/myaccount" ng-class="{ 'disabled' : !isConnected}" translate>dontforget.menu.my_account</a></li>
 				<li><a ng-href="#/tasks" ng-class="{ 'disabled' : !isConnected}" translate>dontforget.menu.my_tasks</a></li>
 				<li ng-show="isConnected"><a ng-href="#/" ng-click="login()" translate>dontforget.menu.logout</a></li>
 				<li ng-show="!isConnected"><a ng-href="#/" ng-click="login()" translate>dontforget.menu.login</a></li>
@@ -80,6 +81,7 @@
 	<script src="scripts/services/tasks.js"></script>
 	<script src="scripts/services/places.js"></script>
 	<script src="scripts/services/categories.js"></script>
+<script src="scripts/controllers/myaccount.js"></script>
 	<!-- endbuild -->
 </body>
 </html>
