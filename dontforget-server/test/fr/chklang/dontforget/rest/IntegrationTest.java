@@ -36,6 +36,7 @@ public class IntegrationTest {
 			ObjectNode lUserCreate = Json.newObject();
 			lUserCreate.put("pseudo", "Chklang");
 			lUserCreate.put("password", "Motdepasse");
+			lUserCreate.put("mail", "supermail@chklang.com");
 			
 			lTestRequestHelper.post("users/login", lUserCreate);
 			Assert.assertEquals("La connexion doit être refusée", 401, lTestRequestHelper.getStatus());
