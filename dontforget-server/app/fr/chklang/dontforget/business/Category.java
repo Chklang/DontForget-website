@@ -30,7 +30,7 @@ public class Category extends Model {
 	@JoinColumn(name="idUser")
 	private User user;
 
-	@Column(name="name", unique=true)
+	@Column(name="name")
 	private String name;
 	
 	@Column(name="lastUpdate", nullable=false)
