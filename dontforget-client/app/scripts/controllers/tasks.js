@@ -7,7 +7,7 @@
 	 * @description # TasksCtrl Controller of the dontforgetApp
 	 */
 	var myApp = angular.module('dontforgetApp');
-	myApp.controller('TasksCtrl', [ '$scope', '$state', 'Dialog', 'Tags', 'Places', 'Categories', 'Tasks', function($scope, $state, Dialog, Tags, Places, Categories, Tasks) {
+	myApp.controller('TasksCtrl', [ '$scope', '$state', '$translate', 'Dialog', 'Tags', 'Places', 'Categories', 'Tasks', function($scope, $state, $translate, Dialog, Tags, Places, Categories, Tasks) {
 		var execute = function (f) { f();};
 		
 		$scope.openTaskDropdown = false;
@@ -58,7 +58,8 @@
 		};
 		
 		$scope.deleteCategogy = function (pCategory) {
-			Dialog.confirm("dontforget.tasks.modals.delete_category.title", "dontforget.tasks.modals.delete_category.text" + pCategory.name + "?").then(function (pValue) {
+			var lText = $translate.instant("dontforget.tasks.modals.delete_category.text", {name:pCategory.name});
+			Dialog.confirm("dontforget.tasks.modals.delete_category.title", lText).then(function (pValue) {
 	        	Categories.delete(pCategory.name, function (pCategoryDto) {
 					var lNewCategoriesList = [];
 					angular.forEach($scope.categories, function (element) {
