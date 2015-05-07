@@ -31,29 +31,37 @@
 		$scope.ajouterCategorie = function () {
 			Dialog.prompt("dontforget.tasks.modals.create_category.title", "dontforget.tasks.modals.create_category.text", "dontforget.tasks.modals.create_category.placeholder").then(function (pNom) {
 				//Création de la catégorie et ajout
-				Categories.create(pNom, function (pCategoryDto) {
-					$scope.categories.push(pCategoryDto);
-				});
+				if (pNom === "" || pNom === null || pNom == undefined) {
+					Dialog.alert("dontforget.tasks.modals.create_category_empty_name.title", "dontforget.tasks.modals.create_category_empty_name.text");
+				} else {
+					Categories.create(pNom, function (pCategoryDto) {
+						$scope.categories.push(pCategoryDto);
+					});
+				}
 			});
 		};
 		
 		$scope.updateCategogy = function (pCategory) {
 			Dialog.prompt("dontforget.tasks.modals.update_category.title", "dontforget.tasks.modals.update_category.text", "dontforget.tasks.modals.update_category.placeholder", pCategory.name).then(function (pNom) {
 				//Modification de la catégorie et ajout
-				Categories.update(pCategory.name, pNom, function (pCategoryDto) {
-					var lOldName = pCategory.name;
-					pCategory.name = pCategoryDto.name;
-					//Update all tasks which use this category
-					angular.forEach($scope.allTasks, function (element) {
-						if (element.category.id == pCategoryDto.id) {
-							element.category = pCategoryDto;
+				if (pNom === "" || pNom === null || pNom == undefined) {
+					Dialog.alert("dontforget.tasks.modals.create_category_empty_name.title", "dontforget.tasks.modals.create_category_empty_name.text");
+				} else {
+					Categories.update(pCategory.name, pNom, function (pCategoryDto) {
+						var lOldName = pCategory.name;
+						pCategory.name = pCategoryDto.name;
+						//Update all tasks which use this category
+						angular.forEach($scope.allTasks, function (element) {
+							if (element.category.id == pCategoryDto.id) {
+								element.category = pCategoryDto;
+							}
+						});
+						
+						if ($scope.currentCategory != null && $scope.currentCategory == lOldName) {
+							$scope.currentCategory = pCategoryDto.name;
 						}
 					});
-					
-					if ($scope.currentCategory != null && $scope.currentCategory == lOldName) {
-						$scope.currentCategory = pCategoryDto.name;
-					}
-				});
+				}
 			});
 		};
 		

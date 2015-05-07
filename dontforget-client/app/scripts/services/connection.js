@@ -5,7 +5,7 @@
  * @name spacesimperiumApp.Connection
  * @description # Connection Service in the spacesimperiumApp.
  */
-angular.module('dontforgetApp').service('Connection', ['restRequest', function Connection(restRequest) {
+angular.module('dontforgetApp').service('Connection', ['$translate', 'restRequest', function Connection($translate, restRequest) {
 	// AngularJS will instantiate a singleton by calling "new" on this
 	// function
 	this.connect = function (pPseudo, pPassword, pSuccessCallback) {
@@ -17,11 +17,11 @@ angular.module('dontforgetApp').service('Connection', ['restRequest', function C
 			},
 			success : pSuccessCallback,
 			errorsCodes : {
-				'401' : function (pData) {
-					alert("Joueur non trouvé ou mot de passe erroné");//TODO TR
+				'401' : {
+					'text' : 'dontforget.services.Connection.connect.401'
 				},
-				'default' : function (pData) {
-					alert("Connexion impossible. Erreur inconnue : " + pData);//TODO TR
+				'default' : {
+					'title' : 'dontforget.services.Connection.connect.title'
 				}
 			}
 		});
@@ -31,8 +31,8 @@ angular.module('dontforgetApp').service('Connection', ['restRequest', function C
 			url : '/users/disconnect',
 			success : pSuccessCallback,
 			errorsCodes : {
-				'default' : function (pData) {
-					alert("Déconnexion impossible. Erreur inconnue : " + pData);//TODO TR
+				'default' : {
+					'title' : 'dontforget.services.Connection.disconnect.title'
 				}
 			}
 		});
@@ -45,8 +45,8 @@ angular.module('dontforgetApp').service('Connection', ['restRequest', function C
 				'401' : function (pData) {
 					pSuccessCallback(null);
 				},
-				'default' : function (pData) {
-					alert("Connexion impossible. Erreur inconnue : " + pData);//TODO TR
+				'default' : {
+					'title' : 'dontforget.services.Connection.me.title'
 				}
 			}
 		});

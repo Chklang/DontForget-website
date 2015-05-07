@@ -29,10 +29,18 @@
 					"text" : "Put here name of the new category:",
 					"placeholder" : "Put the name here"
 				},
+				"create_category_empty_name" : {
+					"title" : "Create a new category",
+					"text" : "Category name is mandatory!"
+				},
 				"update_category" : {
 					"title" : "Update a category",
 					"text" : "Put here new name of the category :",
 					"placeholder" : "Put the name here"
+				},
+				"update_category_empty_name" : {
+					"title" : "Update a category",
+					"text" : "Category name is mandatory!"
 				},
 				"delete_category" : {
 					"title" : "Delete a category",
@@ -56,6 +64,130 @@
 			"pass" : "Password:",
 			"mail" : "E-Mail :",
 			"update" : "Update my account"
+		},
+		"login" : {
+			"login_error" : {
+				"login" : {
+					"title" : "Login error",
+					"text" : "Please enter a login"
+				},
+				"password" : {
+					"title" : "Login error",
+					"text" : "Please enter a password"
+				}
+			},
+			"newaccount_error" : {
+				"login" : {
+					"title" : "New account error",
+					"text" : "Please enter a login"
+				},
+				"password" : {
+					"title" : "New account error",
+					"text" : "Please enter a password"
+				},
+				"password2" : {
+					"title" : "New account error",
+					"text" : "Please confirm your password"
+				},
+				"email" : {
+					"title" : "New account error",
+					"text" : "Please enter an e-mail"
+				},
+				"password_confirm" : {
+					"title" : "New account error",
+					"text" : "Password confirmation in error"
+				}
+			}
+		},
+		"dialogs" : {
+			"unknown_error" : {
+				"title" : "Unknown error",
+				"without_trace" : "An unknown error was occured.",
+				"with_trace" : "An unknown error was occured.<br />Trace : {{trace}}"
+			}
+		},
+		"services" : {
+			"Connection" : {
+				"connect" : {
+					"title" : "Login error",
+					"401" : "User not found or incorrect password."
+				},
+				"disconnect" : {
+					"title" : "Logout error"
+				},
+				"me" : {
+					"title" : "Cannot get information about your account"
+				}
+			},
+			"Categories" : {
+				"getAll" : {
+					"title" : "Impossible to get categories"
+				},
+				"create" : {
+					"title" : "Impossible to create the category",
+					"409" : "The name {{name}} already exists"
+				},
+				"update" : {
+					"title" : "Impossible to update the category",
+					"409" : "The name {{name}} already exists"
+				},
+				"delete" : {
+					"title" : "Impossible to delete the category",
+					"404" : "The category {{name}} wasn't found"
+				}
+			},
+			"Places" : {
+				"getAll" : {
+					"title" : "Impossible to get places"
+				},
+				"delete" : {
+					"title" : "Impossible to delete the place",
+					"404" : "The place {{id}} wasn't found"
+				}
+			},
+			"Tags" : {
+				"getAll" : {
+					"title" : "Impossible to get tags"
+				},
+				"delete" : {
+					"title" : "Impossible to delete the tag",
+					"404" : "The tag {{id}} wasn't found"
+				}
+			},
+			"Tasks" : {
+				"getAll" : {
+					"title" : "Impossible to get tasks"
+				},
+				"getAllByCategory" : {
+					"title" : "Impossible to get tasks",
+					"404" : "The category {{name}} wasn't found"
+				},
+				"get" : {
+					"title" : "Impossible to get the task",
+					"404" : "The task {{id}} wasn't found"
+				},
+				"create" : {
+					"title" : "Impossible to create the task"
+				},
+				"update" : {
+					"title" : "Impossible to update the task",
+					"404" : "The task {{id}} wasn't found"
+				},
+				"delete" : {
+					"title" : "Impossible to delete the task",
+					"404" : "The task {{id}} wasn't found"
+				}
+			},
+			"User" : {
+				"create" : {
+					"title" : "Impossible to create user",
+					"409" : "The login {{login}} is already used"
+				},
+				"update" : {
+					"title" : "Impossible to update user",
+					"409" : "The login {{login}} is already used"
+				}
+			}
 		}
 	}
 }

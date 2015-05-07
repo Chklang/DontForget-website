@@ -7,18 +7,14 @@
 	 * @description # tag Service in the dontforgetApp.
 	 */
 	var myApp = angular.module('dontforgetApp');
-	myApp.service('Tags', [ 'restRequest', function Tags(restRequest) {
+	myApp.service('Tags', [ '$translate', 'restRequest', function Tags($translate, restRequest) {
 		this.getAll = function(pSuccessCallback) {
 			return restRequest.get({
 				url : '/tags',
 				success : pSuccessCallback,
 				errorsCodes : {
-					'400' : function(pData) {
-						alert("Problème de paramètres : " + pData);// TODO TR
-					},
-					'default' : function(pData) {
-						alert("Impossible de récupérer la liste des tâches. Erreur inconnue : " + pData);// TODO
-																								// TR
+					'default' : {
+						'title' : 'dontforget.services.Tags.getAll.title'
 					}
 				}
 			});
@@ -28,12 +24,11 @@
 				url : '/tags/'+pId,
 				success : pSuccessCallback,
 				errorsCodes : {
-					'400' : function(pData) {
-						alert("Problème de paramètres : " + pData);// TODO TR
+					'404' : {
+						'text' : $translate.instant('dontforget.services.Tags.delete.404', {id:pId})
 					},
-					'default' : function(pData) {
-						alert("Impossible de supprimer le tag. Erreur inconnue : " + pData);// TODO
-						// TR
+					'default' : {
+						'title' : 'dontforget.services.Tags.delete.title'
 					}
 				}
 			});

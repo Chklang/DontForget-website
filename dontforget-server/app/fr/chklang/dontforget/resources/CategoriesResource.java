@@ -38,6 +38,9 @@ public class CategoriesResource extends AbstractRest {
 	public static Result create() {
 		return executeAndVerifyConnect(() -> {
 			String lText = request().body().asText();
+			if (StringUtils.isEmpty(lText)) {
+				return status(412);
+			}
 			Category lCategoryDB = Category.dao.findByNameAndUser(lText, getConnectedUser());
 			if (lCategoryDB != null) {
 				return status(409);
