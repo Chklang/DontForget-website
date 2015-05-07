@@ -57,8 +57,29 @@
 				contentType : 'text/plain',
 				success : pSuccessCallback,
 				errorsCodes : {
+					'404' : {
+						'text' : $translate.instant('dontforget.services.Categories.delete.409', {name:pName})
+					},
 					'default' : {
 						'title' : 'dontforget.services.Categories.delete.title'
+					}
+				}
+			});
+		};
+		this.moveAndDelete = function(pName, pCategoryReceiver, pSuccessCallback) {
+			return restRequest.delete({
+				url : '/categories/'+pName+'/'+pCategoryReceiver,
+				data : pName,
+				contentType : 'text/plain',
+				success : pSuccessCallback,
+				errorsCodes : {
+					'404' : function (pData) {
+						return {
+							'text' : $translate.instant('dontforget.services.Categories.moveAndDelete.404', {name:pData})
+						}
+					},
+					'default' : {
+						'title' : 'dontforget.services.Categories.moveAndDelete.title'
 					}
 				}
 			});

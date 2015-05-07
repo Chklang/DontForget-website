@@ -134,6 +134,10 @@
 				"delete" : {
 					"title" : "Impossible to delete the category",
 					"404" : "The category {{name}} wasn't found"
+				},
+				"moveAndDelete" : {
+					"title" : "Impossible to delete the category",
+					"404" : "The category {{name}} wasn't found"
 				}
 			},
 			"Places" : {

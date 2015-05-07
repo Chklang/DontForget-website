@@ -7,14 +7,15 @@
 	 * @description # user Service in the spacesimperiumApp.
 	 */
 	var myApp = angular.module('dontforgetApp');
-	myApp.service('User', [ '$translate', 'restRequest', function User($translate, restRequest) {
+	myApp.service('User', [ '$translate', '$cookieStore', 'restRequest', function User($translate, $cookieStore, restRequest) {
 		this.create = function(pLogin, pPassword, pEmail, pSuccessCallback) {
 			return restRequest.post({
 				url : '/users/create',
 				data : {
 					pseudo : pLogin,
 					password : pPassword,
-					mail : pEmail
+					mail : pEmail,
+					codelang : $cookieStore.get("lang")
 				},
 				success : pSuccessCallback,
 				errorsCodes : {
@@ -33,7 +34,8 @@
 				data : {
 					pseudo : pLogin,
 					password : pPassword,
-					mail : pEmail
+					mail : pEmail,
+					codelang : $cookieStore.get("lang")
 				},
 				success : pSuccessCallback,
 				errorsCodes : {

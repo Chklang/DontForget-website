@@ -35,6 +35,9 @@ public class User extends Model {
 	@Column(name="mail", length=255, nullable=false)
 	private String mail;
 	
+	@Column(name="codelang", length=30, nullable=true)
+	private String codelang;
+	
 	@Column(name="dateInscription", nullable=false)
 	private long dateInscription;
 	
@@ -91,6 +94,14 @@ public class User extends Model {
 
 	public void setMail(String mail) {
 		this.mail = mail;
+	}
+
+	public String getCodelang() {
+		return codelang;
+	}
+
+	public void setCodelang(String codelang) {
+		this.codelang = codelang;
 	}
 
 	/**

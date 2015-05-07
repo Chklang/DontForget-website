@@ -1,5 +1,5 @@
 <tabset>
-    <tab active="category_all" select="changeCurrentCategory(null)">
+    <tab active="category_all_is_chosen" select="changeCurrentCategory(null)">
     	<tab-heading translate>dontforget.tasks.categories_all</tab-heading>
     </tab>
     <tab ng-repeat="category in categories" active="category.active" select="changeCurrentCategory(category)" class="no-padding-right">
@@ -21,9 +21,9 @@
 <form>
 	<div class="form-group">
 		<label for="addTask" translate>dontforget.tasks.new_task</label>
-		<div class="dropdown" ng-class="{open:openTaskDropdown}">
+		<div class="dropdown" ng-class="{open:addTask_openDropdown}">
 			<input type="text" ng-click="addTaskClick()" ng-keyup="addTaskKeyUp($event)" ng-keydown="addTaskKeyDown($event)" class="form-control" id="addTask"
-				placeholder="{{'dontforget.tasks.new_task_placeholder' | translate}}" ng-model="addTaskValue" />
+				placeholder="{{'dontforget.tasks.new_task_placeholder' | translate}}" ng-model="addTaskText" />
 			<ul class="dropdown-menu" role="menu" aria-labelledby="addTask">
 				<li ng-class="{selected: addTaskDropdownIndexIsSelected(-1)}" role="presentation" ng-if="currentWord != null">{{currentWord}}</li>
 				<li
@@ -35,7 +35,7 @@
 	</div>
 </form>
 <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert(alert)">
-{{alert.msg}}
+{{alert.msg | translate}}
 <button class="btn btn-sucess" ng-click="cancelAction(alert)" ng-show="alert.cancel != null" translate>dontforget.tasks.action_cancel</button>
 </alert>
 <fieldset>

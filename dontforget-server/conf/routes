@@ -25,6 +25,7 @@ GET		/rest/categories							fr.chklang.dontforget.resources.CategoriesResource.f
 POST	/rest/categories							fr.chklang.dontforget.resources.CategoriesResource.create()
 PUT		/rest/categories/:name						fr.chklang.dontforget.resources.CategoriesResource.update(name:String)
 DELETE	/rest/categories/:name						fr.chklang.dontforget.resources.CategoriesResource.delete(name:String)
+DELETE	/rest/categories/:name/:receiver			fr.chklang.dontforget.resources.CategoriesResource.moveAndDelete(name:String, receiver:String)
 
 GET		/rest/synchronization/:lastUpdate			fr.chklang.dontforget.resources.SynchronizationResource.getUpdates(lastUpdate:Long)
 POST	/rest/synchronization						fr.chklang.dontforget.resources.SynchronizationResource.setUpdates()
