@@ -64,6 +64,40 @@
 			"pass" : "Password:",
 			"mail" : "E-Mail :",
 			"update" : "Update my account"
+		},
+		"login" : {
+			"login_error" : {
+				"login" : {
+					"title" : "Login error",
+					"text" : "Please enter a login"
+				},
+				"password" : {
+					"title" : "Login error",
+					"text" : "Please enter a password"
+				}
+			},
+			"newaccount_error" : {
+				"login" : {
+					"title" : "New account error",
+					"text" : "Please enter a login"
+				},
+				"password" : {
+					"title" : "New account error",
+					"text" : "Please enter a password"
+				},
+				"password2" : {
+					"title" : "New account error",
+					"text" : "Please confirm your password"
+				},
+				"email" : {
+					"title" : "New account error",
+					"text" : "Please enter an e-mail"
+				},
+				"password_confirm" : {
+					"title" : "New account error",
+					"text" : "Password confirmation in error"
+				}
+			}
 		}
 	}
 }

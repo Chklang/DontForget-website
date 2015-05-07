@@ -64,6 +64,40 @@
 			"pass" : "Mot de passe :",
 			"mail" : "E-Mail :",
 			"update" : "Mettre à jour mon compte"
+		},
+		"login" : {
+			"login_error" : {
+				"login" : {
+					"title" : "Erreur d'identification",
+					"text" : "Veuillez entrer un pseudonyme"
+				},
+				"password" : {
+					"title" : "Erreur d'identification",
+					"text" : "Veuillez entrer un mot de passe"
+				}
+			},
+			"newaccount_error" : {
+				"login" : {
+					"title" : "Erreur de création de compte",
+					"text" : "Veuillez entrer un pseudonyme"
+				},
+				"password" : {
+					"title" : "Erreur de création de compte",
+					"text" : "Veuillez entrer un mot de passe"
+				},
+				"password2" : {
+					"title" : "Erreur de création de compte",
+					"text" : "Veuillez confirmez votre mot de passe"
+				},
+				"email" : {
+					"title" : "Erreur de création de compte",
+					"text" : "Veuillez entrer une adresse e-mail"
+				},
+				"password_confirm" : {
+					"title" : "Erreur de création de compte",
+					"text" : "La confirmation du mot de passe est erroné"
+				}
+			}
 		}
 	}
 }
