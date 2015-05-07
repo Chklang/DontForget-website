@@ -40,7 +40,9 @@
 				$scope.login_submit = function() {
 					// window.modalInstance.close();
 					if ($scope.login == "") {
-						Dialog.alert("Erreur d'identification", "Veuillez entrer un pseudonyme");
+						Dialog.alert("Erreur d'identification", "Veuillez entrer un pseudonyme").then(function () {
+							angular.element("#login_login").focus();
+						});
 						return;
 					}
 					if ($scope.password == "") {
@@ -63,23 +65,33 @@
 
 				$scope.newcompte_submit = function() {
 					if ($scope.login == "") {
-						Dialog.alert("Erreur de création de compte", "Veuillez entrer un pseudonyme");
+						Dialog.alert("Erreur de création de compte", "Veuillez entrer un pseudonyme").then(function () {
+							angular.element("#login_login").focus();
+						});
 						return;
 					}
 					if ($scope.password == "") {
-						Dialog.alert("Erreur de création de compte", "Veuillez entrer un mot de passe");
+						Dialog.alert("Erreur de création de compte", "Veuillez entrer un mot de passe").then(function () {
+							angular.element("#login_password").focus();
+						});
 						return;
 					}
 					if ($scope.password2 == "") {
-						Dialog.alert("Erreur de création de compte", "Veuillez confirmez votre mot de passe");
+						Dialog.alert("Erreur de création de compte", "Veuillez confirmez votre mot de passe").then(function () {
+							angular.element("#login_password2").focus();
+						});
 						return;
 					}
 					if ($scope.email == "") {
-						Dialog.alert("Erreur de création de compte", "Veuillez entrer une adresse e-mail");
+						Dialog.alert("Erreur de création de compte", "Veuillez entrer une adresse e-mail").then(function () {
+							angular.element("#newcompte_mail").focus();
+						});
 						return;
 					}
 					if ($scope.password != $scope.password2) {
-						Dialog.alert("Erreur de création de compte", "La confirmation du mot de passe est erroné");
+						Dialog.alert("Erreur de création de compte", "La confirmation du mot de passe est erroné").then(function () {
+							angular.element("#login_password2").focus();
+						});
 						return;
 					}
 					User.create($scope.login, $scope.password, $scope.email,
