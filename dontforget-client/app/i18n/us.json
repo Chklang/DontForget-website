@@ -29,10 +29,18 @@
 					"text" : "Put here name of the new category:",
 					"placeholder" : "Put the name here"
 				},
+				"create_category_empty_name" : {
+					"title" : "Create a new category",
+					"text" : "Category name is mandatory!"
+				},
 				"update_category" : {
 					"title" : "Update a category",
 					"text" : "Put here new name of the category :",
 					"placeholder" : "Put the name here"
+				},
+				"update_category_empty_name" : {
+					"title" : "Update a category",
+					"text" : "Category name is mandatory!"
 				},
 				"delete_category" : {
 					"title" : "Delete a category",

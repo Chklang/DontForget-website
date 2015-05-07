@@ -29,10 +29,18 @@
 					"text" : "Entrez le nom de la nouvelle catégorie :",
 					"placeholder" : "Entrez le nom ici"
 				},
+				"create_category_empty_name" : {
+					"title" : "Créer une nouvelle catégorie",
+					"text" : "Le nom de la catégorie doit être renseigné!"
+				},
 				"update_category" : {
 					"title" : "Modifier une catégorie",
 					"text" : "Entrez le nouveau nom de la catégorie :",
 					"placeholder" : "Entrez le nom ici"
+				},
+				"update_category_empty_name" : {
+					"title" : "Modifier une catégorie",
+					"text" : "Le nom de la catégorie doit être renseigné!"
 				},
 				"delete_category" : {
 					"title" : "Suppression d'une catégorie",
