@@ -134,6 +134,10 @@
 				"delete" : {
 					"title" : "Impossible de supprimer la catégorie",
 					"404" : "La catégorie {{name}} n'a pas été trouvée"
+				},
+				"moveAndDelete" : {
+					"title" : "Impossible de supprimer la catégorie",
+					"404" : "La catégorie {{name}} n'a pas été trouvée"
 				}
 			},
 			"Places" : {

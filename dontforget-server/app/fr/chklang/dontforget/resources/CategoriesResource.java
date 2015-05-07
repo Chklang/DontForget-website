@@ -10,12 +10,14 @@ import org.apache.commons.lang3.StringUtils;
 import play.libs.Json;
 import play.mvc.Result;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import fr.chklang.dontforget.business.Category;
+import fr.chklang.dontforget.business.Task;
+import fr.chklang.dontforget.business.User;
 import fr.chklang.dontforget.dto.CategoryDTO;
+
 
 /**
  * @author Chklang
@@ -55,10 +57,44 @@ public class CategoriesResource extends AbstractRest {
 	
 	public static Result delete(String pTaskCategoryName) {
 		return executeAndVerifyConnect(() -> {
-			Category lCategoryDB = Category.dao.findByNameAndUser(pTaskCategoryName, getConnectedUser());
+			User lConnectedUser = getConnectedUser();
+			
+			Category lCategoryDB = Category.dao.findByNameAndUser(pTaskCategoryName, lConnectedUser);
 			if (lCategoryDB == null) {
-				return notFound();
+				return notFound(pTaskCategoryName);
 			}
+
+			Set<Task> lTasksToMove = Task.dao.findByCategoryAndUser(lCategoryDB, lConnectedUser);
+			if (!lTasksToMove.isEmpty())  {
+				return status(412);
+			}
+			
+			
+			lCategoryDB.delete();
+			return ok();
+		});
+	}
+	
+	public static Result moveAndDelete(String pTaskCategoryName, String pCategoryReceiver) {
+		return executeAndVerifyConnect(() -> {
+			User lConnectedUser = getConnectedUser();
+			
+			Category lCategoryDB = Category.dao.findByNameAndUser(pTaskCategoryName, lConnectedUser);
+			if (lCategoryDB == null) {
+				return notFound(pTaskCategoryName);
+			}
+			
+			Category lCategoryReceiver = Category.dao.findByNameAndUser(pCategoryReceiver, lConnectedUser);
+			if (lCategoryReceiver == null) {
+				return notFound(pCategoryReceiver);
+			}
+			
+			Set<Task> lTasksToMove = Task.dao.findByCategoryAndUser(lCategoryDB, lConnectedUser);
+			for (Task lTaskToMove : lTasksToMove) {
+				lTaskToMove.setCategory(lCategoryReceiver);
+				lTaskToMove.save();
+			}
+			
 			lCategoryDB.delete();
 			return ok();
 		});
