@@ -6,18 +6,14 @@
 	 * @description # Categories Service in the dontforgetApp.
 	 */
 	var lMyApp = angular.module('dontforgetApp');
-	lMyApp.service('Categories', [ 'restRequest', function Tasks(restRequest) {
+	lMyApp.service('Categories', [ '$translate', 'restRequest', function Tasks($translate, restRequest) {
 		this.getAll = function(pSuccessCallback) {
 			return restRequest.get({
 				url : '/categories',
 				success : pSuccessCallback,
 				errorsCodes : {
-					'400' : function(pData) {
-						alert("Problème de paramètres : " + pData);// TODO TR
-					},
-					'default' : function(pData) {
-						alert("Impossible de récupérer la liste des catégories. Erreur inconnue : " + pData);// TODO
-						// TR
+					'default' : {
+						'title' : 'dontforget.services.Categories.getAll.title'
 					}
 				}
 			});
@@ -29,14 +25,11 @@
 				contentType : 'text/plain',
 				success : pSuccessCallback,
 				errorsCodes : {
-					'400' : function(pData) {
-						alert("Problème de paramètres : " + pData);// TODO TR
-					},'409' : function(pData) {
-						alert("Le nom " + pNom + " existe déjà.");// TODO TR
+					'409' : {
+						'text' : $translate.instant('dontforget.services.Categories.create.409', {name:pName})
 					},
-					'default' : function(pData) {
-						alert("Impossible de créer la catégorie. Erreur inconnue : " + pData);// TODO
-						// TR
+					'default' : {
+						'title' : 'dontforget.services.Categories.create.title'
 					}
 				}
 			});
@@ -48,14 +41,11 @@
 				contentType : 'text/plain',
 				success : pSuccessCallback,
 				errorsCodes : {
-					'400' : function(pData) {
-						alert("Problème de paramètres : " + pData);// TODO TR
-					},'409' : function(pData) {
-						alert("Le nom " + pNom + " existe déjà.");// TODO TR
+					'409' : {
+						'text' : $translate.instant('dontforget.services.Categories.update.409', {name:pNewName})
 					},
-					'default' : function(pData) {
-						alert("Impossible de modifier la catégorie. Erreur inconnue : " + pData);// TODO
-						// TR
+					'default' : {
+						'title' : 'dontforget.services.Categories.update.title'
 					}
 				}
 			});
@@ -67,12 +57,8 @@
 				contentType : 'text/plain',
 				success : pSuccessCallback,
 				errorsCodes : {
-					'400' : function(pData) {
-						alert("Problème de paramètres : " + pData);// TODO TR
-					},
-					'default' : function(pData) {
-						alert("Impossible de supprimer la catégorie. Erreur inconnue : " + pData);// TODO
-						// TR
+					'default' : {
+						'title' : 'dontforget.services.Categories.delete.title'
 					}
 				}
 			});

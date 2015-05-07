@@ -98,6 +98,96 @@
 					"text" : "La confirmation du mot de passe est erroné"
 				}
 			}
+		},
+		"dialogs" : {
+			"unknown_error" : {
+				"title" : "Erreur inconnue",
+				"without_trace" : "Une erreur inconnue s'est produite.",
+				"with_trace" : "Une erreur inconnue s'est produite.<br />Trace : {{trace}}"
+			}
+		},
+		"services" : {
+			"Connection" : {
+				"connect" : {
+					"title" : "Erreur de connexion",
+					"401" : "Joueur non trouvé ou mot de passe erroné."
+				},
+				"disconnect" : {
+					"title" : "Erreur de deconnexion"
+				},
+				"me" : {
+					"title" : "Impossible d'obtenir d'information sur votre compte"
+				}
+			},
+			"Categories" : {
+				"getAll" : {
+					"title" : "Impossible de récupérer la liste des catégories"
+				},
+				"create" : {
+					"title" : "Impossible de créer la catégorie",
+					"409" : "Le nom {{name}} existe déjà"
+				},
+				"update" : {
+					"title" : "Impossible de modifier la catégorie",
+					"409" : "Le nom {{name}} existe déjà"
+				},
+				"delete" : {
+					"title" : "Impossible de supprimer la catégorie",
+					"404" : "La catégorie {{name}} n'a pas été trouvée"
+				}
+			},
+			"Places" : {
+				"getAll" : {
+					"title" : "Impossible de récupérer la liste des lieux"
+				},
+				"delete" : {
+					"title" : "Impossible de supprimer le lieu",
+					"404" : "Le lieu {{id}} n'a pas été trouvé"
+				}
+			},
+			"Tags" : {
+				"getAll" : {
+					"title" : "Impossible de récupérer la liste des tags"
+				},
+				"delete" : {
+					"title" : "Impossible de supprimer le tag",
+					"404" : "Le tag {{id}} n'a pas été trouvé"
+				}
+			},
+			"Tasks" : {
+				"getAll" : {
+					"title" : "Impossible de récupérer la liste des tâches"
+				},
+				"getAllByCategory" : {
+					"title" : "Impossible de récupérer la liste des tâches",
+					"404" : "La catégorie {{name}} n'a pas été trouvée"
+				},
+				"get" : {
+					"title" : "Impossible de récupérer la tâche",
+					"404" : "La tâche {{id}} n'a pas été trouvée"
+				},
+				"create" : {
+					"title" : "Impossible de créer la tâche"
+				},
+				"update" : {
+					"title" : "Impossible de mettre à jour la tâche",
+					"404" : "La tâche {{id}} n'a pas été trouvée"
+				},
+				"delete" : {
+					"title" : "Impossible de supprimer la tâche",
+					"404" : "La tâche {{id}} n'a pas été trouvée"
+				}
+			},
+			"User" : {
+				"create" : {
+					"title" : "Impossible de créer l'utilisateur",
+					"409" : "Le pseudonyme {{login}} est déjà utilisé"
+				},
+				"update" : {
+					"title" : "Impossible de modifier l'utilisateur",
+					"409" : "Le pseudonyme {{login}} est déjà utilisé"
+				}
+			}
 		}
 	}
 }

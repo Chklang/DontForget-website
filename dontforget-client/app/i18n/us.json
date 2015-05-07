@@ -98,6 +98,96 @@
 					"text" : "Password confirmation in error"
 				}
 			}
+		},
+		"dialogs" : {
+			"unknown_error" : {
+				"title" : "Unknown error",
+				"without_trace" : "An unknown error was occured.",
+				"with_trace" : "An unknown error was occured.<br />Trace : {{trace}}"
+			}
+		},
+		"services" : {
+			"Connection" : {
+				"connect" : {
+					"title" : "Login error",
+					"401" : "User not found or incorrect password."
+				},
+				"disconnect" : {
+					"title" : "Logout error"
+				},
+				"me" : {
+					"title" : "Cannot get information about your account"
+				}
+			},
+			"Categories" : {
+				"getAll" : {
+					"title" : "Impossible to get categories"
+				},
+				"create" : {
+					"title" : "Impossible to create the category",
+					"409" : "The name {{name}} already exists"
+				},
+				"update" : {
+					"title" : "Impossible to update the category",
+					"409" : "The name {{name}} already exists"
+				},
+				"delete" : {
+					"title" : "Impossible to delete the category",
+					"404" : "The category {{name}} wasn't found"
+				}
+			},
+			"Places" : {
+				"getAll" : {
+					"title" : "Impossible to get places"
+				},
+				"delete" : {
+					"title" : "Impossible to delete the place",
+					"404" : "The place {{id}} wasn't found"
+				}
+			},
+			"Tags" : {
+				"getAll" : {
+					"title" : "Impossible to get tags"
+				},
+				"delete" : {
+					"title" : "Impossible to delete the tag",
+					"404" : "The tag {{id}} wasn't found"
+				}
+			},
+			"Tasks" : {
+				"getAll" : {
+					"title" : "Impossible to get tasks"
+				},
+				"getAllByCategory" : {
+					"title" : "Impossible to get tasks",
+					"404" : "The category {{name}} wasn't found"
+				},
+				"get" : {
+					"title" : "Impossible to get the task",
+					"404" : "The task {{id}} wasn't found"
+				},
+				"create" : {
+					"title" : "Impossible to create the task"
+				},
+				"update" : {
+					"title" : "Impossible to update the task",
+					"404" : "The task {{id}} wasn't found"
+				},
+				"delete" : {
+					"title" : "Impossible to delete the task",
+					"404" : "The task {{id}} wasn't found"
+				}
+			},
+			"User" : {
+				"create" : {
+					"title" : "Impossible to create user",
+					"409" : "The login {{login}} is already used"
+				},
+				"update" : {
+					"title" : "Impossible to update user",
+					"409" : "The login {{login}} is already used"
+				}
+			}
 		}
 	}
 }

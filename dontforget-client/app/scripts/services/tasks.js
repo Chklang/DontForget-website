@@ -7,18 +7,14 @@
 	 * @description # task Service in the dontforgetApp.
 	 */
 	var myApp = angular.module('dontforgetApp');
-	myApp.service('Tasks', [ 'restRequest', function Tasks(restRequest) {
+	myApp.service('Tasks', [ '$translate', 'restRequest', function Tasks($translate, restRequest) {
 		this.getAll = function(pSuccessCallback) {
 			return restRequest.get({
 				url : '/tasks',
 				success : pSuccessCallback,
 				errorsCodes : {
-					'400' : function(pData) {
-						alert("Problème de paramètres : " + pData);// TODO TR
-					},
-					'default' : function(pData) {
-						alert("Impossible de récupérer la liste des tâches. Erreur inconnue : " + pData);// TODO
-																								// TR
+					'default' : {
+						'title' : 'dontforget.services.Tasks.getAll.title'
 					}
 				}
 			});
@@ -28,12 +24,11 @@
 				url : '/tasks/' + pCategoryName,
 				success : pSuccessCallback,
 				errorsCodes : {
-					'400' : function(pData) {
-						alert("Problème de paramètres : " + pData);// TODO TR
+					'404' : {
+						'text' : $translate.instant('dontforget.services.Tasks.getAllByCategory.404', {name:pCategoryName})
 					},
-					'default' : function(pData) {
-						alert("Impossible de récupérer la liste des tâches. Erreur inconnue : " + pData);// TODO
-						// TR
+					'default' : {
+						'title' : 'dontforget.services.Tasks.getAllByCategory.title'
 					}
 				}
 			});
@@ -43,12 +38,11 @@
 				url : '/tasks/' + pId,
 				success : pSuccessCallback,
 				errorsCodes : {
-					'400' : function(pData) {
-						alert("Problème de paramètres : " + pData);// TODO TR
+					'404' : {
+						'text' : $translate.instant('dontforget.services.Tasks.delete.404', {id:pId})
 					},
-					'default' : function(pData) {
-						alert("Impossible de récupérer la tâche. Erreur inconnue : " + pData);// TODO
-																								// TR
+					'default' : {
+						'title' : 'dontforget.services.Tasks.get.title'
 					}
 				}
 			});
@@ -60,12 +54,8 @@
 				data : pText,
 				success : pSuccessCallback,
 				errorsCodes : {
-					'400' : function(pData) {
-						alert("Problème de paramètres : " + pData);// TODO TR
-					},
-					'default' : function(pData) {
-						alert("Impossible de créer la tâche. Erreur inconnue : " + pData);// TODO
-																								// TR
+					'default' : {
+						'title' : 'dontforget.services.Tasks.create.title'
 					}
 				}
 			});
@@ -76,12 +66,11 @@
 				data : pData,
 				success : pSuccessCallback,
 				errorsCodes : {
-					'400' : function(pData) {
-						alert("Problème de paramètres : " + pData);// TODO TR
+					'404' : {
+						'text' : $translate.instant('dontforget.services.Tasks.delete.404', {id:pId})
 					},
-					'default' : function(pData) {
-						alert("Impossible de mettre à jour la tâche. Erreur inconnue : " + pData);// TODO
-																								// TR
+					'default' : {
+						'title' : 'dontforget.services.Tasks.update.title'
 					}
 				}
 			});
@@ -91,12 +80,11 @@
 				url : '/tasks/'+pId,
 				success : pSuccessCallback,
 				errorsCodes : {
-					'400' : function(pData) {
-						alert("Problème de paramètres : " + pData);// TODO TR
+					'404' : {
+						'text' : $translate.instant('dontforget.services.Tasks.delete.404', {id:pId})
 					},
-					'default' : function(pData) {
-						alert("Impossible de supprimer la tâche. Erreur inconnue : " + pData);// TODO
-						// TR
+					'default' : {
+						'title' : 'dontforget.services.Tasks.delete.title'
 					}
 				}
 			});
