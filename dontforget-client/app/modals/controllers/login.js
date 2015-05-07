@@ -11,8 +11,8 @@
 			'$scope',
 			'$state',
 			'User',
-			'Connection',
-			function($scope, $state, User, Connection) {
+			'Connection', 'Dialog',
+			function($scope, $state, User, Connection, Dialog) {
 				$scope.isNewCompte = false;
 				var lLoginIsOK = false;
 
@@ -40,11 +40,13 @@
 				$scope.login_submit = function() {
 					// window.modalInstance.close();
 					if ($scope.login == "") {
-						alert("Veuillez entrer un pseudonyme");
+						Dialog.alert("Erreur d'identification", "Veuillez entrer un pseudonyme");
 						return;
 					}
 					if ($scope.password == "") {
-						alert("Veuillez entrer un mot de passe");
+						Dialog.alert("Erreur d'identification", "Veuillez entrer un mot de passe").then(function () {
+							angular.element("#login_password").focus();
+						});
 						return;
 					}
 					Connection.connect($scope.login, $scope.password,
@@ -61,23 +63,23 @@
 
 				$scope.newcompte_submit = function() {
 					if ($scope.login == "") {
-						alert("Veuillez entrer un pseudonyme");
+						Dialog.alert("Erreur de création de compte", "Veuillez entrer un pseudonyme");
 						return;
 					}
 					if ($scope.password == "") {
-						alert("Veuillez entrer un mot de passe");
+						Dialog.alert("Erreur de création de compte", "Veuillez entrer un mot de passe");
 						return;
 					}
 					if ($scope.password2 == "") {
-						alert("Veuillez confirmez votre mot de passe");
+						Dialog.alert("Erreur de création de compte", "Veuillez confirmez votre mot de passe");
 						return;
 					}
 					if ($scope.email == "") {
-						alert("Veuillez entrer une adresse e-mail");
+						Dialog.alert("Erreur de création de compte", "Veuillez entrer une adresse e-mail");
 						return;
 					}
 					if ($scope.password != $scope.password2) {
-						alert("La confirmation du mot de passe est erroné");
+						Dialog.alert("Erreur de création de compte", "La confirmation du mot de passe est erroné");
 						return;
 					}
 					User.create($scope.login, $scope.password, $scope.email,
