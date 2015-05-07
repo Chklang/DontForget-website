@@ -33,6 +33,8 @@ public class UsersResource extends AbstractRest {
 			String lPseudo = getMandatoryValueAsString(lJson, "pseudo");
 			String lPassword = getMandatoryValueAsString(lJson, "password");
 			String lMail = getMandatoryValueAsString(lJson, "mail");
+			String lCodelang = getValueAsString(lJson, "codelang");
+			
 			lPassword = DigestUtils.sha1Hex(lPassword);
 
 			User lUser = User.dao.findByPseudo(lPseudo);
@@ -45,6 +47,7 @@ public class UsersResource extends AbstractRest {
 			lUser.setPassword(lPassword);
 			lUser.setDateInscription(System.currentTimeMillis());
 			lUser.setMail(lMail);
+			lUser.setCodelang(lCodelang);
 			lUser.save();
 
 			SessionHelper.setPlayerId(session(), lUser);
@@ -79,7 +82,7 @@ public class UsersResource extends AbstractRest {
 			}
 
 			SessionHelper.setPlayerId(session(), lUser);
-			return ok();
+			return ok(new UserDTO(lUser));
 		});
 	}
 
@@ -103,6 +106,7 @@ public class UsersResource extends AbstractRest {
 			String lPseudo = getValueAsString(lJson, "pseudo");
 			String lPassword = getValueAsString(lJson, "password");
 			String lMail = getValueAsString(lJson, "mail");
+			String lCodelang = getValueAsString(lJson, "codelang");
 
 			if (!StringUtils.isEmpty(lPseudo)) {
 				User lUserFromDB = User.dao.findByPseudo(lPseudo);
@@ -120,6 +124,9 @@ public class UsersResource extends AbstractRest {
 			}
 			if (!StringUtils.isEmpty(lMail)) {
 				lUser.setMail(lMail);
+			}
+			if (!StringUtils.isEmpty(lCodelang)) {
+				lUser.setCodelang(lCodelang);
 			}
 			
 			lUser.save();

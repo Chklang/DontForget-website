@@ -16,6 +16,8 @@ public class UserDTO extends ObjectNode {
 	
 	private final String mail;
 	
+	private final String codelang;
+	
 	private final long dateInscription;
 	
 	private final long lastUpdate;
@@ -26,6 +28,7 @@ public class UserDTO extends ObjectNode {
 		id = pJson.get("id").asInt();
 		pseudo = pJson.get("pseudo").asText();
 		mail = pJson.get("mail").asText();
+		codelang = pJson.get("codelang").asText();
 		dateInscription = pJson.get("dateInscription").asLong();
 		lastUpdate = pJson.get("lastUpdate").asLong();
 	}
@@ -36,6 +39,7 @@ public class UserDTO extends ObjectNode {
 		id = pUser.getIdUser();
 		pseudo = pUser.getPseudo();
 		mail = pUser.getMail();
+		codelang = pUser.getCodelang();
 		dateInscription = pUser.getDateInscription();
 		lastUpdate = pUser.getLastUpdate();
 		
@@ -46,6 +50,7 @@ public class UserDTO extends ObjectNode {
 		this.put("id", id);
 		this.put("pseudo", pseudo);
 		this.put("mail", mail);
+		this.put("codelang", codelang);
 		this.put("dateInscription", dateInscription);
 		
 		this.put("lastUpdate", lastUpdate);
@@ -61,6 +66,10 @@ public class UserDTO extends ObjectNode {
 
 	public String getMail() {
 		return mail;
+	}
+
+	public String getCodelang() {
+		return codelang;
 	}
 
 	public long getDateInscription() {
