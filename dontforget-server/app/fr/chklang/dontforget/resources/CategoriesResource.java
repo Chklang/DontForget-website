@@ -51,6 +51,7 @@ public class CategoriesResource extends AbstractRest {
 			lCategoryDB.setName(lText);
 			lCategoryDB.setUser(getConnectedUser());
 			lCategoryDB.save();
+			
 			return ok(new CategoryDTO(lCategoryDB));
 		});
 	}

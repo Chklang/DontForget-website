@@ -17,7 +17,10 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.StringUtils;
+
 import play.db.ebean.Model;
+import fr.chklang.dontforget.ConstantsHelper;
 import fr.chklang.dontforget.dao.TaskDAO;
 
 /**
@@ -59,6 +62,9 @@ public class Task extends Model {
 	
 	@Column(name="lastUpdate", nullable=false)
 	private long lastUpdate;
+	
+	@Column(name="uuid", unique=true, nullable=true)
+	private String uuid;
 	
 	public static final TaskDAO dao = new TaskDAO();
 
@@ -172,5 +178,28 @@ public class Task extends Model {
 	 */
 	public void setLastUpdate(long lastUpdate) {
 		this.lastUpdate = lastUpdate;
+	}
+
+	/**
+	 * @return the uuid
+	 */
+	public String getUuid() {
+		return uuid;
+	}
+
+	/**
+	 * @param uuid the uuid to set
+	 */
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+
+	@Override
+	public void save() {
+		super.save();
+		if (StringUtils.isEmpty(this.getUuid())) {
+			this.setUuid(ConstantsHelper.singleton().getDEVICE_ID() + "_" + getIdTask());
+			super.save();
+		}
 	}
 }

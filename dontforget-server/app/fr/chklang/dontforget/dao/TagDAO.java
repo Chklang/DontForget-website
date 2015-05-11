@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 
 import play.db.ebean.Model.Finder;
-import fr.chklang.dontforget.business.Category;
 import fr.chklang.dontforget.business.Tag;
 import fr.chklang.dontforget.business.User;
 
