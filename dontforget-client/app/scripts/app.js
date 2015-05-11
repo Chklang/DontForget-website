@@ -7,6 +7,8 @@
 	 * 
 	 * Main module of the application.
 	 */
+	var DialogService = null;
+	var TranslateService = null;
 	var myApp = angular.module('dontforgetApp', [ 'ngAnimate', 'ngAria',
 			'ngCookies', 'ngMessages', 'ngResource', 'ngRoute', 'ngSanitize',
 			'ngTouch', 'ui.bootstrap', 'ui.router', 'RestModule',
@@ -15,7 +17,6 @@
 			$translateProvider) {
 
 		$translateProvider.useLoader('i18nFilerevLoader');
-		$translateProvider.preferredLanguage('fr');
 
 		$urlRouterProvider.when("", "/main");
 		$urlRouterProvider.when("/", "/main");
@@ -31,9 +32,28 @@
 			url : '/tasks',
 			templateUrl : 'views/tasks.html',
 			controller : 'TasksCtrl'
+		}).state('myaccount', {
+			url : '/myaccount',
+			templateUrl : 'views/myaccount.html',
+			controller : 'MyAccountCtrl'
 		});
 
 		restProvider.restPath('/rest');
+		restProvider.setDefaultErrorCode('default', function (pData, pOptions) {
+			var lText = pOptions?pOptions.text:null;
+			var lTitle = pOptions?pOptions.title:"dontforget.dialogs.unknown_error.title";
+			if (pData === "" || pData === undefined || pData === null) {
+				lText = lText || "dontforget.dialogs.unknown_error.without_trace";
+				DialogService.alert(lTitle, lText);
+			} else {
+				lText = lText || TranslateService.instant("dontforget.dialogs.unknown_error.with_trace", {trace : pData});
+				DialogService.alert(lTitle, lText);
+			}
+		});
+	}]);
+	myApp.run(['Dialog', '$translate', function(Dialog, $translate) {
+		DialogService = Dialog;
+		TranslateService = $translate;
 	}]);
 	myApp.factory('i18nFilerevLoader', ['$http', '$q', function($http, $q) {
 		return function(options) {

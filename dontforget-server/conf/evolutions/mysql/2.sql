@@ -1,0 +1,7 @@
+# --- !Ups
+
+ALTER TABLE t_task_category DROP INDEX uq_T_TASK_CATEGORY_name;
+
+# --- !Downs
+
+ALTER TABLE T_TASK_CATEGORY ADD CONSTRAINT uq_T_TASK_CATEGORY_name UNIQUE(name);

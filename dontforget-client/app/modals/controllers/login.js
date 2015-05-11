@@ -11,13 +11,13 @@
 			'$scope',
 			'$state',
 			'User',
-			'Connection',
-			function($scope, $state, User, Connection) {
+			'Connection', 'Dialog',
+			function($scope, $state, User, Connection, Dialog) {
 				$scope.isNewCompte = false;
 				var lLoginIsOK = false;
 
-				$scope.login = "";
-				$scope.password = "";
+				$scope.login = angular.element("#fake_login_login").val();
+				$scope.password = angular.element("#fake_login_password").val();
 				$scope.password2 = "";
 				$scope.email = "";
 				$scope.action = "";
@@ -40,18 +40,24 @@
 				$scope.login_submit = function() {
 					// window.modalInstance.close();
 					if ($scope.login == "") {
-						alert("Veuillez entrer un pseudonyme");
+						Dialog.alert("dontforget.login.login_error.login.title", "dontforget.login.login_error.login.text").then(function () {
+							angular.element("#login_login").focus();
+						});
 						return;
 					}
 					if ($scope.password == "") {
-						alert("Veuillez entrer un mot de passe");
+						Dialog.alert("dontforget.login.login_error.password.title", "dontforget.login.login_error.password.text").then(function () {
+							angular.element("#login_password").focus();
+						});
 						return;
 					}
 					Connection.connect($scope.login, $scope.password,
 							function() {
 								// Connexion OK
 								lLoginIsOK = true;
-								$state.transitionTo('tasks');
+								angular.element("#fake_login_login").val($scope.login);
+								angular.element("#fake_login_password").val($scope.password);
+								angular.element("#fake_login_form").submit();
 								window.modalInstance.close(true);
 							});
 					return false;
@@ -59,29 +65,41 @@
 
 				$scope.newcompte_submit = function() {
 					if ($scope.login == "") {
-						alert("Veuillez entrer un pseudonyme");
+						Dialog.alert("dontforget.login.newaccount_error.login.title", "dontforget.login.newaccount_error.login.text").then(function () {
+							angular.element("#login_login").focus();
+						});
 						return;
 					}
 					if ($scope.password == "") {
-						alert("Veuillez entrer un mot de passe");
+						Dialog.alert("dontforget.login.newaccount_error.password.title", "dontforget.login.newaccount_error.password.text").then(function () {
+							angular.element("#login_password").focus();
+						});
 						return;
 					}
 					if ($scope.password2 == "") {
-						alert("Veuillez confirmez votre mot de passe");
+						Dialog.alert("dontforget.login.newaccount_error.password2.title", "dontforget.login.newaccount_error.password2.text").then(function () {
+							angular.element("#login_password2").focus();
+						});
 						return;
 					}
 					if ($scope.email == "") {
-						alert("Veuillez entrer une adresse e-mail");
+						Dialog.alert("dontforget.login.newaccount_error.email.title", "dontforget.login.newaccount_error.email.text").then(function () {
+							angular.element("#newcompte_mail").focus();
+						});
 						return;
 					}
 					if ($scope.password != $scope.password2) {
-						alert("La confirmation du mot de passe est erroné");
+						Dialog.alert("dontforget.login.newaccount_error.password_confirm.title", "dontforget.login.newaccount_error.password_confirm.text").then(function () {
+							angular.element("#login_password2").focus();
+						});
 						return;
 					}
 					User.create($scope.login, $scope.password, $scope.email,
 							function(pData) {
 								lLoginIsOK = true;
-								$scope.action = "/#/game";
+								angular.element("#fake_login_login").val($scope.login);
+								angular.element("#fake_login_password").val($scope.password);
+								angular.element("#fake_login_form").submit();
 								window.modalInstance.close(true);
 							});
 					return false;

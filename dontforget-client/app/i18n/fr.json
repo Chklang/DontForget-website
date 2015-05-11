@@ -1,6 +1,7 @@
 {
 	"dontforget" : {
 		"menu" : {
+			"my_account" : "Mon compte",
 			"my_tasks" : "Mes tâches",
 			"logout" : "Deconnexion",
 			"login" : "Connexion"
@@ -28,14 +29,22 @@
 					"text" : "Entrez le nom de la nouvelle catégorie :",
 					"placeholder" : "Entrez le nom ici"
 				},
+				"create_category_empty_name" : {
+					"title" : "Créer une nouvelle catégorie",
+					"text" : "Le nom de la catégorie doit être renseigné!"
+				},
 				"update_category" : {
 					"title" : "Modifier une catégorie",
 					"text" : "Entrez le nouveau nom de la catégorie :",
 					"placeholder" : "Entrez le nom ici"
 				},
+				"update_category_empty_name" : {
+					"title" : "Modifier une catégorie",
+					"text" : "Le nom de la catégorie doit être renseigné!"
+				},
 				"delete_category" : {
 					"title" : "Suppression d'une catégorie",
-					"text" : "Êtes-vous sûr de vouloir supprimer la catégorie {}?"
+					"text" : "Êtes-vous sûr de vouloir supprimer la catégorie {{name}}?"
 				},
 				"no_category_selected" : {
 					"title" : "Pas de catégorie sélectionnée",
@@ -47,6 +56,141 @@
 				"to_open" : "La tâche est marquée ouverte.",
 				"to_delete" : "La tâche est supprimée.",
 				"to_trash" : "La tâche est supprimée définitivement."
+			}
+		},
+		"myaccount" : {
+			"title" : "Mon compte",
+			"pseudo" : "Pseudonyme :",
+			"pass" : "Mot de passe :",
+			"mail" : "E-Mail :",
+			"update" : "Mettre à jour mon compte"
+		},
+		"login" : {
+			"login_error" : {
+				"login" : {
+					"title" : "Erreur d'identification",
+					"text" : "Veuillez entrer un pseudonyme"
+				},
+				"password" : {
+					"title" : "Erreur d'identification",
+					"text" : "Veuillez entrer un mot de passe"
+				}
+			},
+			"newaccount_error" : {
+				"login" : {
+					"title" : "Erreur de création de compte",
+					"text" : "Veuillez entrer un pseudonyme"
+				},
+				"password" : {
+					"title" : "Erreur de création de compte",
+					"text" : "Veuillez entrer un mot de passe"
+				},
+				"password2" : {
+					"title" : "Erreur de création de compte",
+					"text" : "Veuillez confirmez votre mot de passe"
+				},
+				"email" : {
+					"title" : "Erreur de création de compte",
+					"text" : "Veuillez entrer une adresse e-mail"
+				},
+				"password_confirm" : {
+					"title" : "Erreur de création de compte",
+					"text" : "La confirmation du mot de passe est erroné"
+				}
+			}
+		},
+		"dialogs" : {
+			"unknown_error" : {
+				"title" : "Erreur inconnue",
+				"without_trace" : "Une erreur inconnue s'est produite.",
+				"with_trace" : "Une erreur inconnue s'est produite.<br />Trace : {{trace}}"
+			}
+		},
+		"services" : {
+			"Connection" : {
+				"connect" : {
+					"title" : "Erreur de connexion",
+					"401" : "Joueur non trouvé ou mot de passe erroné."
+				},
+				"disconnect" : {
+					"title" : "Erreur de deconnexion"
+				},
+				"me" : {
+					"title" : "Impossible d'obtenir d'information sur votre compte"
+				}
+			},
+			"Categories" : {
+				"getAll" : {
+					"title" : "Impossible de récupérer la liste des catégories"
+				},
+				"create" : {
+					"title" : "Impossible de créer la catégorie",
+					"409" : "Le nom {{name}} existe déjà"
+				},
+				"update" : {
+					"title" : "Impossible de modifier la catégorie",
+					"409" : "Le nom {{name}} existe déjà"
+				},
+				"delete" : {
+					"title" : "Impossible de supprimer la catégorie",
+					"404" : "La catégorie {{name}} n'a pas été trouvée"
+				},
+				"moveAndDelete" : {
+					"title" : "Impossible de supprimer la catégorie",
+					"404" : "La catégorie {{name}} n'a pas été trouvée"
+				}
+			},
+			"Places" : {
+				"getAll" : {
+					"title" : "Impossible de récupérer la liste des lieux"
+				},
+				"delete" : {
+					"title" : "Impossible de supprimer le lieu",
+					"404" : "Le lieu {{id}} n'a pas été trouvé"
+				}
+			},
+			"Tags" : {
+				"getAll" : {
+					"title" : "Impossible de récupérer la liste des tags"
+				},
+				"delete" : {
+					"title" : "Impossible de supprimer le tag",
+					"404" : "Le tag {{id}} n'a pas été trouvé"
+				}
+			},
+			"Tasks" : {
+				"getAll" : {
+					"title" : "Impossible de récupérer la liste des tâches"
+				},
+				"getAllByCategory" : {
+					"title" : "Impossible de récupérer la liste des tâches",
+					"404" : "La catégorie {{name}} n'a pas été trouvée"
+				},
+				"get" : {
+					"title" : "Impossible de récupérer la tâche",
+					"404" : "La tâche {{id}} n'a pas été trouvée"
+				},
+				"create" : {
+					"title" : "Impossible de créer la tâche"
+				},
+				"update" : {
+					"title" : "Impossible de mettre à jour la tâche",
+					"404" : "La tâche {{id}} n'a pas été trouvée"
+				},
+				"delete" : {
+					"title" : "Impossible de supprimer la tâche",
+					"404" : "La tâche {{id}} n'a pas été trouvée"
+				}
+			},
+			"User" : {
+				"create" : {
+					"title" : "Impossible de créer l'utilisateur",
+					"409" : "Le pseudonyme {{login}} est déjà utilisé"
+				},
+				"update" : {
+					"title" : "Impossible de modifier l'utilisateur",
+					"409" : "Le pseudonyme {{login}} est déjà utilisé"
+				}
 			}
 		}
 	}

@@ -62,9 +62,8 @@ module.exports = function(grunt) {
 						options : {
 							livereload : '<%= connect.options.livereload %>'
 						},
-						files : [ '<%= yeoman.app %>/{,*/}*.html',
-								'.tmp/styles/{,*/}*.css',
-								'<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}' ]
+						files : [ '<%= yeoman.app %>/{,*/}*.*',
+								'.tmp/styles/{,*/}*.css' ]
 					}
 				},
 
@@ -246,6 +245,7 @@ module.exports = function(grunt) {
 							'<%= yeoman.dist %>/plugins/{,*/}*.js',
 							'<%= yeoman.dist %>/styles/{,*/}*.css',
 							'<%= yeoman.dist %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
+							'<%= yeoman.dist %>/styles/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
 							'<%= yeoman.dist %>/styles/fonts/*',
 							'<%= yeoman.dist %>/views/*.html',
 							'<%= yeoman.dist %>/modals/{,*/}*.html',
@@ -402,7 +402,8 @@ module.exports = function(grunt) {
 									        'plugins/**/*.html',
 											'*.html', 'views/{,*/}*.html','modals/{,*/}*.html',
 											'images/{,*/}*.{webp}',
-											'styles/fonts/{,*/}*.*' ]
+											'styles/fonts/{,*/}*.*',
+											'styles/{,*/}*.{png,jpg,jpeg,gif,webp,svg}' ]
 								}, {
 									expand : true,
 									cwd : '.tmp/images',

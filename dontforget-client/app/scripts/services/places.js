@@ -7,18 +7,14 @@
 	 * @description # place Service in the dontforgetApp.
 	 */
 	var myApp = angular.module('dontforgetApp');
-	myApp.service('Places', [ 'restRequest', function Places(restRequest) {
+	myApp.service('Places', [ '$translate', 'restRequest', function Places($translate, restRequest) {
 		this.getAll = function(pSuccessCallback) {
 			return restRequest.get({
 				url : '/places',
 				success : pSuccessCallback,
 				errorsCodes : {
-					'400' : function(pData) {
-						alert("Problème de paramètres : " + pData);// TODO TR
-					},
-					'default' : function(pData) {
-						alert("Impossible de récupérer la liste des tâches. Erreur inconnue : " + pData);// TODO
-																								// TR
+					'default' :  {
+						'title' : 'dontforget.services.Places.getAll.title'
 					}
 				}
 			});
@@ -28,12 +24,11 @@
 				url : '/places/'+pId,
 				success : pSuccessCallback,
 				errorsCodes : {
-					'400' : function(pData) {
-						alert("Problème de paramètres : " + pData);// TODO TR
+					'404' : {
+						'text' : $translate.instant('dontforget.services.Places.delete.404', {id:pId})
 					},
-					'default' : function(pData) {
-						alert("Impossible de supprimer le place. Erreur inconnue : " + pData);// TODO
-						// TR
+					'default' : {
+						'title' : 'dontforget.services.Places.delete.title'
 					}
 				}
 			});
