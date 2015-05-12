@@ -28,4 +28,8 @@ public class TaskDAO extends Finder<Integer, Task> {
 	public Collection<Task> findByLastUpdate(long pLastUpdate, User pUser) {
 		return this.where().ge("lastUpdate", pLastUpdate).eq("user", pUser).findList();
 	}
+	
+	public Task getByUuid(String pUuid) {
+		return this.where().eq("uuid", pUuid).findUnique();
+	}
 }

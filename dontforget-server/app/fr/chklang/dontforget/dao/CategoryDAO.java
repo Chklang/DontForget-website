@@ -27,4 +27,8 @@ public class CategoryDAO extends Finder<Integer, Category> {
 	public Collection<Category> findByLastUpdate(long pLastUpdate, User pUser) {
 		return this.where().ge("lastUpdate", pLastUpdate).eq("user", pUser).findList();
 	}
+	
+	public Category getByUuid(String pUuid) {
+		return this.where().eq("uuid", pUuid).findUnique();
+	}
 }

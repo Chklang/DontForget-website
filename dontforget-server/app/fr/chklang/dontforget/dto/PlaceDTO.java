@@ -17,7 +17,7 @@ public class PlaceDTO extends ObjectNode {
 	
 	private static final ObjectMapper mapper = new ObjectMapper();
 
-	private final int id;
+	private final String uuid;
 	
 	private final String name;
 	
@@ -26,7 +26,7 @@ public class PlaceDTO extends ObjectNode {
 	public PlaceDTO(JsonNode pJson) {
 		super(mapper.getNodeFactory());
 		
-		id = pJson.get("id").asInt();
+		uuid = pJson.get("uuid").asText();
 		name = pJson.get("name").asText();
 		lastUpdate = pJson.get("lastUpdate").asLong();
 		
@@ -36,7 +36,7 @@ public class PlaceDTO extends ObjectNode {
 	public PlaceDTO(Place pTag) {
 		super(mapper.getNodeFactory());
 		
-		id = pTag.getId();
+		uuid = pTag.getUuid();
 		name = pTag.getName();
 		lastUpdate = pTag.getLastUpdate();
 		
@@ -44,7 +44,7 @@ public class PlaceDTO extends ObjectNode {
 	}
 	
 	private void build() {
-		this.put("id", id);
+		this.put("uuid", uuid);
 		
 		this.put("name", name);
 		
@@ -52,10 +52,10 @@ public class PlaceDTO extends ObjectNode {
 	}
 
 	/**
-	 * @return the id
+	 * @return the uuid
 	 */
-	public int getId() {
-		return id;
+	public String getUuid() {
+		return uuid;
 	}
 
 	/**

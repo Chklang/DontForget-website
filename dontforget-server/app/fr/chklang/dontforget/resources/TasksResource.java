@@ -123,16 +123,16 @@ public class TasksResource extends AbstractRest {
 		});
 	}
 	
-	public static Result get(final int pIdTask) {
+	public static Result get(final String pUuidTask) {
 		return executeAndVerifyConnect(() -> {
-			Task lTask = Task.dao.byId(pIdTask);
+			Task lTask = Task.dao.getByUuid(pUuidTask);
 			return ok(new TaskDTO(lTask));
 		});
 	}
 	
-	public static Result delete(final int pIdTask) {
+	public static Result delete(final String pUuidTask) {
 		return executeAndVerifyConnect(() -> {
-			Task lTask = Task.dao.byId(pIdTask);
+			Task lTask = Task.dao.getByUuid(pUuidTask);
 			if (lTask == null) {
 				return notFound();
 			}
@@ -147,9 +147,9 @@ public class TasksResource extends AbstractRest {
 		});
 	}
 	
-	public static Result update(final int pIdTask) {
+	public static Result update(final String pUuidTask) {
 		return executeAndVerifyConnect(() -> {
-			Task lTask = Task.dao.byId(pIdTask);
+			Task lTask = Task.dao.getByUuid(pUuidTask);
 			if (lTask == null) {
 				return notFound();
 			}
