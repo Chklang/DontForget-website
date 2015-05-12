@@ -293,9 +293,17 @@ public class TasksActivity extends Activity {
 				return categories.size() + 1;
 			}
 		};
-		ListView categories_view = (ListView) findViewById(R.id.tasks_menu_list);
-		DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.tasks_menu_layout);
+		final ListView categories_view = (ListView) findViewById(R.id.tasks_menu_list);
+		final DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.tasks_menu_layout);
 		categories_view.setAdapter(categoriesAdapter);
+		
+		((ImageButton)this.findViewById(R.id.tasks_open_menu)).setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				mDrawerLayout.openDrawer(categories_view);				
+			}
+		});
 
 		// Set the list's click listener
 		categories_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
