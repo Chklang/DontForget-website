@@ -39,7 +39,7 @@ public class ConfigurationDAO extends AbstractDAO<Configuration, String> {
 	@Override
 	protected ContentValues onUpdate(Configuration pObjectToSave, Configuration pOriginalObject) {
 		ContentValues lValues = new ContentValues();
-		if (areEquals(pOriginalObject.getValue(), pObjectToSave.getValue())) {
+		if (!areEquals(pOriginalObject.getValue(), pObjectToSave.getValue())) {
 			lValues.put(COLUMN_VALUE, pObjectToSave.getValue());
 		}
 		

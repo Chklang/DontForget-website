@@ -4,6 +4,8 @@
     <string name="app_name">Don\'t Forget</string>
     <string name="welcome_text">Welcome on Don\'t forget application. Loading&#8230;</string>
     
+    <string name="tasks_new_text">New task</string>
+    
     <string name="connection_protocol">Protocol</string>
     <string name="connection_host">Server</string>
     <string name="connection_port">Port</string>

@@ -76,7 +76,7 @@ public class TokenDAO extends AbstractDAO<Token, TokenKey> {
 	@Override
 	protected ContentValues onUpdate(Token pObjectToSave, Token pOriginalObject) {
 		ContentValues lValues = new ContentValues();
-		if (areEquals(pOriginalObject.getToken(), pObjectToSave.getToken())) {
+		if (!areEquals(pOriginalObject.getToken(), pObjectToSave.getToken())) {
 			lValues.put(COLUMN_TOKEN, pObjectToSave.getToken());
 		}
 		

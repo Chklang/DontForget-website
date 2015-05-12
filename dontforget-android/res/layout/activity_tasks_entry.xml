@@ -7,21 +7,21 @@
 
     <ImageButton
         android:id="@+id/validate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/validate" />
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="@drawable/validate" />
 
     <ImageButton
         android:id="@+id/trash"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/trash" />
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="@drawable/trash" />
 
     <ImageButton
         android:id="@+id/delete"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/delete" />
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="@drawable/delete" />
 
     <TextView
         android:id="@+id/title_task"

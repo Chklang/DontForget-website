@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="welcome_text">Bienvenue sur l\'application Don\'t Forget. Chargement en cours&#8230;</string>
+
+    <string name="tasks_new_text">Nouvelle tâche</string>
     
     <string name="connection_protocol">Protocol</string>
     <string name="connection_host">Serveur</string>

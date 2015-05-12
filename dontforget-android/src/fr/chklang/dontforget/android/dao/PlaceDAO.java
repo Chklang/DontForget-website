@@ -62,13 +62,13 @@ public class PlaceDAO extends AbstractDAO<Place, Integer> {
 	@Override
 	protected ContentValues onUpdate(Place pObjectToSave, Place pOriginalObject) {
 		ContentValues lValues = new ContentValues();
-		if (areEquals(pOriginalObject.getName(), pObjectToSave.getName())) {
+		if (!areEquals(pOriginalObject.getName(), pObjectToSave.getName())) {
 			lValues.put(COLUMN_NAME, pObjectToSave.getName());
 		}
-		if (areEquals(pOriginalObject.getLastUpdate(), pObjectToSave.getLastUpdate())) {
+		if (!areEquals(pOriginalObject.getLastUpdate(), pObjectToSave.getLastUpdate())) {
 			lValues.put(COLUMN_LASTUPDATE, pObjectToSave.getLastUpdate());
 		}
-		if (areEquals(pOriginalObject.getUuid(), pObjectToSave.getUuid())) {
+		if (!areEquals(pOriginalObject.getUuid(), pObjectToSave.getUuid())) {
 			lValues.put(COLUMN_UUID, pObjectToSave.getUuid());
 		}
 		

@@ -16,6 +16,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -30,6 +31,7 @@ import fr.chklang.dontforget.android.dto.TaskStatus;
 
 @SuppressWarnings("deprecation")
 public class TasksActivity extends Activity {
+
 	private String categories_ALL;
 
 	private List<Category> categories = new ArrayList<Category>();
@@ -40,10 +42,10 @@ public class TasksActivity extends Activity {
 	private BaseAdapter categoriesAdapter;
 	private TaskStatus currentStatus;
 	private Category currentCategory;
-	
+
 	private CategoryDAO lCategoryDAO = new CategoryDAO();
-	private TaskDAO lTaskDAO = new TaskDAO();
-	
+	private TaskDAO taskDAO = new TaskDAO();
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -63,15 +65,19 @@ public class TasksActivity extends Activity {
 		categories.clear();
 		categories.addAll(lCategoryDAO.getAll());
 		tasks.clear();
-		tasks.addAll(lTaskDAO.getAll());
+		tasks.addAll(taskDAO.getAll());
 		categoriesAdapter.notifyDataSetChanged();
 	}
-	
+
 	private void initializeActionsButtons() {
 		ImageView lButtonInprogress = (ImageView) findViewById(R.id.tasks_inprogress);
 		ImageView lButtonFinished = (ImageView) findViewById(R.id.tasks_finished);
 		ImageView lButtonDeleted = (ImageView) findViewById(R.id.tasks_deleted);
 		ImageView lButtonAll = (ImageView) findViewById(R.id.tasks_all);
+
+		final EditText tasks_new_text = (EditText) this.findViewById(R.id.tasks_new_text);
+		ImageButton tasks_new_button = (ImageButton) this.findViewById(R.id.tasks_new_button);
+
 		lButtonInprogress.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -100,8 +106,29 @@ public class TasksActivity extends Activity {
 				actualiseTasksList();
 			}
 		});
+
+		tasks_new_button.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				String lTaskText = tasks_new_text.getText().toString();
+				if (lTaskText == null || lTaskText.isEmpty()) {
+					return;
+				}
+
+				Task lTask = new Task();
+				lTask.setName(lTaskText);
+				lTask.setIdCategory(1);
+				lTask.setStatus(TaskStatus.OPENED);
+				lTask.setLastUpdate(System.currentTimeMillis());
+
+				taskDAO.save(lTask);
+
+				tasks.add(lTask);
+				actualiseTasksList();
+			}
+		});
 	}
-	
+
 	private void actualiseTasksList() {
 		currentTasks.clear();
 		for (Task lTask : tasks) {
@@ -133,43 +160,69 @@ public class TasksActivity extends Activity {
 		tasksAdapter = new BaseAdapter() {
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
-				LayoutInflater mInflater = (LayoutInflater)TasksActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		        LinearLayout linearLayout;
-		        TextView title = null;
-		        ImageButton lValidateButton = null;
-		        ImageButton lTrashButton = null;
-		        ImageButton lDeleteButton = null;
+				LayoutInflater mInflater = (LayoutInflater) TasksActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				LinearLayout linearLayout;
+				TextView title = null;
+				ImageButton lValidateButton = null;
+				ImageButton lTrashButton = null;
+				ImageButton lDeleteButton = null;
 
-		        if (convertView == null) {
-		        	View view = mInflater.inflate(R.layout.activity_tasks_entry, parent, false);
-		        	linearLayout = (LinearLayout) view;
-		        } else {
-		            View view = convertView;
-		            linearLayout = (LinearLayout) view;
-		        }
+				final Task lCurrentTask = currentTasks.get(position);
 
-		        try {
-	                //  Otherwise, find the TextView field within the layout
-		        	for (int i=0; i<linearLayout.getChildCount(); i++) {
-		        		View lChild = linearLayout.getChildAt(i);
-		        		if (lChild.getId() == R.id.title_task) {
-		        			title = (TextView) lChild;
-		        		} else if (lChild.getId() == R.id.validate) {
-		        			lValidateButton = (ImageButton) lChild;
-		        		} else if (lChild.getId() == R.id.trash) {
-		        			lTrashButton = (ImageButton) lChild;
-		        		} else if (lChild.getId() == R.id.delete) {
-		        			lDeleteButton = (ImageButton) lChild;
-		        		}
-		        	}
-		        } catch (ClassCastException e) {
-		            Log.e("ArrayAdapter", "You must supply a resource ID for a TextView");
-		            throw new IllegalStateException(
-		                    "ArrayAdapter requires the resource ID to be a TextView", e);
-		        }
+				if (convertView == null) {
+					View view = mInflater.inflate(R.layout.activity_tasks_entry, parent, false);
+					linearLayout = (LinearLayout) view;
+				} else {
+					View view = convertView;
+					linearLayout = (LinearLayout) view;
+				}
 
-		        String item = getItem(position);
-	            title.setText(item);
+				try {
+					// Otherwise, find the TextView field within the layout
+					for (int i = 0; i < linearLayout.getChildCount(); i++) {
+						View lChild = linearLayout.getChildAt(i);
+						if (lChild.getId() == R.id.title_task) {
+							title = (TextView) lChild;
+						} else if (lChild.getId() == R.id.validate) {
+							lValidateButton = (ImageButton) lChild;
+						} else if (lChild.getId() == R.id.trash) {
+							lTrashButton = (ImageButton) lChild;
+						} else if (lChild.getId() == R.id.delete) {
+							lDeleteButton = (ImageButton) lChild;
+						}
+					}
+				} catch (ClassCastException e) {
+					Log.e("ArrayAdapter", "You must supply a resource ID for a TextView");
+					throw new IllegalStateException("ArrayAdapter requires the resource ID to be a TextView", e);
+				}
+
+				title.setText(lCurrentTask.getName());
+
+				// Enable buttons
+				lValidateButton.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						lCurrentTask.setStatus(TaskStatus.FINISHED);
+						taskDAO.save(lCurrentTask);
+						actualiseTasksList();
+					}
+				});
+				lTrashButton.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						lCurrentTask.setStatus(TaskStatus.DELETED);
+						taskDAO.save(lCurrentTask);
+						actualiseTasksList();
+					}
+				});
+				lDeleteButton.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						tasks.remove(lCurrentTask);
+						taskDAO.delete(lCurrentTask.getIdTask());
+						actualiseTasksList();
+					}
+				});
 				return linearLayout;
 			}
 
@@ -196,27 +249,26 @@ public class TasksActivity extends Activity {
 		categoriesAdapter = new BaseAdapter() {
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
-				LayoutInflater mInflater = (LayoutInflater)TasksActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		        View view;
-		        TextView text;
+				LayoutInflater mInflater = (LayoutInflater) TasksActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				View view;
+				TextView text;
 
-		        if (convertView == null) {
-		            view = mInflater.inflate(R.layout.activity_tasks_menu_entry, parent, false);
-		        } else {
-		            view = convertView;
-		        }
+				if (convertView == null) {
+					view = mInflater.inflate(R.layout.activity_tasks_menu_entry, parent, false);
+				} else {
+					view = convertView;
+				}
 
-		        try {
-	                //  Otherwise, find the TextView field within the layout
-	                text = (TextView) view;
-		        } catch (ClassCastException e) {
-		            Log.e("ArrayAdapter", "You must supply a resource ID for a TextView");
-		            throw new IllegalStateException(
-		                    "ArrayAdapter requires the resource ID to be a TextView", e);
-		        }
+				try {
+					// Otherwise, find the TextView field within the layout
+					text = (TextView) view;
+				} catch (ClassCastException e) {
+					Log.e("ArrayAdapter", "You must supply a resource ID for a TextView");
+					throw new IllegalStateException("ArrayAdapter requires the resource ID to be a TextView", e);
+				}
 
-		        String item = getItem(position);
-	            text.setText(item);
+				String item = getItem(position);
+				text.setText(item);
 				return text;
 			}
 
@@ -285,9 +337,9 @@ public class TasksActivity extends Activity {
 		}
 		actualiseTasksList();
 	}
-	
+
 	public void onBackPressed() {
-	    finish();
-	    return;  
+		finish();
+		return;
 	}
 }

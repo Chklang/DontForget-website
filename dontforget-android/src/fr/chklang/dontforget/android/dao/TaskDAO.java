@@ -63,19 +63,19 @@ public class TaskDAO extends AbstractDAO<Task, Integer> {
 	@Override
 	protected ContentValues onUpdate(Task pObjectToSave, Task pOriginalObject) {
 		ContentValues lValues = new ContentValues();
-		if (areEquals(pOriginalObject.getName(), pObjectToSave.getName())) {
+		if (!areEquals(pOriginalObject.getName(), pObjectToSave.getName())) {
 			lValues.put(COLUMN_NAME, pObjectToSave.getName());
 		}
-		if (areEquals(pOriginalObject.getLastUpdate(), pObjectToSave.getLastUpdate())) {
+		if (!areEquals(pOriginalObject.getLastUpdate(), pObjectToSave.getLastUpdate())) {
 			lValues.put(COLUMN_LASTUPDATE, pObjectToSave.getLastUpdate());
 		}
-		if (areEquals(pOriginalObject.getUuid(), pObjectToSave.getUuid())) {
+		if (!areEquals(pOriginalObject.getUuid(), pObjectToSave.getUuid())) {
 			lValues.put(COLUMN_UUID, pObjectToSave.getUuid());
 		}
-		if (areEquals(pOriginalObject.getIdCategory(), pObjectToSave.getIdCategory())) {
+		if (!areEquals(pOriginalObject.getIdCategory(), pObjectToSave.getIdCategory())) {
 			lValues.put(COLUMN_IDCATEGORY, pObjectToSave.getIdCategory());
 		}
-		if (areEquals(pOriginalObject.getStatus(), pObjectToSave.getStatus())) {
+		if (!areEquals(pOriginalObject.getStatus(), pObjectToSave.getStatus())) {
 			lValues.put(COLUMN_STATUS, pObjectToSave.getStatus().getIdStatus());
 		}
 		
