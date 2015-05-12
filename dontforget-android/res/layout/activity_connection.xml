@@ -9,13 +9,22 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="fr.chklang.dontforget.android.ConnectionActivity" >
 
+    <Spinner
+        android:id="@+id/connection_protocol"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:entries="@array/connection_protocols"
+        android:prompt="@string/connection_protocol"/>
+
     <EditText
-        android:id="@+id/connection_url"
+        android:id="@+id/connection_host"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:ems="10"
-        android:hint="@string/connection_url" />
+        android:hint="@string/connection_host"
+        android:inputType="text" />
 
     <EditText
         android:id="@+id/connection_port"
@@ -25,6 +34,15 @@
         android:ems="10"
         android:hint="@string/connection_port"
         android:inputType="number" />
+
+    <EditText
+        android:id="@+id/connection_context"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ems="10"
+        android:hint="@string/connection_context"
+        android:inputType="text" />
 
     <EditText
         android:id="@+id/connection_login"
@@ -51,23 +69,12 @@
         android:hint="@string/connection_send"
         android:text="@string/connection_send" />
 
-    <ScrollView
-        android:id="@+id/scrollView1"
+    <Button
+        android:id="@+id/connection_skip"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1" >
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" >
-            <ListView
-                android:id="@+id/connection_history"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
-            </ListView>
-
-        </LinearLayout>
-    </ScrollView>
+        android:layout_weight="1"
+        android:hint="@string/connection_skip"
+        android:text="@string/connection_skip" />
 
 </LinearLayout>

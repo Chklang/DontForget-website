@@ -27,4 +27,8 @@ public class DatabaseManager {
 	public static SQLiteDatabase getWrittableDatabase() {
 		return connection.get().getWritableDatabase();
 	}
+	
+	public static SQLiteDatabase getReadableDatabase() {
+		return connection.get().getReadableDatabase();
+	}
 }

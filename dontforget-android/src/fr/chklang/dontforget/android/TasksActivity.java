@@ -1,7 +1,6 @@
 package fr.chklang.dontforget.android;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import android.app.Activity;
@@ -23,25 +22,27 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import fr.chklang.dontforget.android.dto.CategoryDTO;
-import fr.chklang.dontforget.android.dto.TaskDTO;
+import fr.chklang.dontforget.android.business.Category;
+import fr.chklang.dontforget.android.business.Task;
+import fr.chklang.dontforget.android.dao.CategoryDAO;
+import fr.chklang.dontforget.android.dao.TaskDAO;
 import fr.chklang.dontforget.android.dto.TaskStatus;
-import fr.chklang.dontforget.android.services.AbstractService.Result;
-import fr.chklang.dontforget.android.services.CategoriesService;
-import fr.chklang.dontforget.android.services.TasksService;
 
 @SuppressWarnings("deprecation")
 public class TasksActivity extends Activity {
 	private String categories_ALL;
 
-	private List<CategoryDTO> categories = new ArrayList<CategoryDTO>();
-	private List<TaskDTO> tasks = new ArrayList<TaskDTO>();
-	private List<TaskDTO> currentTasks = new ArrayList<TaskDTO>();
+	private List<Category> categories = new ArrayList<Category>();
+	private List<Task> tasks = new ArrayList<Task>();
+	private List<Task> currentTasks = new ArrayList<Task>();
 
 	private BaseAdapter tasksAdapter;
 	private BaseAdapter categoriesAdapter;
 	private TaskStatus currentStatus;
-	private CategoryDTO currentCategory;
+	private Category currentCategory;
+	
+	private CategoryDAO lCategoryDAO = new CategoryDAO();
+	private TaskDAO lTaskDAO = new TaskDAO();
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -59,11 +60,10 @@ public class TasksActivity extends Activity {
 	}
 
 	private void refreshCategories() {
-		Result<Collection<CategoryDTO>> lResult = CategoriesService.getAll();
 		categories.clear();
-		categories.addAll(lResult.get());
+		categories.addAll(lCategoryDAO.getAll());
 		tasks.clear();
-		tasks.addAll(TasksService.getAll().get());
+		tasks.addAll(lTaskDAO.getAll());
 		categoriesAdapter.notifyDataSetChanged();
 	}
 	
@@ -104,8 +104,8 @@ public class TasksActivity extends Activity {
 	
 	private void actualiseTasksList() {
 		currentTasks.clear();
-		for (TaskDTO lTask : tasks) {
-			if (currentCategory == null || currentCategory.getName().equals(lTask.getCategoryName())) {
+		for (Task lTask : tasks) {
+			if (currentCategory == null || currentCategory.getIdCategory() == lTask.getIdCategory()) {
 				if (currentStatus == null) {
 					currentTasks.add(lTask);
 					continue;
@@ -175,12 +175,12 @@ public class TasksActivity extends Activity {
 
 			@Override
 			public long getItemId(int position) {
-				return currentTasks.get(position).getId();
+				return currentTasks.get(position).getIdTask();
 			}
 
 			@Override
 			public String getItem(int position) {
-				return currentTasks.get(position).getText();
+				return currentTasks.get(position).getName();
 			}
 
 			@Override
@@ -225,7 +225,7 @@ public class TasksActivity extends Activity {
 				if (position == 0) {
 					return -1;
 				}
-				return categories.get(position - 1).getId();
+				return categories.get(position - 1).getIdCategory();
 			}
 
 			@Override
@@ -280,9 +280,14 @@ public class TasksActivity extends Activity {
 			currentCategory = null;
 			currentTasks.addAll(tasks);
 		} else {
-			CategoryDTO lCategory = categories.get(pIndex - 1);
+			Category lCategory = categories.get(pIndex - 1);
 			currentCategory = lCategory;
 		}
 		actualiseTasksList();
+	}
+	
+	public void onBackPressed() {
+	    finish();
+	    return;  
 	}
 }

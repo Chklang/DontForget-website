@@ -34,7 +34,7 @@ public class Token extends Model {
 	@Column(name="token", updatable=false, insertable=false)
 	private String token;
 	
-	@Column(name="token", length=36)
+	@Column(name="deviceId", length=36)
 	private String deviceId;
 	
 	public static final TokenDAO dao = new TokenDAO();

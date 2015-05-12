@@ -49,6 +49,8 @@ public class TokenResource extends AbstractRest {
 			
 			Token lToken = new Token();
 			lToken.setKey(lTokenKey);
+			lToken.setUser(lUser);
+			lToken.setToken(lTokenKey.getToken());
 			lToken.setDeviceId(lDeviceId);
 			lToken.save();
 			

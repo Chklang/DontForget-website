@@ -1,7 +1,7 @@
 /**
  * 
  */
-package fr.chklang.dontforget.android.services;
+package fr.chklang.dontforget.android.rest;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -30,13 +30,13 @@ import org.apache.http.protocol.HTTP;
 import org.json.JSONObject;
 
 import fr.chklang.dontforget.android.AbstractDontForgetException;
-import fr.chklang.dontforget.android.Configuration;
+import fr.chklang.dontforget.android.ServerConfiguration;
 
 /**
  * @author Chklang
  *
  */
-public abstract class AbstractService {
+public abstract class AbstractRest {
 	public static interface CallbackOnException {
 		void call(Exception pException);
 	}
@@ -72,36 +72,27 @@ public abstract class AbstractService {
 		return new Result<T>(lExecutorService.submit(pCallable));
 	}
 
-	protected static HttpResponse get(String pUrl) {
+	protected static HttpResponse get(final ServerConfiguration pConfiguration, final String pUrl) {
 		try {
-			String lProtocol = Configuration.get().getProtocol();
-			String lUrl = Configuration.get().getUrl();
-			int lPort = Configuration.get().getPort();
-			HttpGet lHttpGet = new HttpGet(lProtocol + "://" + lUrl + ":" + lPort + pUrl);
-			return generic(lHttpGet);
+			HttpGet lHttpGet = new HttpGet(pConfiguration.composeUrl() + pUrl);
+			return generic(pConfiguration, lHttpGet);
 		} catch (Exception e) {
 			throw new AbstractDontForgetException(e);
 		}
 	}
 
-	protected static HttpResponse delete(String pUrl) {
+	protected static HttpResponse delete(final ServerConfiguration pConfiguration, final String pUrl) {
 		try {
-			String lProtocol = Configuration.get().getProtocol();
-			String lUrl = Configuration.get().getUrl();
-			int lPort = Configuration.get().getPort();
-			HttpDelete lHttpDelete = new HttpDelete(lProtocol + "://" + lUrl + ":" + lPort + pUrl);
-			return generic(lHttpDelete);
+			HttpDelete lHttpDelete = new HttpDelete(pConfiguration.composeUrl() + pUrl);
+			return generic(pConfiguration, lHttpDelete);
 		} catch (Exception e) {
 			throw new AbstractDontForgetException(e);
 		}
 	}
 
-	protected static HttpResponse post(String pUrl, JSONObject pData) {
+	protected static HttpResponse post(final ServerConfiguration pConfiguration, final String pUrl, final JSONObject pData) {
 		try {
-			String lProtocol = Configuration.get().getProtocol();
-			String lUrl = Configuration.get().getUrl();
-			int lPort = Configuration.get().getPort();
-			HttpPost lHttpPost = new HttpPost(lProtocol + "://" + lUrl + ":" + lPort + pUrl);
+			HttpPost lHttpPost = new HttpPost(pConfiguration.composeUrl() + pUrl);
 			if (pData != null) {
 				String lContentString = pData.toString();
 				StringEntity lEntity = new StringEntity(lContentString);
@@ -109,18 +100,15 @@ public abstract class AbstractService {
 				lEntity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json;charset=UTF-8"));
 				lHttpPost.setEntity(lEntity);
 			}
-			return generic(lHttpPost);
+			return generic(pConfiguration, lHttpPost);
 		} catch (Exception e) {
 			throw new AbstractDontForgetException(e);
 		}
 	}
 
-	protected static HttpResponse put(String pUrl, JSONObject pData) {
+	protected static HttpResponse put(final ServerConfiguration pConfiguration, final String pUrl, JSONObject pData) {
 		try {
-			String lProtocol = Configuration.get().getProtocol();
-			String lUrl = Configuration.get().getUrl();
-			int lPort = Configuration.get().getPort();
-			HttpPut lHttpPut = new HttpPut(lProtocol + "://" + lUrl + ":" + lPort + pUrl);
+			HttpPut lHttpPut = new HttpPut(pConfiguration.composeUrl() + pUrl);
 			if (pData != null) {
 				String lContentString = pData.toString();
 				StringEntity lEntity = new StringEntity(lContentString);
@@ -128,16 +116,16 @@ public abstract class AbstractService {
 				lEntity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json;charset=UTF-8"));
 				lHttpPut.setEntity(lEntity);
 			}
-			return generic(lHttpPut);
+			return generic(pConfiguration, lHttpPut);
 		} catch (Exception e) {
 			throw new AbstractDontForgetException(e);
 		}
 	}
 
-	private static HttpResponse generic(HttpUriRequest pRequest) {
+	private static HttpResponse generic(final ServerConfiguration pConfiguration, final HttpUriRequest pRequest) {
 		try {
 			HttpClient lHttpClient = new DefaultHttpClient();
-			for (Entry<String, String> lCookie : Configuration.get().getCookies().entrySet()) {
+			for (Entry<String, String> lCookie : pConfiguration.getCookies().entrySet()) {
 				pRequest.setHeader("Cookie", lCookie.getValue());
 			}
 			HttpResponse lHttpResponse = lHttpClient.execute(pRequest);
@@ -148,14 +136,14 @@ public abstract class AbstractService {
 				Cookie lCookieObject = parseRawCookie(lCookie.getValue());
 				lCookiesValues.put(lCookieObject.getName(), lCookie.getValue());
 			}
-			Configuration.get().setCookies(lCookiesValues);
+			pConfiguration.setCookies(lCookiesValues);
 			return lHttpResponse;
 		} catch (Exception e) {
 			throw new AbstractDontForgetException(e);
 		}
 	}
 
-	protected static BasicClientCookie parseRawCookie(String rawCookie) throws Exception {
+	protected static BasicClientCookie parseRawCookie(final String rawCookie) throws Exception {
 		String[] rawCookieParams = rawCookie.split(";");
 
 		String[] rawCookieNameAndValue = rawCookieParams[0].split("=");

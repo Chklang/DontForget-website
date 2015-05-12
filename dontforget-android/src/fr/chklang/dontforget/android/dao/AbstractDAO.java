@@ -17,6 +17,14 @@ import fr.chklang.dontforget.android.database.DatabaseManager;
  *
  */
 public abstract class AbstractDAO<T extends AbstractBusinessObject, Key> {
+	
+	public T get(Key pKey) {
+		return getByCriterias(whereKey(pKey));
+	}
+	
+	public Collection<T> getAll() {
+		return findByCriterias(null);
+	}
 
 	public void save(T pObject) {
 		if (pObject.isAlreadyIntoDB()) {
@@ -33,14 +41,6 @@ public abstract class AbstractDAO<T extends AbstractBusinessObject, Key> {
 		pObject.setAlreadyIntoDB(true);
 	}
 	
-	public T get(Key pKey) {
-		Pair<String, String[]> lWhere = whereKey(pKey);
-		Cursor lCursor = DatabaseManager.getWrittableDatabase().query(getTableName(), getColumnNames(), lWhere.first, lWhere.second, null, null, null);
-		T lResult = toObject(lCursor);
-		lResult.setAlreadyIntoDB(true);
-		return lResult;
-	}
-	
 	public void update(T pObject) {
 		ContentValues lValues = onUpdate(pObject, get(getKey(pObject)));
 		Pair<String, String[]> lWhere = whereKey(getKey(pObject));
@@ -53,6 +53,49 @@ public abstract class AbstractDAO<T extends AbstractBusinessObject, Key> {
 	public void delete(Key pKey) {
 		Pair<String, String[]> lWhere = whereKey(pKey);
 		DatabaseManager.getWrittableDatabase().delete(getTableName(), lWhere.first, lWhere.second);
+	}
+	
+	protected T getByCriterias(Pair<String, String[]> pCriterias) {
+		String lWhere = pCriterias == null?null:pCriterias.first;
+		String[] lWhereArgs = pCriterias == null?null:pCriterias.second;
+		Cursor lCursor = DatabaseManager.getReadableDatabase().query(getTableName(), getColumnNames(), lWhere, lWhereArgs, null, null, null);
+		T lResult = toObject(lCursor);
+		if (lResult != null) {
+			lResult.setAlreadyIntoDB(true);
+		}
+		return lResult;
+	}
+	
+	protected Collection<T> findByCriterias(Pair<String, String[]> pCriterias) {
+		String lWhere = pCriterias == null?null:pCriterias.first;
+		String[] lWhereArgs = pCriterias == null?null:pCriterias.second;
+		Cursor lCursor = DatabaseManager.getReadableDatabase().query(getTableName(), getColumnNames(), lWhere, lWhereArgs, null, null, null);
+		Collection<T> lResults = toListObjects(lCursor);
+		for (T lObject : lResults) {
+			lObject.setAlreadyIntoDB(true);
+		}
+		return lResults;
+	}
+	
+	protected String generateSelectFrom(String pTableAlias) {
+		String lQuery = "SELECT ";
+		boolean lMustAddSeparator = false;
+		for (String lColumnName : getColumnNames()) {
+			if (lMustAddSeparator) {
+				lQuery += ", ";
+			} else {
+				lMustAddSeparator = true;
+			}
+			if (pTableAlias != null && !pTableAlias.isEmpty()) {
+				lQuery += pTableAlias + ".";
+			}
+			lQuery += lColumnName;
+		}
+		lQuery += " FROM " + getTableName() + " ";
+		if (pTableAlias != null && !pTableAlias.isEmpty()) {
+			lQuery += pTableAlias + " ";
+		}
+		return lQuery;
 	}
 	
 	protected T toObject(Cursor pCursor) {
@@ -81,6 +124,7 @@ public abstract class AbstractDAO<T extends AbstractBusinessObject, Key> {
 		pCursor.moveToFirst();
 		while (!pCursor.isAfterLast()) {
 			lResults.add(toObject(pCursor));
+			pCursor.moveToNext();
 		}
 		
 		pCursor.close();

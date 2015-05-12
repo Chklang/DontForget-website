@@ -1,43 +1,50 @@
 package fr.chklang.dontforget.android;
 
+import java.util.UUID;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
-import fr.chklang.dontforget.android.services.AbstractService.CallbackOnException;
-import fr.chklang.dontforget.android.services.AbstractService.Result;
-import fr.chklang.dontforget.android.services.UsersService;
+import fr.chklang.dontforget.android.business.Configuration;
+import fr.chklang.dontforget.android.business.Token;
+import fr.chklang.dontforget.android.business.TokenKey;
+import fr.chklang.dontforget.android.dao.ConfigurationDAO;
+import fr.chklang.dontforget.android.dao.TokenDAO;
+import fr.chklang.dontforget.android.dto.TokenDTO;
+import fr.chklang.dontforget.android.rest.AbstractRest.CallbackOnException;
+import fr.chklang.dontforget.android.rest.AbstractRest.Result;
+import fr.chklang.dontforget.android.rest.TokensRest;
 
 public class ConnectionActivity extends Activity {
 
-	private EditText connection_url;
+	private Spinner connection_protocol;
+	private EditText connection_host;
 	private EditText connection_port;
+	private EditText connection_context;
 	private EditText connection_login;
 	private EditText connection_password;
 	private Button connection_send;
+	private Button connection_skip;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_connection);
 
-		connection_url = (EditText) this.findViewById(R.id.connection_url);
+		connection_protocol = (Spinner) this.findViewById(R.id.connection_protocol);
+		connection_host = (EditText) this.findViewById(R.id.connection_host);
 		connection_port = (EditText) this.findViewById(R.id.connection_port);
+		connection_context = (EditText) this.findViewById(R.id.connection_context);
 		connection_login = (EditText) this.findViewById(R.id.connection_login);
 		connection_password = (EditText) this.findViewById(R.id.connection_password);
 		connection_send = (Button) this.findViewById(R.id.connection_send);
-
-		// Default values
-		connection_url.setText("192.168.0.11");
-		connection_port.setText("9000");
-		connection_login.setText("Chklang");
-		connection_password.setText("password");
+		connection_skip = (Button) this.findViewById(R.id.connection_skip);
 
 		connection_send.setOnClickListener(new OnClickListener() {
 			@Override
@@ -45,49 +52,74 @@ public class ConnectionActivity extends Activity {
 				connection();
 			}
 		});
+		connection_skip.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				goToTasks();
+			}
+		});
+
+		init();
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.connection, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
+	private void init() {
+		ConfigurationDAO lConfigurationDAO = new ConfigurationDAO();
+		Configuration lDeviceId = lConfigurationDAO.get("DEVICE_ID");
+		if (lDeviceId == null) {
+			// Generate a device id
+			lDeviceId = new Configuration();
+			lDeviceId.setKey("DEVICE_ID");
+			lDeviceId.setValue(UUID.randomUUID().toString());
+			lConfigurationDAO.save(lDeviceId);
 		}
-		return super.onOptionsItemSelected(item);
 	}
 
 	private void connection() {
-		final String lUrl = connection_url.getText().toString();
+		final String lProtocol = String.valueOf(connection_protocol.getSelectedItem());
+		final String lHost = connection_host.getText().toString();
 		final int lPort = Integer.parseInt(connection_port.getText().toString());
+		final String lContext = connection_context.getText().toString();
 		final String lLogin = connection_login.getText().toString();
 		final String lPassword = connection_password.getText().toString();
-		Configuration.set(lUrl, lPort);
 
-		Result<Boolean> lResult = UsersService.connexion(lLogin, lPassword);
+		// Get device id
+		ConfigurationDAO lConfigurationDAO = new ConfigurationDAO();
+		Configuration lConfiguration = lConfigurationDAO.get("DEVICE_ID");
+
+		ServerConfiguration lServerConfiguration = ServerConfiguration.newConfiguration(lProtocol, lHost, lPort, lContext);
+
+		Result<TokenDTO> lResult = TokensRest.connexion(lServerConfiguration, lLogin, lPassword, lConfiguration.getValue());
 		lResult.setOnException(new CallbackOnException() {
 			@Override
 			public void call(Exception pException) {
 				Toast.makeText(ConnectionActivity.this, "Connection error", Toast.LENGTH_LONG).show();
-				;
 			}
 		});
-		boolean lConnectionIsOk = lResult.get();
-		if (!lConnectionIsOk) {
+		TokenDTO lTokenDTO = lResult.get();
+		if (lTokenDTO == null) {
 			Toast.makeText(ConnectionActivity.this, "Connection error", Toast.LENGTH_LONG).show();
-			;
 		} else {
-			Intent lIntent = new Intent(ConnectionActivity.this, TasksActivity.class);
-			startActivity(lIntent);
+			// Save it
+			TokenDAO lTokenDAO = new TokenDAO();
+			Token lToken = lTokenDAO.get(new TokenKey(lLogin, lServerConfiguration));
+			if (lToken == null) {
+				lToken = new Token(lLogin, lServerConfiguration);
+			}
+			lToken.setToken(lTokenDTO.getToken());
+			lTokenDAO.save(lToken);
+			goToTasks();
 		}
+	}
+
+	private void goToTasks() {
+		Intent lIntent = new Intent(ConnectionActivity.this, TasksActivity.class);
+		lIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		lIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);                  
+		startActivity(lIntent);
+	}
+
+	public void onBackPressed() {
+		finish();
+		return;
 	}
 }
