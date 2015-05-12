@@ -30,6 +30,9 @@ POST	/rest/categories/:name/tasks				fr.chklang.dontforget.resources.TasksResour
 GET		/rest/synchronization/:lastUpdate			fr.chklang.dontforget.resources.SynchronizationResource.getUpdates(lastUpdate:Long)
 POST	/rest/synchronization						fr.chklang.dontforget.resources.SynchronizationResource.setUpdates()
 
+POST	/rest/tokens/new							fr.chklang.dontforget.resources.TokenResource.create()
+POST	/rest/tokens/login							fr.chklang.dontforget.resources.TokenResource.login()
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET		/							controllers.Assets.at(path="/public", file="index.html")
