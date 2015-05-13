@@ -81,4 +81,8 @@ public class CategoryDAO extends AbstractDAO<Category, Integer> {
 		
 		return lResult;
 	}
+	
+	public Category getByName(String pName) {
+		return getByCriterias(Pair.create(COLUMN_NAME+"=?", new String[] {pName}));
+	}
 }

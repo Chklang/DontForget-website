@@ -4,8 +4,12 @@
     <string name="app_name">Don\'t Forget</string>
     <string name="welcome_text">Welcome on Don\'t forget application. Loading&#8230;</string>
     
-    <string name="tasks_nocategory">No category</string>
+    <string name="tasks_allcategories">All categories</string>
     <string name="tasks_new_text">New task</string>
+    
+    <string name="tasks_categories_delete_tasks_associated">Impossible to delete this category because some tasks are associated to it</string>
+    <string name="tasks_categories_create_name_already_used">Impossible to create this category because it already exists</string>
+    <string name="tasks_tasks_create_no_category_selected">Please select a category to create a task</string>
     
     <string name="connection_protocol">Protocol</string>
     <string name="connection_host">Server</string>

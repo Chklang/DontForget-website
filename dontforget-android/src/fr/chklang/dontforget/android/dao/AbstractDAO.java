@@ -123,7 +123,7 @@ public abstract class AbstractDAO<T extends AbstractBusinessObject, Key> {
 		
 		pCursor.moveToFirst();
 		while (!pCursor.isAfterLast()) {
-			lResults.add(toObject(pCursor));
+			lResults.add(cursorToObjectWithoutControl(pCursor));
 			pCursor.moveToNext();
 		}
 		

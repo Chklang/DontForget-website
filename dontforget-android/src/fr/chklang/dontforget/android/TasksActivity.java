@@ -1,6 +1,7 @@
 package fr.chklang.dontforget.android;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import android.app.Activity;
@@ -14,7 +15,6 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -28,6 +28,7 @@ import fr.chklang.dontforget.android.business.Task;
 import fr.chklang.dontforget.android.dao.CategoryDAO;
 import fr.chklang.dontforget.android.dao.TaskDAO;
 import fr.chklang.dontforget.android.dto.TaskStatus;
+import fr.chklang.dontforget.android.helpers.CategoriesHelper;
 
 @SuppressWarnings("deprecation")
 public class TasksActivity extends Activity {
@@ -43,7 +44,7 @@ public class TasksActivity extends Activity {
 	private TaskStatus currentStatus;
 	private Category currentCategory;
 
-	private CategoryDAO lCategoryDAO = new CategoryDAO();
+	private CategoryDAO categoryDAO = new CategoryDAO();
 	private TaskDAO taskDAO = new TaskDAO();
 
 	@Override
@@ -63,7 +64,7 @@ public class TasksActivity extends Activity {
 
 	private void refreshCategories() {
 		categories.clear();
-		categories.addAll(lCategoryDAO.getAll());
+		categories.addAll(categoryDAO.getAll());
 		tasks.clear();
 		tasks.addAll(taskDAO.getAll());
 		categoriesAdapter.notifyDataSetChanged();
@@ -114,13 +115,24 @@ public class TasksActivity extends Activity {
 				if (lTaskText == null || lTaskText.isEmpty()) {
 					return;
 				}
+				
+				if (currentCategory == null) {
+					Toast.makeText(TasksActivity.this, R.string.tasks_tasks_create_no_category_selected, Toast.LENGTH_LONG).show();
+
+					final LinearLayout leftmenu = (LinearLayout) findViewById(R.id.tasks_leftmenu);
+					final DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.tasks_menu_layout);
+					mDrawerLayout.openDrawer(leftmenu);	
+					return;
+				}
 
 				Task lTask = new Task();
 				lTask.setName(lTaskText);
-				lTask.setIdCategory(1);
+				lTask.setIdCategory(currentCategory.getIdCategory());
 				lTask.setStatus(TaskStatus.OPENED);
 				lTask.setLastUpdate(System.currentTimeMillis());
 
+				taskDAO.save(lTask);
+				lTask.setUuid(CategoriesHelper.getDeviceId() + "_" + lTask.getIdTask());
 				taskDAO.save(lTask);
 
 				tasks.add(lTask);
@@ -144,6 +156,16 @@ public class TasksActivity extends Activity {
 			}
 		}
 		tasksAdapter.notifyDataSetChanged();
+	}
+
+	private void actualiseCategoriesList() {
+		TextView lTextCategorySelected = (TextView) findViewById(R.id.tasks_category_selected);
+		if (currentCategory == null) {
+			lTextCategorySelected.setText(R.string.tasks_allcategories);
+		} else {
+			lTextCategorySelected.setText(currentCategory.getName());
+		}
+		categoriesAdapter.notifyDataSetChanged();
 	}
 
 	/* Called whenever we call invalidateOptionsMenu() */
@@ -250,26 +272,67 @@ public class TasksActivity extends Activity {
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
 				LayoutInflater mInflater = (LayoutInflater) TasksActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				View view;
-				TextView text;
+				
+				LinearLayout lParent;
+				TextView lText = null;
+				ImageButton lButtonDelete = null;
 
 				if (convertView == null) {
-					view = mInflater.inflate(R.layout.activity_tasks_menu_entry, parent, false);
+					lParent = (LinearLayout) mInflater.inflate(R.layout.activity_tasks_leftmenu_categories_entry, parent, false);
 				} else {
-					view = convertView;
+					lParent = (LinearLayout) convertView;
 				}
 
 				try {
 					// Otherwise, find the TextView field within the layout
-					text = (TextView) view;
+					for (int i = 0; i < lParent.getChildCount(); i++) {
+						View lChild = lParent.getChildAt(i);
+						if (lChild.getId() == R.id.tasks_leftmenu_categories_entry_text) {
+							lText = (TextView) lChild;
+						} else if (lChild.getId() == R.id.tasks_leftmenu_categories_entry_delete) {
+							lButtonDelete = (ImageButton) lChild;
+						}
+					}
 				} catch (ClassCastException e) {
 					Log.e("ArrayAdapter", "You must supply a resource ID for a TextView");
 					throw new IllegalStateException("ArrayAdapter requires the resource ID to be a TextView", e);
 				}
 
-				String item = getItem(position);
-				text.setText(item);
-				return text;
+				final Category lCategory = getCurrentCategory(position);
+
+				if (lCategory == null) {
+					lText.setText(categories_ALL);
+					lButtonDelete.setVisibility(View.INVISIBLE);
+				} else {
+					lText.setText(lCategory.getName());
+					lButtonDelete.setVisibility(View.VISIBLE);
+					lButtonDelete.setOnClickListener(new OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							Collection<Task> lTasksOfThisCategory = taskDAO.findByCategory(lCategory);
+							if (!lTasksOfThisCategory.isEmpty()) {
+								Toast.makeText(TasksActivity.this, R.string.tasks_categories_delete_tasks_associated, Toast.LENGTH_LONG).show();
+								return;
+							}
+							if (currentCategory != null && currentCategory.getIdCategory() == lCategory.getIdCategory()) {
+								//Move to "All tasks"
+								currentCategory = null;
+							}
+							categoryDAO.delete(lCategory.getIdCategory());
+							categories.remove(lCategory);
+							actualiseCategoriesList();
+							actualiseTasksList();
+						}
+					});
+				}
+				lParent.setOnClickListener(new OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
+						changeCategory(lCategory);
+					}
+				});
+				return lParent;
 			}
 
 			@Override
@@ -277,7 +340,7 @@ public class TasksActivity extends Activity {
 				if (position == 0) {
 					return -1;
 				}
-				return categories.get(position - 1).getIdCategory();
+				return getCurrentCategory(position).getIdCategory();
 			}
 
 			@Override
@@ -285,7 +348,14 @@ public class TasksActivity extends Activity {
 				if (position == 0) {
 					return categories_ALL;
 				}
-				return categories.get(position - 1).getName();
+				return getCurrentCategory(position).getName();
+			}
+			
+			private Category getCurrentCategory(int position) {
+				if (position == 0) {
+					return null;
+				}
+				return categories.get(position - 1);
 			}
 
 			@Override
@@ -294,6 +364,7 @@ public class TasksActivity extends Activity {
 			}
 		};
 		final ListView categories_view = (ListView) findViewById(R.id.tasks_menu_list);
+		final LinearLayout leftmenu = (LinearLayout) findViewById(R.id.tasks_leftmenu);
 		final DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.tasks_menu_layout);
 		categories_view.setAdapter(categoriesAdapter);
 		
@@ -301,15 +372,7 @@ public class TasksActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				mDrawerLayout.openDrawer(categories_view);				
-			}
-		});
-
-		// Set the list's click listener
-		categories_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				changeCategory(position);
+				mDrawerLayout.openDrawer(leftmenu);				
 			}
 		});
 		ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
@@ -317,7 +380,6 @@ public class TasksActivity extends Activity {
 			/** Called when a drawer has settled in a completely closed state. */
 			public void onDrawerClosed(View view) {
 				super.onDrawerClosed(view);
-				Toast.makeText(TasksActivity.this, "close", Toast.LENGTH_LONG).show();
 				invalidateOptionsMenu(); // creates call to
 											// onPrepareOptionsMenu()
 			}
@@ -325,7 +387,6 @@ public class TasksActivity extends Activity {
 			/** Called when a drawer has settled in a completely open state. */
 			public void onDrawerOpened(View drawerView) {
 				super.onDrawerOpened(drawerView);
-				Toast.makeText(TasksActivity.this, "open", Toast.LENGTH_LONG).show();
 				invalidateOptionsMenu(); // creates call to
 											// onPrepareOptionsMenu()
 			}
@@ -333,16 +394,44 @@ public class TasksActivity extends Activity {
 
 		// Set the drawer toggle as the DrawerListener
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
+		
+		//Enable button to create a category
+		final EditText categories_new_text = (EditText) this.findViewById(R.id.tasks_leftmenu_newcategory_text);
+		final ImageButton categories_new_button = (ImageButton) this.findViewById(R.id.tasks_leftmenu_newcategory_button);
+		categories_new_button.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				String lCategoryText = categories_new_text.getText().toString();
+				if (lCategoryText == null || lCategoryText.isEmpty()) {
+					return;
+				}
+
+				if (categoryDAO.getByName(lCategoryText) != null) {
+					Toast.makeText(TasksActivity.this, R.string.tasks_categories_create_name_already_used, Toast.LENGTH_LONG).show();
+					return;
+				}
+				Category lCategory = new Category();
+				lCategory.setLastUpdate(System.currentTimeMillis());
+				lCategory.setName(lCategoryText);
+				categoryDAO.save(lCategory);
+				lCategory.setUuid(CategoriesHelper.getDeviceId() + "_" + lCategory.getIdCategory());
+				categoryDAO.save(lCategory);
+
+				categories.add(lCategory);
+				
+				actualiseCategoriesList();
+			}
+		});
 	}
 
-	private void changeCategory(int pIndex) {
-		if (pIndex == 0) {
+	private void changeCategory(Category lNewCategory) {
+		if (lNewCategory == null) {
 			currentCategory = null;
 			currentTasks.addAll(tasks);
 		} else {
-			Category lCategory = categories.get(pIndex - 1);
-			currentCategory = lCategory;
+			currentCategory = lNewCategory;
 		}
+		actualiseCategoriesList();
 		actualiseTasksList();
 	}
 

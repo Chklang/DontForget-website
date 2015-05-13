@@ -1,7 +1,5 @@
 package fr.chklang.dontforget.android;
 
-import java.util.UUID;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,12 +9,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
-import fr.chklang.dontforget.android.business.Configuration;
 import fr.chklang.dontforget.android.business.Token;
 import fr.chklang.dontforget.android.business.TokenKey;
-import fr.chklang.dontforget.android.dao.ConfigurationDAO;
 import fr.chklang.dontforget.android.dao.TokenDAO;
 import fr.chklang.dontforget.android.dto.TokenDTO;
+import fr.chklang.dontforget.android.helpers.CategoriesHelper;
 import fr.chklang.dontforget.android.rest.AbstractRest.CallbackOnException;
 import fr.chklang.dontforget.android.rest.AbstractRest.Result;
 import fr.chklang.dontforget.android.rest.TokensRest;
@@ -58,20 +55,6 @@ public class ConnectionActivity extends Activity {
 				goToTasks();
 			}
 		});
-
-		init();
-	}
-
-	private void init() {
-		ConfigurationDAO lConfigurationDAO = new ConfigurationDAO();
-		Configuration lDeviceId = lConfigurationDAO.get("DEVICE_ID");
-		if (lDeviceId == null) {
-			// Generate a device id
-			lDeviceId = new Configuration();
-			lDeviceId.setKey("DEVICE_ID");
-			lDeviceId.setValue(UUID.randomUUID().toString());
-			lConfigurationDAO.save(lDeviceId);
-		}
 	}
 
 	private void connection() {
@@ -82,13 +65,9 @@ public class ConnectionActivity extends Activity {
 		final String lLogin = connection_login.getText().toString();
 		final String lPassword = connection_password.getText().toString();
 
-		// Get device id
-		ConfigurationDAO lConfigurationDAO = new ConfigurationDAO();
-		Configuration lConfiguration = lConfigurationDAO.get("DEVICE_ID");
-
 		ServerConfiguration lServerConfiguration = ServerConfiguration.newConfiguration(lProtocol, lHost, lPort, lContext);
 
-		Result<TokenDTO> lResult = TokensRest.connexion(lServerConfiguration, lLogin, lPassword, lConfiguration.getValue());
+		Result<TokenDTO> lResult = TokensRest.connexion(lServerConfiguration, lLogin, lPassword, CategoriesHelper.getDeviceId());
 		lResult.setOnException(new CallbackOnException() {
 			@Override
 			public void call(Exception pException) {

@@ -3,9 +3,12 @@
  */
 package fr.chklang.dontforget.android.dao;
 
+import java.util.Collection;
+
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.util.Pair;
+import fr.chklang.dontforget.android.business.Category;
 import fr.chklang.dontforget.android.business.Task;
 import fr.chklang.dontforget.android.dto.TaskStatus;
 
@@ -93,5 +96,9 @@ public class TaskDAO extends AbstractDAO<Task, Integer> {
 		lResult.setStatus(TaskStatus.getById(pCursor.getInt(pCursor.getColumnIndex(COLUMN_STATUS))));
 		
 		return lResult;
+	}
+	
+	public Collection<Task> findByCategory(Category pCategory) {
+		return findByCriterias(Pair.create(COLUMN_IDCATEGORY + "=?", new String[] {Integer.toString(pCategory.getIdCategory())}));
 	}
 }
