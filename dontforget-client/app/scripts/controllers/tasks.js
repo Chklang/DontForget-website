@@ -165,7 +165,7 @@
 		
 		execute(function () {
 			var lCurrentPrefix = null;
-			var addTaskElement = angular.element("#addTask")[0];
+			var addTaskElement = document.getElementById("addTask");
 	
 			//Get current word where user is
 			function getCurrentWord() {

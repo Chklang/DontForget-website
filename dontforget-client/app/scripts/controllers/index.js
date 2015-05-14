@@ -62,7 +62,7 @@
 					});
 					window.modalInstance.result.then(function(connectionIsOk) {
 						$rootScope.isConnected = true;
-						angular.element('#login_form').submit();
+						document.getElementById('login_form').submit();
 					});
 				};
 
