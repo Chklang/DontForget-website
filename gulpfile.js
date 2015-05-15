@@ -6,9 +6,13 @@ var shell = require('gulp-shell');
 var del = require('del');
 
 gulp.task( 'client', function () {
-    gulp.src( './dontforget-client/gulpfile.js' )
+    return gulp.src( './dontforget-client/gulpfile.js' )
         .pipe( chug( {
             tasks:  [ 'default' ],
+			logPackage : false,
+			logScript : false,
+			removeDate : true,
+			removeLineBreaks : true
         } ) );
 } );
 
