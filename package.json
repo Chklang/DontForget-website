@@ -1,0 +1,14 @@
+{
+  "name": "Dontforget",
+  "version": "1.0.0",
+  "dependencies": {},
+  "devDependencies": {
+    "del": "~1.1.1",
+    "gulp": "~3.8.10",
+    "gulp-chug": "~0.4.2",
+    "gulp-shell": "~0.4.1"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  }
+}
