@@ -13,6 +13,7 @@ public class Token extends AbstractBusinessObject {
 
 	private TokenKey tokenKey;
 	private String token;
+	private long lastSynchro;
 	
 	public Token() {
 		super();
@@ -51,10 +52,25 @@ public class Token extends AbstractBusinessObject {
 		this.token = token;
 	}
 
+	/**
+	 * @return the lastSynchro
+	 */
+	public long getLastSynchro() {
+		return lastSynchro;
+	}
+
+	/**
+	 * @param lastSynchro the lastSynchro to set
+	 */
+	public void setLastSynchro(long lastSynchro) {
+		this.lastSynchro = lastSynchro;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + (int) (lastSynchro ^ (lastSynchro >>> 32));
 		result = prime * result + ((token == null) ? 0 : token.hashCode());
 		result = prime * result + ((tokenKey == null) ? 0 : tokenKey.hashCode());
 		return result;
@@ -69,6 +85,8 @@ public class Token extends AbstractBusinessObject {
 		if (getClass() != obj.getClass())
 			return false;
 		Token other = (Token) obj;
+		if (lastSynchro != other.lastSynchro)
+			return false;
 		if (token == null) {
 			if (other.token != null)
 				return false;
@@ -84,6 +102,6 @@ public class Token extends AbstractBusinessObject {
 
 	@Override
 	public String toString() {
-		return "Token [tokenKey=" + tokenKey + ", token=" + token + "]";
+		return "Token [tokenKey=" + tokenKey + ", token=" + token + ", lastSynchro=" + lastSynchro + "]";
 	}
 }

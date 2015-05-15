@@ -80,10 +80,17 @@ public class DatabaseConnection extends SQLiteOpenHelper {
 		db.execSQL(lTableTaskTag);
 		db.execSQL(lTableToken);
 	}
+	
+	private void v2(SQLiteDatabase db) {
+		String lAddColumnToken = "ALTER TABLE \"t_token\" ADD COLUMN \"lastSynchro\" INTEGER NOT NULL DEFAULT 0";
+		db.execSQL(lAddColumnToken);
+	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		switch (oldVersion) {
+		case 1 :
+			v2(db);
 		default :
 			break;
 		}

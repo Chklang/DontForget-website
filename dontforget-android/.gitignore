@@ -1,1 +1,4 @@
 /bin
+res/drawable*
+node_modules
+lint.xml

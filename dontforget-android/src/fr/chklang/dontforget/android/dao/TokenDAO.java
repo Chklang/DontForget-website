@@ -22,6 +22,7 @@ public class TokenDAO extends AbstractDAO<Token, TokenKey> {
 	private static final String COLUMN_PORT = "port";
 	private static final String COLUMN_CONTEXT = "context";
 	private static final String COLUMN_TOKEN = "token";
+	private static final String COLUMN_LASTSYNCRHO = "lastSynchro";
 
 	@Override
 	protected TokenKey getKey(Token pObject) {
@@ -52,7 +53,7 @@ public class TokenDAO extends AbstractDAO<Token, TokenKey> {
 
 	@Override
 	protected String[] getColumnNames() {
-		return new String[] {COLUMN_PSEUDO, COLUMN_PROTOCOL, COLUMN_HOST, COLUMN_PORT, COLUMN_CONTEXT, COLUMN_TOKEN};
+		return new String[] {COLUMN_PSEUDO, COLUMN_PROTOCOL, COLUMN_HOST, COLUMN_PORT, COLUMN_CONTEXT, COLUMN_TOKEN, COLUMN_LASTSYNCRHO};
 	}
 
 	@Override
@@ -69,6 +70,7 @@ public class TokenDAO extends AbstractDAO<Token, TokenKey> {
 		lValues.put(COLUMN_PORT, pObject.getTokenKey().getPort());
 		lValues.put(COLUMN_CONTEXT, pObject.getTokenKey().getContext());
 		lValues.put(COLUMN_TOKEN, pObject.getToken());
+		lValues.put(COLUMN_LASTSYNCRHO, pObject.getLastSynchro());
 		
 		return lValues;
 	}
@@ -78,6 +80,9 @@ public class TokenDAO extends AbstractDAO<Token, TokenKey> {
 		ContentValues lValues = new ContentValues();
 		if (!areEquals(pOriginalObject.getToken(), pObjectToSave.getToken())) {
 			lValues.put(COLUMN_TOKEN, pObjectToSave.getToken());
+		}
+		if (!areEquals(pOriginalObject.getLastSynchro(), pObjectToSave.getLastSynchro())) {
+			lValues.put(COLUMN_LASTSYNCRHO, pObjectToSave.getLastSynchro());
 		}
 		
 		return lValues;
@@ -95,6 +100,7 @@ public class TokenDAO extends AbstractDAO<Token, TokenKey> {
 		
 		lResult.setTokenKey(lTokenKey);
 		lResult.setToken(pCursor.getString(pCursor.getColumnIndex(COLUMN_TOKEN)));
+		lResult.setLastSynchro(pCursor.getLong(pCursor.getColumnIndex(COLUMN_LASTSYNCRHO)));
 		
 		return lResult;
 	}
