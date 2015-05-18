@@ -13,7 +13,7 @@ import fr.chklang.dontforget.android.business.Token;
 import fr.chklang.dontforget.android.business.TokenKey;
 import fr.chklang.dontforget.android.dao.TokenDAO;
 import fr.chklang.dontforget.android.dto.TokenDTO;
-import fr.chklang.dontforget.android.helpers.CategoriesHelper;
+import fr.chklang.dontforget.android.helpers.ConfigurationHelper;
 import fr.chklang.dontforget.android.rest.AbstractRest.CallbackOnException;
 import fr.chklang.dontforget.android.rest.AbstractRest.Result;
 import fr.chklang.dontforget.android.rest.TokensRest;
@@ -67,7 +67,7 @@ public class ConnectionActivity extends Activity {
 
 		ServerConfiguration lServerConfiguration = ServerConfiguration.newConfiguration(lProtocol, lHost, lPort, lContext);
 
-		Result<TokenDTO> lResult = TokensRest.connexion(lServerConfiguration, lLogin, lPassword, CategoriesHelper.getDeviceId());
+		Result<TokenDTO> lResult = TokensRest.connexion(lServerConfiguration, lLogin, lPassword, ConfigurationHelper.getDeviceId());
 		lResult.setOnException(new CallbackOnException() {
 			@Override
 			public void call(Exception pException) {

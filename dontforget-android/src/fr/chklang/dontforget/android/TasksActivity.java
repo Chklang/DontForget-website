@@ -2,10 +2,17 @@ package fr.chklang.dontforget.android;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
@@ -15,6 +22,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -24,11 +32,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import fr.chklang.dontforget.android.business.Category;
+import fr.chklang.dontforget.android.business.Place;
+import fr.chklang.dontforget.android.business.Tag;
 import fr.chklang.dontforget.android.business.Task;
 import fr.chklang.dontforget.android.dao.CategoryDAO;
 import fr.chklang.dontforget.android.dao.TaskDAO;
 import fr.chklang.dontforget.android.dto.TaskStatus;
-import fr.chklang.dontforget.android.helpers.CategoriesHelper;
+import fr.chklang.dontforget.android.helpers.ConfigurationHelper;
 
 @SuppressWarnings("deprecation")
 public class TasksActivity extends Activity {
@@ -125,15 +135,60 @@ public class TasksActivity extends Activity {
 					return;
 				}
 
+				Set<Tag> lTags = new HashSet<Tag>();
+				Set<Place> lPlaces = new HashSet<Place>();
+				Set<Category> lCategories = new HashSet<Category>();
+				
+				Pattern lPatternTags = Pattern.compile(" #([^ ]+)");
+				Matcher lMatcher = lPatternTags.matcher(" " + lTaskText);
+				while (lMatcher.find()) {
+					String lTagString = lMatcher.group(1);
+					Tag lTag = Tag.dao.getByName(lTagString);
+					if (lTag == null) {
+						lTag = new Tag();
+						lTag.setName(lTagString);
+						lTag.setLastUpdate(System.currentTimeMillis());
+						Tag.dao.save(lTag);
+					}
+					lTags.add(lTag);
+					lTaskText = lTaskText.replace("#" + lTagString, "");
+				}
+				
+				Pattern lPatternPlaces = Pattern.compile(" @([^ ]+)");
+				lMatcher = lPatternPlaces.matcher(" " + lTaskText);
+				while (lMatcher.find()) {
+					String lPlaceString = lMatcher.group(1);
+					Place lPlace = Place.dao.getByName(lPlaceString);
+					if (lPlace == null) {
+						lPlace = new Place();
+						lPlace.setName(lPlaceString);
+						lPlace.setLastUpdate(System.currentTimeMillis());
+						Place.dao.save(lPlace);
+					}
+					lPlaces.add(lPlace);
+					lTaskText = lTaskText.replace("@" + lPlaceString, "");
+				}
+				
+				while (lTaskText.contains("  ")) {
+					lTaskText = lTaskText.replaceAll("  ",	" ");
+				}
+				
+				lTaskText = lTaskText.trim();
+
 				Task lTask = new Task();
 				lTask.setName(lTaskText);
 				lTask.setIdCategory(currentCategory.getIdCategory());
 				lTask.setStatus(TaskStatus.OPENED);
 				lTask.setLastUpdate(System.currentTimeMillis());
-
 				taskDAO.save(lTask);
-				lTask.setUuid(CategoriesHelper.getDeviceId() + "_" + lTask.getIdTask());
-				taskDAO.save(lTask);
+				
+				for (Tag lTag : lTags) {
+					Task.dao.addTagToTask(lTask, lTag);
+				}
+				
+				for (Place lPlace : lPlaces) {
+					Task.dao.addPlaceToTask(lTask, lPlace);
+				}
 
 				tasks.add(lTask);
 				actualiseTasksList();
@@ -180,6 +235,10 @@ public class TasksActivity extends Activity {
 
 	private void initializeTasksAdapter() {
 		tasksAdapter = new BaseAdapter() {
+			
+			Map<Tag, View> lBadgesTags = new HashMap<Tag, View>();
+			Map<Place, View> lBadgesPlaces = new HashMap<Place, View>();
+			
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
 				LayoutInflater mInflater = (LayoutInflater) TasksActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -245,6 +304,53 @@ public class TasksActivity extends Activity {
 						actualiseTasksList();
 					}
 				});
+				
+				//Add badges for tags
+				Collection<Tag> lTags = Tag.dao.getTagsOfTask(lCurrentTask);
+				Collection<View> lTagsViewToRemove = new ArrayList<View>();
+				for (Tag lTag : lTags) {
+					if (lBadgesTags.containsKey(lTag)) {
+						lTagsViewToRemove.remove(lBadgesTags.get(lTag));
+						continue;
+					}
+					TextView lTextView = new TextView(TasksActivity.this);
+					lTextView.setText("#" + lTag.getName());
+					lTextView.setBackgroundColor(Color.GRAY);
+					lTextView.setTextColor(Color.WHITE);
+					
+					LayoutParams lParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+					lTextView.setLayoutParams(lParams);
+					lTextView.setPadding(3, 3, 0, 0);
+					linearLayout.addView(lTextView);
+					lBadgesTags.put(lTag, lTextView);
+				}
+				//Remove old tags
+				for (View lView : lTagsViewToRemove) {
+					linearLayout.removeView(lView);
+				}
+				
+				Collection<Place> lPlaces = Place.dao.getPlacesOfTask(lCurrentTask);
+				Collection<View> lPlacesViewToRemove = new ArrayList<View>();
+				for (Place lPlace : lPlaces) {
+					if (lBadgesPlaces.containsKey(lPlace)) {
+						lPlacesViewToRemove.remove(lBadgesPlaces.get(lPlace));
+						continue;
+					}
+					TextView lTextView = new TextView(TasksActivity.this);
+					lTextView.setText("@" + lPlace.getName());
+					lTextView.setBackgroundColor(Color.GRAY);
+					lTextView.setTextColor(Color.WHITE);
+					
+					LayoutParams lParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+					lTextView.setLayoutParams(lParams);
+					lTextView.setPadding(3, 3, 0, 0);
+					linearLayout.addView(lTextView);
+					lBadgesPlaces.put(lPlace, lTextView);
+				}
+				//Remove old places
+				for (View lView : lPlacesViewToRemove) {
+					linearLayout.removeView(lView);
+				}
 				return linearLayout;
 			}
 
@@ -414,7 +520,7 @@ public class TasksActivity extends Activity {
 				lCategory.setLastUpdate(System.currentTimeMillis());
 				lCategory.setName(lCategoryText);
 				categoryDAO.save(lCategory);
-				lCategory.setUuid(CategoriesHelper.getDeviceId() + "_" + lCategory.getIdCategory());
+				lCategory.setUuid(ConfigurationHelper.getDeviceId() + "_" + lCategory.getIdCategory());
 				categoryDAO.save(lCategory);
 
 				categories.add(lCategory);

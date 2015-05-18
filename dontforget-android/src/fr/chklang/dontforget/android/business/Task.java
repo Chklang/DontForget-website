@@ -3,6 +3,7 @@
  */
 package fr.chklang.dontforget.android.business;
 
+import fr.chklang.dontforget.android.dao.TaskDAO;
 import fr.chklang.dontforget.android.dto.TaskStatus;
 
 /**
@@ -22,6 +23,8 @@ public class Task extends AbstractBusinessObject {
 	private int idCategory;
 	
 	private TaskStatus status;
+	
+	public static final TaskDAO dao = new TaskDAO();
 
 	/**
 	 * @return the idTask

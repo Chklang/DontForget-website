@@ -3,6 +3,8 @@
  */
 package fr.chklang.dontforget.android.business;
 
+import fr.chklang.dontforget.android.dao.TagDAO;
+
 /**
  * @author S0075724
  *
@@ -16,6 +18,8 @@ public class Tag extends AbstractBusinessObject {
 	private long lastUpdate;
 	
 	private String uuid;
+	
+	public static final TagDAO dao = new TagDAO();
 
 	/**
 	 * @return the idTag

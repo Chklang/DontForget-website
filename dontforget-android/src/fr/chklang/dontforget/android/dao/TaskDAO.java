@@ -9,8 +9,12 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.util.Pair;
 import fr.chklang.dontforget.android.business.Category;
+import fr.chklang.dontforget.android.business.Place;
+import fr.chklang.dontforget.android.business.Tag;
 import fr.chklang.dontforget.android.business.Task;
+import fr.chklang.dontforget.android.database.DatabaseManager;
 import fr.chklang.dontforget.android.dto.TaskStatus;
+import fr.chklang.dontforget.android.helpers.ConfigurationHelper;
 
 /**
  * @author S0075724
@@ -25,6 +29,15 @@ public class TaskDAO extends AbstractDAO<Task, Integer> {
 	public static final String COLUMN_UUID = "uuid";
 	public static final String COLUMN_IDCATEGORY = "category_id";
 	public static final String COLUMN_STATUS = "status";
+	
+	@Override
+	public void save(Task pObject) {
+		super.save(pObject);
+		if (pObject.getUuid() == null || pObject.getUuid().isEmpty()) {
+			pObject.setUuid(ConfigurationHelper.getDeviceId() + "_" + pObject.getIdTask());
+			super.save(pObject);
+		}
+	}
 
 	@Override
 	protected Integer getKey(Task pObject) {
@@ -100,5 +113,27 @@ public class TaskDAO extends AbstractDAO<Task, Integer> {
 	
 	public Collection<Task> findByCategory(Category pCategory) {
 		return findByCriterias(Pair.create(COLUMN_IDCATEGORY + "=?", new String[] {Integer.toString(pCategory.getIdCategory())}));
+	}
+	
+	public void addTagToTask(Task pTask, Tag pTag) {
+		ContentValues lValues = new ContentValues();
+		lValues.put("idTask", pTask.getIdTask());
+		lValues.put("idTag", pTag.getIdTag());
+		DatabaseManager.getWrittableDatabase().insert("t_task_tag", null, lValues);
+	}
+	
+	public void removeTagFromTask(Task pTask, Tag pTag) {
+		DatabaseManager.getWrittableDatabase().delete("t_task_tag", "idTask=? AND idTag=?", new String[]{Integer.toString(pTask.getIdTask()), Integer.toString(pTag.getIdTag())});
+	}
+	
+	public void addPlaceToTask(Task pTask, Place pPlace) {
+		ContentValues lValues = new ContentValues();
+		lValues.put("idTask", pTask.getIdTask());
+		lValues.put("idPlace", pPlace.getIdPlace());
+		DatabaseManager.getWrittableDatabase().insert("t_task_place", null, lValues);
+	}
+	
+	public void removeTagFromTask(Task pTask, Place pPlace) {
+		DatabaseManager.getWrittableDatabase().delete("t_task_place", "idTask=? AND idPlace=?", new String[]{Integer.toString(pTask.getIdTask()), Integer.toString(pPlace.getIdPlace())});
 	}
 }

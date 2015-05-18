@@ -10,7 +10,7 @@ import fr.chklang.dontforget.android.dao.ConfigurationDAO;
  * @author S0075724
  *
  */
-public class CategoriesHelper {
+public class ConfigurationHelper {
 
 	public static String getDeviceId() {
 		ConfigurationDAO lConfigurationDAO = new ConfigurationDAO();

@@ -3,6 +3,8 @@
  */
 package fr.chklang.dontforget.android.business;
 
+import fr.chklang.dontforget.android.dao.PlaceDAO;
+
 /**
  * @author S0075724
  *
@@ -16,6 +18,8 @@ public class Place extends AbstractBusinessObject {
 	private long lastUpdate;
 	
 	private String uuid;
+	
+	public static final PlaceDAO dao = new PlaceDAO();
 
 	/**
 	 * @return the idPlace

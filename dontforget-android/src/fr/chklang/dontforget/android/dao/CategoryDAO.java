@@ -7,6 +7,8 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.util.Pair;
 import fr.chklang.dontforget.android.business.Category;
+import fr.chklang.dontforget.android.business.Place;
+import fr.chklang.dontforget.android.helpers.ConfigurationHelper;
 
 /**
  * @author S0075724
@@ -19,6 +21,15 @@ public class CategoryDAO extends AbstractDAO<Category, Integer> {
 	public static final String COLUMN_NAME = "name";
 	public static final String COLUMN_LASTUPDATE = "lastUpdate";
 	public static final String COLUMN_UUID = "uuid";
+	
+	@Override
+	public void save(Category pObject) {
+		super.save(pObject);
+		if (pObject.getUuid() == null || pObject.getUuid().isEmpty()) {
+			pObject.setUuid(ConfigurationHelper.getDeviceId() + "_" + pObject.getIdCategory());
+			super.save(pObject);
+		}
+	}
 
 	@Override
 	protected Integer getKey(Category pObject) {

@@ -11,6 +11,7 @@ import android.util.Pair;
 import fr.chklang.dontforget.android.business.Tag;
 import fr.chklang.dontforget.android.business.Task;
 import fr.chklang.dontforget.android.database.DatabaseManager;
+import fr.chklang.dontforget.android.helpers.ConfigurationHelper;
 
 /**
  * @author S0075724
@@ -23,6 +24,15 @@ public class TagDAO extends AbstractDAO<Tag, Integer> {
 	public static final String COLUMN_NAME = "name";
 	public static final String COLUMN_LASTUPDATE = "lastUpdate";
 	public static final String COLUMN_UUID = "uuid";
+	
+	@Override
+	public void save(Tag pObject) {
+		super.save(pObject);
+		if (pObject.getUuid() == null || pObject.getUuid().isEmpty()) {
+			pObject.setUuid(ConfigurationHelper.getDeviceId() + "_" + pObject.getIdTag());
+			super.save(pObject);
+		}
+	}
 
 	@Override
 	protected Integer getKey(Tag pObject) {
@@ -91,5 +101,12 @@ public class TagDAO extends AbstractDAO<Tag, Integer> {
 		lQuery += ", t_task_tag TT WHERE TT.idTask=? AND TT.idTag = T.idTag";
 		Cursor lCursor = DatabaseManager.getReadableDatabase().rawQuery(lQuery, new String[] {Integer.toString(pTask.getIdTask())});
 		return toListObjects(lCursor);
+	}
+	
+	public Tag getByName(String pName) {
+		String lQuery = generateSelectFrom("T");
+		lQuery += " WHERE T."+COLUMN_NAME+"=+?";
+		Cursor lCursor = DatabaseManager.getReadableDatabase().rawQuery(lQuery, new String[] {pName});
+		return toObject(lCursor);
 	}
 }

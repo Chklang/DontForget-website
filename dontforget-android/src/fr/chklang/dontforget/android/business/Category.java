@@ -3,6 +3,8 @@
  */
 package fr.chklang.dontforget.android.business;
 
+import fr.chklang.dontforget.android.dao.CategoryDAO;
+
 /**
  * @author S0075724
  *
@@ -16,6 +18,8 @@ public class Category extends AbstractBusinessObject {
 	private long lastUpdate;
 	
 	private String uuid;
+	
+	public static final CategoryDAO dao = new CategoryDAO();
 
 	/**
 	 * @return the idCategory

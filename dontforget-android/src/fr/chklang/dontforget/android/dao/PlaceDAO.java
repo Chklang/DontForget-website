@@ -11,6 +11,7 @@ import android.util.Pair;
 import fr.chklang.dontforget.android.business.Place;
 import fr.chklang.dontforget.android.business.Task;
 import fr.chklang.dontforget.android.database.DatabaseManager;
+import fr.chklang.dontforget.android.helpers.ConfigurationHelper;
 
 /**
  * @author S0075724
@@ -23,6 +24,15 @@ public class PlaceDAO extends AbstractDAO<Place, Integer> {
 	public static final String COLUMN_NAME = "name";
 	public static final String COLUMN_LASTUPDATE = "lastUpdate";
 	public static final String COLUMN_UUID = "uuid";
+	
+	@Override
+	public void save(Place pObject) {
+		super.save(pObject);
+		if (pObject.getUuid() == null || pObject.getUuid().isEmpty()) {
+			pObject.setUuid(ConfigurationHelper.getDeviceId() + "_" + pObject.getIdPlace());
+			super.save(pObject);
+		}
+	}
 
 	@Override
 	protected Integer getKey(Place pObject) {
@@ -86,10 +96,17 @@ public class PlaceDAO extends AbstractDAO<Place, Integer> {
 		return lResult;
 	}
 	
-	public Collection<Place> getTagsOfTask(Task pTask) {
+	public Collection<Place> getPlacesOfTask(Task pTask) {
 		String lQuery = generateSelectFrom("T");
-		lQuery += ", t_task_place TT WHERE TT.idTask=? AND TT.idPlace = T.idTag";
+		lQuery += ", t_task_place TT WHERE TT.idTask=? AND TT.idPlace = T.idPlace";
 		Cursor lCursor = DatabaseManager.getReadableDatabase().rawQuery(lQuery, new String[] {Integer.toString(pTask.getIdTask())});
 		return toListObjects(lCursor);
+	}
+	
+	public Place getByName(String pName) {
+		String lQuery = generateSelectFrom("T");
+		lQuery += " WHERE T."+COLUMN_NAME+"=+?";
+		Cursor lCursor = DatabaseManager.getReadableDatabase().rawQuery(lQuery, new String[] {pName});
+		return toObject(lCursor);
 	}
 }
