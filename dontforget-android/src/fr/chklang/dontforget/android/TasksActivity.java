@@ -2,13 +2,13 @@ package fr.chklang.dontforget.android;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apmem.tools.layouts.FlowLayout;
 
 import android.app.Activity;
 import android.content.Context;
@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -232,17 +233,21 @@ public class TasksActivity extends Activity {
 		// menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
 		return super.onPrepareOptionsMenu(menu);
 	}
+	
+	private static class Badge extends TextView {
+		public Badge(Context context) {
+			super(context);
+		}
+	}
 
 	private void initializeTasksAdapter() {
 		tasksAdapter = new BaseAdapter() {
 			
-			Map<Tag, View> lBadgesTags = new HashMap<Tag, View>();
-			Map<Place, View> lBadgesPlaces = new HashMap<Place, View>();
-			
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
 				LayoutInflater mInflater = (LayoutInflater) TasksActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				LinearLayout linearLayout;
+				ViewGroup linearLayout;
+				FlowLayout lLayoutBadges = null;
 				TextView title = null;
 				ImageButton lValidateButton = null;
 				ImageButton lTrashButton = null;
@@ -252,26 +257,19 @@ public class TasksActivity extends Activity {
 
 				if (convertView == null) {
 					View view = mInflater.inflate(R.layout.activity_tasks_entry, parent, false);
-					linearLayout = (LinearLayout) view;
+					linearLayout = (ViewGroup) view;
 				} else {
 					View view = convertView;
-					linearLayout = (LinearLayout) view;
+					linearLayout = (ViewGroup) view;
 				}
 
 				try {
 					// Otherwise, find the TextView field within the layout
-					for (int i = 0; i < linearLayout.getChildCount(); i++) {
-						View lChild = linearLayout.getChildAt(i);
-						if (lChild.getId() == R.id.title_task) {
-							title = (TextView) lChild;
-						} else if (lChild.getId() == R.id.validate) {
-							lValidateButton = (ImageButton) lChild;
-						} else if (lChild.getId() == R.id.trash) {
-							lTrashButton = (ImageButton) lChild;
-						} else if (lChild.getId() == R.id.delete) {
-							lDeleteButton = (ImageButton) lChild;
-						}
-					}
+					title = (TextView) linearLayout.findViewById(R.id.title_task);
+					lValidateButton = (ImageButton) linearLayout.findViewById(R.id.validate);
+					lTrashButton = (ImageButton) linearLayout.findViewById(R.id.trash);
+					lDeleteButton = (ImageButton) linearLayout.findViewById(R.id.delete);
+					lLayoutBadges = (FlowLayout) linearLayout.findViewById(R.id.task_badges);
 				} catch (ClassCastException e) {
 					Log.e("ArrayAdapter", "You must supply a resource ID for a TextView");
 					throw new IllegalStateException("ArrayAdapter requires the resource ID to be a TextView", e);
@@ -305,51 +303,46 @@ public class TasksActivity extends Activity {
 					}
 				});
 				
+//				int lNbChildren = linearLayout.getChildCount();
+//				Collection<View> lChildren = new ArrayList<View>();
+//				for (int i =0; i<lNbChildren; i++) {
+//					View lChild = linearLayout.getChildAt(i);
+//					if (lChild instanceof Badge) {
+//						lChildren.add(lChild);
+//					}
+//				}
+//				for (View lChild : lChildren) {
+//					linearLayout.removeView(lChild);
+//				}
+				lLayoutBadges.removeAllViews();
 				//Add badges for tags
 				Collection<Tag> lTags = Tag.dao.getTagsOfTask(lCurrentTask);
-				Collection<View> lTagsViewToRemove = new ArrayList<View>();
 				for (Tag lTag : lTags) {
-					if (lBadgesTags.containsKey(lTag)) {
-						lTagsViewToRemove.remove(lBadgesTags.get(lTag));
-						continue;
-					}
-					TextView lTextView = new TextView(TasksActivity.this);
+					Badge lTextView = new Badge(TasksActivity.this);
 					lTextView.setText("#" + lTag.getName());
 					lTextView.setBackgroundColor(Color.GRAY);
 					lTextView.setTextColor(Color.WHITE);
 					
 					LayoutParams lParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+//					lParams.
+					lTextView.setGravity(Gravity.RIGHT);
 					lTextView.setLayoutParams(lParams);
 					lTextView.setPadding(3, 3, 0, 0);
-					linearLayout.addView(lTextView);
-					lBadgesTags.put(lTag, lTextView);
-				}
-				//Remove old tags
-				for (View lView : lTagsViewToRemove) {
-					linearLayout.removeView(lView);
+					lLayoutBadges.addView(lTextView);
 				}
 				
 				Collection<Place> lPlaces = Place.dao.getPlacesOfTask(lCurrentTask);
-				Collection<View> lPlacesViewToRemove = new ArrayList<View>();
 				for (Place lPlace : lPlaces) {
-					if (lBadgesPlaces.containsKey(lPlace)) {
-						lPlacesViewToRemove.remove(lBadgesPlaces.get(lPlace));
-						continue;
-					}
-					TextView lTextView = new TextView(TasksActivity.this);
+					Badge lTextView = new Badge(TasksActivity.this);
 					lTextView.setText("@" + lPlace.getName());
 					lTextView.setBackgroundColor(Color.GRAY);
 					lTextView.setTextColor(Color.WHITE);
 					
 					LayoutParams lParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 					lTextView.setLayoutParams(lParams);
+					lTextView.setGravity(Gravity.RIGHT);
 					lTextView.setPadding(3, 3, 0, 0);
-					linearLayout.addView(lTextView);
-					lBadgesPlaces.put(lPlace, lTextView);
-				}
-				//Remove old places
-				for (View lView : lPlacesViewToRemove) {
-					linearLayout.removeView(lView);
+					lLayoutBadges.addView(lTextView);
 				}
 				return linearLayout;
 			}
