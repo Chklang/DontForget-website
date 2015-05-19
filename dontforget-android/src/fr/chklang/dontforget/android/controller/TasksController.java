@@ -398,6 +398,10 @@ public class TasksController {
 				currentCategory = pCategory;
 				actualiseCategoriesList();
 				actualiseTasksList();
+
+				final View lLeftmenu = tasksActivity.getMainLayout().getLeftMenuContainer();
+				final DrawerLayout lDrawerLayout = tasksActivity.getMainLayout().getMainView();
+				lDrawerLayout.closeDrawer(lLeftmenu);
 			}
 
 			@Override
