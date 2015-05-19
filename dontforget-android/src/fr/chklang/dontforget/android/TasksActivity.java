@@ -8,22 +8,17 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apmem.tools.layouts.FlowLayout;
-
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -247,7 +242,7 @@ public class TasksActivity extends Activity {
 			public View getView(int position, View convertView, ViewGroup parent) {
 				LayoutInflater mInflater = (LayoutInflater) TasksActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 				ViewGroup linearLayout;
-				FlowLayout lLayoutBadges = null;
+				ViewGroup lLayoutBadges = null;
 				TextView title = null;
 				ImageButton lValidateButton = null;
 				ImageButton lTrashButton = null;
@@ -269,7 +264,7 @@ public class TasksActivity extends Activity {
 					lValidateButton = (ImageButton) linearLayout.findViewById(R.id.validate);
 					lTrashButton = (ImageButton) linearLayout.findViewById(R.id.trash);
 					lDeleteButton = (ImageButton) linearLayout.findViewById(R.id.delete);
-					lLayoutBadges = (FlowLayout) linearLayout.findViewById(R.id.task_badges);
+					lLayoutBadges = (ViewGroup) linearLayout.findViewById(R.id.task_badges);
 				} catch (ClassCastException e) {
 					Log.e("ArrayAdapter", "You must supply a resource ID for a TextView");
 					throw new IllegalStateException("ArrayAdapter requires the resource ID to be a TextView", e);
@@ -318,31 +313,18 @@ public class TasksActivity extends Activity {
 				//Add badges for tags
 				Collection<Tag> lTags = Tag.dao.getTagsOfTask(lCurrentTask);
 				for (Tag lTag : lTags) {
-					Badge lTextView = new Badge(TasksActivity.this);
+					View lTextLayout = mInflater.inflate(R.layout.activity_tasks_entry_badge, parent, false);
+					TextView lTextView = (TextView) lTextLayout.findViewById(R.id.badge);
 					lTextView.setText("#" + lTag.getName());
-					lTextView.setBackgroundColor(Color.GRAY);
-					lTextView.setTextColor(Color.WHITE);
-					
-					LayoutParams lParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-//					lParams.
-					lTextView.setGravity(Gravity.RIGHT);
-					lTextView.setLayoutParams(lParams);
-					lTextView.setPadding(3, 3, 0, 0);
-					lLayoutBadges.addView(lTextView);
+					lLayoutBadges.addView(lTextLayout);
 				}
 				
 				Collection<Place> lPlaces = Place.dao.getPlacesOfTask(lCurrentTask);
 				for (Place lPlace : lPlaces) {
-					Badge lTextView = new Badge(TasksActivity.this);
+					View lTextLayout = mInflater.inflate(R.layout.activity_tasks_entry_badge, parent, false);
+					TextView lTextView = (TextView) lTextLayout.findViewById(R.id.badge);
 					lTextView.setText("@" + lPlace.getName());
-					lTextView.setBackgroundColor(Color.GRAY);
-					lTextView.setTextColor(Color.WHITE);
-					
-					LayoutParams lParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-					lTextView.setLayoutParams(lParams);
-					lTextView.setGravity(Gravity.RIGHT);
-					lTextView.setPadding(3, 3, 0, 0);
-					lLayoutBadges.addView(lTextView);
+					lLayoutBadges.addView(lTextLayout);
 				}
 				return linearLayout;
 			}
