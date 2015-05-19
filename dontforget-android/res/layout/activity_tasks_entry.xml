@@ -1,7 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/LinearLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal" >
+
+        <ImageButton
+            android:id="@+id/restore"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="@drawable/restore" />
+
+        <ImageButton
+            android:id="@+id/validate"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="@drawable/validate" />
+
+        <ImageButton
+            android:id="@+id/trash"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="@drawable/trash" />
+
+        <ImageButton
+            android:id="@+id/delete"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="@drawable/delete" />
+
+        <TextView
+            android:id="@+id/title_task"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <org.apmem.tools.layouts.FlowLayout
+        android:id="@+id/task_badges"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:gravity="right"
+         >
+    </org.apmem.tools.layouts.FlowLayout>
+
 </LinearLayout>

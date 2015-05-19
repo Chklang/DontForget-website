@@ -27,4 +27,8 @@ public class PlaceDAO extends Finder<Integer, Place> {
 	public Collection<Place> findByLastUpdate(long pLastUpdate, User pUser) {
 		return this.where().ge("lastUpdate", pLastUpdate).eq("user", pUser).findList();
 	}
+	
+	public Place getByUuid(String pUuid) {
+		return this.where().eq("uuid", pUuid).findUnique();
+	}
 }

@@ -4,10 +4,8 @@
 package fr.chklang.dontforget.resources;
 
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import org.apache.commons.codec.digest.DigestUtils;
-
 import org.apache.commons.lang3.StringUtils;
 
 import play.mvc.Result;

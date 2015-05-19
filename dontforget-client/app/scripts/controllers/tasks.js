@@ -90,7 +90,7 @@
 							pCategory.name = pCategoryDto.name;
 							//Update all tasks which use this category
 							angular.forEach($scope.allTasks, function (element) {
-								if (element.category.id == pCategoryDto.id) {
+								if (element.category.uuid == pCategoryDto.uuid) {
 									element.category = pCategoryDto;
 								}
 							});
@@ -165,7 +165,7 @@
 		
 		execute(function () {
 			var lCurrentPrefix = null;
-			var addTaskElement = angular.element("#addTask")[0];
+			var addTaskElement = document.getElementById("addTask");
 	
 			//Get current word where user is
 			function getCurrentWord() {
@@ -498,10 +498,10 @@
 			
 			$scope.allTasksStatusFinished = function (pTask) {
 				var lOrigin = pTask.status;
-				Tasks.setFinished(pTask.id, function (pResult) {
+				Tasks.setFinished(pTask.uuid, function (pResult) {
 					var lNbElements = $scope.allTasks.length;
 					for (var i=0; i<lNbElements; i++) {
-						if ($scope.allTasks[i].id == pResult.id) {
+						if ($scope.allTasks[i].uuid == pResult.uuid) {
 							$scope.allTasks[i] = pResult;
 						}
 					}
@@ -515,10 +515,10 @@
 			};
 			$scope.allTasksStatusOpened = function (pTask) {
 				var lOrigin = pTask.status;
-				Tasks.setOpened(pTask.id, function (pResult) {
+				Tasks.setOpened(pTask.uuid, function (pResult) {
 					var lNbElements = $scope.allTasks.length;
 					for (var i=0; i<lNbElements; i++) {
-						if ($scope.allTasks[i].id == pResult.id) {
+						if ($scope.allTasks[i].uuid == pResult.uuid) {
 							$scope.allTasks[i] = pResult;
 						}
 					}
@@ -532,10 +532,10 @@
 			};
 			$scope.allTasksStatusDeleted = function (pTask) {
 				var lOrigin = pTask.status;
-				Tasks.setDeleted(pTask.id, function (pResult) {
+				Tasks.setDeleted(pTask.uuid, function (pResult) {
 					var lNbElements = $scope.allTasks.length;
 					for (var i=0; i<lNbElements; i++) {
-						if ($scope.allTasks[i].id == pResult.id) {
+						if ($scope.allTasks[i].uuid == pResult.uuid) {
 							$scope.allTasks[i] = pResult;
 						}
 					}
@@ -549,11 +549,11 @@
 			};
 			$scope.allTasksStatusDeletedDefinitivly = function (pTask) {
 				var lOrigin = pTask.status;
-				Tasks.delete(pTask.id, function (pResult) {
+				Tasks.delete(pTask.uuid, function (pResult) {
 					var lNbElements = $scope.allTasks.length;
 					var lNewTaskList = [];
 					angular.forEach($scope.allTasks, function (element) {
-						if (element.id != pTask.id) {
+						if (element.uuid != pTask.uuid) {
 							lNewTaskList.push(element);
 						}
 					});

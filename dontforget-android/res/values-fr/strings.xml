@@ -1,12 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="connection_url">Serveur</string>
+    <string name="welcome_text">Bienvenue sur l\'application Don\'t Forget. Chargement en cours&#8230;</string>
+
+    <string name="tasks_allcategories">Toutes les catégories</string>
+    <string name="tasks_new_text">Nouvelle tâche</string>
+
+    <string name="button_yes">Oui</string>
+    <string name="button_no">Non</string>
+    
+    <string name="tasks_categories_delete_tasks_associated">Impossible de supprimer la catégorie car des tâches y sont associées</string>
+    <string name="tasks_categories_create_name_already_used">Impossible de creer la catégorie car elle existe déjà</string>
+    <string name="tasks_tasks_create_no_category_selected">Veuillez d\'abord choisir une catégorie pour créer une tâche</string>
+    <string name="tasks_tags_delete_tasks_associated">Impossible de supprimer le tag car des tâches y sont associées</string>
+    <string name="tasks_tags_create_name_already_used">Impossible de creer le tag car il existe déjà</string>
+    <string name="tasks_places_delete_tasks_associated">Impossible de supprimer le lieu car des tâches y sont associées</string>
+    <string name="tasks_places_create_name_already_used">Impossible de creer le lieu car il existe déjà</string>
+    
+    <string name="connection_protocol">Protocol</string>
+    <string name="connection_host">Serveur</string>
     <string name="connection_port">Port</string>
+    <string name="connection_context">Context</string>
     <string name="connection_login">Identifiant</string>
     <string name="connection_password">Mot de passe</string>
     <string name="connection_send">Connexion</string>
+    <string name="connection_skip">Ignorer la connexion</string>
+    <string-array name="connection_protocols">
+        <item>http</item>
+        <item>https</item>
+    </string-array>
 
     <string name="categories_all">Toutes</string>
+
+    <string name="title_activity_tasks">Tâches</string>
+    <string name="title_activity_welcome">WelcomeActivity</string>
+    
+    
+    
     <string name="drawer_open">drawer_open</string>
     <string name="drawer_close">drawer_close</string>
 </resources>

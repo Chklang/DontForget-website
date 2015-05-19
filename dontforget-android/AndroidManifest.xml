@@ -16,21 +16,21 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".ConnectionActivity"
+            android:name=".activity.ConnectionActivity"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name=".activity.TasksActivity"
+            android:label="@string/title_activity_tasks" >
+        </activity>
+        <activity
+            android:name=".activity.WelcomeActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name=".TasksActivity"
-            android:label="@string/title_activity_tasks" >
-        </activity>
-        <activity
-            android:name=".TestActivity"
-            android:label="@string/title_activity_test" >
         </activity>
     </application>
 

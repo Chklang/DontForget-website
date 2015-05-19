@@ -23,7 +23,7 @@ public class TaskDTO extends ObjectNode {
 	
 	private static final ObjectMapper mapper = new ObjectMapper();
 	
-	private final int id;
+	private final String uuid;
 	
 	private final String text;
 	
@@ -39,7 +39,7 @@ public class TaskDTO extends ObjectNode {
 
 	public TaskDTO(JsonNode pJson) {
 		super(mapper.getNodeFactory());
-		id = pJson.get("id").asInt();
+		uuid = pJson.get("uuid").asText();
 		text = pJson.get("text").asText();
 		status = TaskStatus.valueOf(pJson.get("status").asText());
 		Collection<TagDTO> lTags = new ArrayList<>();
@@ -59,7 +59,7 @@ public class TaskDTO extends ObjectNode {
 	public TaskDTO(Task pTask) {
 		super(mapper.getNodeFactory());
 
-		id = pTask.getIdTask();
+		uuid = pTask.getUuid();
 		text = pTask.getText();
 		status = pTask.getStatus();
 		
@@ -79,7 +79,7 @@ public class TaskDTO extends ObjectNode {
 	}
 	
 	private void build() {
-		this.put("id", id);
+		this.put("uuid", uuid);
 		this.put("text", text);
 		this.put("status", status.name());
 		
@@ -100,10 +100,10 @@ public class TaskDTO extends ObjectNode {
 		this.put("lastUpdate", lastUpdate);
 	}
 	/**
-	 * @return the id
+	 * @return the uuid
 	 */
-	public int getId() {
-		return id;
+	public String getUuid() {
+		return uuid;
 	}
 	/**
 	 * @return the text

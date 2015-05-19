@@ -12,7 +12,7 @@
 	var myApp = angular.module('dontforgetApp', [ 'ngAnimate', 'ngAria',
 			'ngCookies', 'ngMessages', 'ngResource', 'ngRoute', 'ngSanitize',
 			'ngTouch', 'ui.bootstrap', 'ui.router', 'RestModule',
-			'WaitingModule', 'pascalprecht.translate', 'DialogsModule' ]);
+			'pascalprecht.translate', 'DialogsModule' ]);
 	myApp.config(['$stateProvider', '$urlRouterProvider', 'restProvider', '$translateProvider', function($stateProvider, $urlRouterProvider, restProvider,
 			$translateProvider) {
 

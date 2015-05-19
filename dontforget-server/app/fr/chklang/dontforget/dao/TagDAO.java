@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 
 import play.db.ebean.Model.Finder;
-import fr.chklang.dontforget.business.Category;
 import fr.chklang.dontforget.business.Tag;
 import fr.chklang.dontforget.business.User;
 
@@ -27,5 +26,9 @@ public class TagDAO extends Finder<Integer, Tag> {
 	
 	public Collection<Tag> findByLastUpdate(long pLastUpdate, User pUser) {
 		return this.where().ge("lastUpdate", pLastUpdate).eq("user", pUser).findList();
+	}
+	
+	public Tag getByUuid(String pUuid) {
+		return this.where().eq("uuid", pUuid).findUnique();
 	}
 }

@@ -21,6 +21,34 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal" >
 
+                <ImageButton
+                    android:id="@+id/tasks_open_menu"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:adjustViewBounds="true"
+                    android:background="@drawable/menu"
+                    android:scaleType="fitCenter" />
+
+                <TextView
+                    android:id="@+id/tasks_category_selected"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/tasks_allcategories" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:background="#FF000000" >
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="fill_parent"
@@ -86,23 +114,55 @@
                 </LinearLayout>
             </LinearLayout>
 
-        <ListView
-            android:id="@+id/tasks_elements"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
-        </ListView>
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:background="#FF000000" />
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+
+                <EditText
+                    android:id="@+id/tasks_new_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:hint="@string/tasks_new_text" >
+
+                    <requestFocus />
+                </EditText>
+
+                <ImageButton
+                    android:id="@+id/tasks_new_button"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:adjustViewBounds="true"
+                    android:background="@drawable/add"
+                    android:scaleType="fitCenter" />
+            </LinearLayout>
+
+            <ListView
+                android:id="@+id/tasks_elements"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+            </ListView>
         </LinearLayout>
     </FrameLayout>
 
     <!-- The navigation drawer -->
 
-    <ListView android:id="@+id/tasks_menu_list"
+    <LinearLayout
+        android:id="@+id/tasks_leftmenu"
         android:layout_width="240dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:choiceMode="singleChoice"
+        android:background="#111"
         android:divider="@android:color/transparent"
         android:dividerHeight="0dp"
-        android:background="#111"/>
+        android:orientation="horizontal" >
+    </LinearLayout>
 
 </android.support.v4.widget.DrawerLayout>

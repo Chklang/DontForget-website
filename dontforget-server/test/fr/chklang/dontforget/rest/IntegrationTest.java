@@ -64,7 +64,7 @@ public class IntegrationTest {
 			Assert.assertEquals("Il ne doit y avoir aucune tâche pour l'instant", 0, lResponse.size());
 			
 			String lTaskString = "Nouvelle tâche #test @maison";
-			lTestRequestHelper.post("tasks/"+lFirstCategory, lTaskString);
+			lTestRequestHelper.post("categories/"+lFirstCategory+"/tasks", lTaskString);
 			Assert.assertEquals("La création de la tâche a échoué", 200, lTestRequestHelper.getStatus());
 			lResponse = lTestRequestHelper.getBodyAsJson();
 			Assert.assertTrue("Le résultat doit être un objet", lResponse.isObject());

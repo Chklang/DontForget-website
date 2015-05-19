@@ -1,4 +1,4 @@
-'use strict';
+	'use strict';
 
 (function() {
 	/**
@@ -21,7 +21,7 @@
 		};
 		this.getAllByCategory = function(pCategoryName, pSuccessCallback) {
 			return restRequest.get({
-				url : '/tasks/' + pCategoryName,
+				url : '/categories/' + pCategoryName + '/tasks',
 				success : pSuccessCallback,
 				errorsCodes : {
 					'404' : {
@@ -33,13 +33,13 @@
 				}
 			});
 		};
-		this.get = function(pId, pSuccessCallback) {
+		this.get = function(pUuid, pSuccessCallback) {
 			return restRequest.get({
-				url : '/tasks/' + pId,
+				url : '/tasks/' + pUuid,
 				success : pSuccessCallback,
 				errorsCodes : {
 					'404' : {
-						'text' : $translate.instant('dontforget.services.Tasks.delete.404', {id:pId})
+						'text' : $translate.instant('dontforget.services.Tasks.delete.404', {id:pUuid})
 					},
 					'default' : {
 						'title' : 'dontforget.services.Tasks.get.title'
@@ -49,7 +49,7 @@
 		};
 		this.create = function(pCategoryName, pText, pSuccessCallback) {
 			return restRequest.post({
-				url : '/tasks/' + pCategoryName,
+				url : '/categories/' + pCategoryName + '/tasks',
 				contentType : "text/plain",
 				data : pText,
 				success : pSuccessCallback,
@@ -60,14 +60,14 @@
 				}
 			});
 		};
-		this.update = function(pId, pData, pSuccessCallback) {
+		this.update = function(pUuid, pData, pSuccessCallback) {
 			return restRequest.put({
-				url : '/tasks/'+pId,
+				url : '/tasks/'+pUuid,
 				data : pData,
 				success : pSuccessCallback,
 				errorsCodes : {
 					'404' : {
-						'text' : $translate.instant('dontforget.services.Tasks.delete.404', {id:pId})
+						'text' : $translate.instant('dontforget.services.Tasks.delete.404', {id:pUuid})
 					},
 					'default' : {
 						'title' : 'dontforget.services.Tasks.update.title'
@@ -75,13 +75,13 @@
 				}
 			});
 		};
-		this.delete = function(pId, pSuccessCallback) {
+		this.delete = function(pUuid, pSuccessCallback) {
 			return restRequest.delete({
-				url : '/tasks/'+pId,
+				url : '/tasks/'+pUuid,
 				success : pSuccessCallback,
 				errorsCodes : {
 					'404' : {
-						'text' : $translate.instant('dontforget.services.Tasks.delete.404', {id:pId})
+						'text' : $translate.instant('dontforget.services.Tasks.delete.404', {id:pUuid})
 					},
 					'default' : {
 						'title' : 'dontforget.services.Tasks.delete.title'
@@ -89,18 +89,18 @@
 				}
 			});
 		};
-		this.setFinished = function (pId, pSuccessCallback) {
-			return this.update(pId, {
+		this.setFinished = function (pUuid, pSuccessCallback) {
+			return this.update(pUuid, {
 				status : 'FINISHED'
 			}, pSuccessCallback);
 		};
-		this.setOpened = function (pId, pSuccessCallback) {
-			return this.update(pId, {
+		this.setOpened = function (pUuid, pSuccessCallback) {
+			return this.update(pUuid, {
 				status : 'OPENED'
 			}, pSuccessCallback);
 		};
-		this.setDeleted = function (pId, pSuccessCallback) {
-			return this.update(pId, {
+		this.setDeleted = function (pUuid, pSuccessCallback) {
+			return this.update(pUuid, {
 				status : 'DELETED'
 			}, pSuccessCallback);
 		};

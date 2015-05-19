@@ -52,7 +52,7 @@ public class SynchronizationResource extends AbstractRest {
 		});
 
 		lDTO.getTasks().forEach((pTaskDTO) -> {
-			Task lTaskDB = Task.dao.byId(pTaskDTO.getId());
+			Task lTaskDB = Task.dao.getByUuid(pTaskDTO.getUuid());
 			Category lCategory = insertOrUpdate(pTaskDTO.getCategory());
 			if (lCategory == null) {
 				// Category isn't assigned to current user
@@ -102,7 +102,7 @@ public class SynchronizationResource extends AbstractRest {
 	}
 
 	private static Tag insertOrUpdate(TagDTO pTagDTO) {
-		Tag lTagDB = Tag.dao.byId(pTagDTO.getId());
+		Tag lTagDB = Tag.dao.getByUuid(pTagDTO.getUuid());
 		if (lTagDB != null) {
 			if (lTagDB.getUser().getIdUser() != getConnectedUser().getIdUser()) {
 				return null;
@@ -125,7 +125,7 @@ public class SynchronizationResource extends AbstractRest {
 	}
 
 	private static Place insertOrUpdate(PlaceDTO pPlaceDTO) {
-		Place lPlaceDB = Place.dao.byId(pPlaceDTO.getId());
+		Place lPlaceDB = Place.dao.getByUuid(pPlaceDTO.getUuid());
 		if (lPlaceDB != null) {
 			if (lPlaceDB.getUser().getIdUser() != getConnectedUser().getIdUser()) {
 				return null;
@@ -148,7 +148,7 @@ public class SynchronizationResource extends AbstractRest {
 	}
 
 	private static Category insertOrUpdate(CategoryDTO pCategoryDTO) {
-		Category lCategoryDB = Category.dao.byId(pCategoryDTO.getId());
+		Category lCategoryDB = Category.dao.getByUuid(pCategoryDTO.getUuid());
 		if (lCategoryDB != null) {
 			if (lCategoryDB.getUser().getIdUser() != getConnectedUser().getIdUser()) {
 				return null;

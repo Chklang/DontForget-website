@@ -9,11 +9,9 @@ POST    /rest/users/create                          fr.chklang.dontforget.resour
 PUT    	/rest/users/update		                    fr.chklang.dontforget.resources.UsersResource.update()
 
 GET		/rest/tasks									fr.chklang.dontforget.resources.TasksResource.findAll()
-GET		/rest/tasks/:id<[0-9]+>						fr.chklang.dontforget.resources.TasksResource.get(id:Integer)
-GET		/rest/tasks/:type							fr.chklang.dontforget.resources.TasksResource.findAllByCategory(type:String)
-POST	/rest/tasks/:type							fr.chklang.dontforget.resources.TasksResource.create(type:String)
-DELETE 	/rest/tasks/:id								fr.chklang.dontforget.resources.TasksResource.delete(id:Integer)
-PUT		/rest/tasks/:id								fr.chklang.dontforget.resources.TasksResource.update(id:Integer)
+GET		/rest/tasks/:uuid							fr.chklang.dontforget.resources.TasksResource.get(uuid:String)
+DELETE 	/rest/tasks/:uuid							fr.chklang.dontforget.resources.TasksResource.delete(uuid:String)
+PUT		/rest/tasks/:uuid							fr.chklang.dontforget.resources.TasksResource.update(uuid:String)
 
 GET		/rest/tags									fr.chklang.dontforget.resources.TagsResource.findAll()
 DELETE	/rest/tags/:name							fr.chklang.dontforget.resources.TagsResource.delete(name:String)
@@ -26,9 +24,14 @@ POST	/rest/categories							fr.chklang.dontforget.resources.CategoriesResource.c
 PUT		/rest/categories/:name						fr.chklang.dontforget.resources.CategoriesResource.update(name:String)
 DELETE	/rest/categories/:name						fr.chklang.dontforget.resources.CategoriesResource.delete(name:String)
 DELETE	/rest/categories/:name/:receiver			fr.chklang.dontforget.resources.CategoriesResource.moveAndDelete(name:String, receiver:String)
+GET		/rest/categories/:name/tasks				fr.chklang.dontforget.resources.TasksResource.findAllByCategory(name:String)
+POST	/rest/categories/:name/tasks				fr.chklang.dontforget.resources.TasksResource.create(name:String)
 
 GET		/rest/synchronization/:lastUpdate			fr.chklang.dontforget.resources.SynchronizationResource.getUpdates(lastUpdate:Long)
 POST	/rest/synchronization						fr.chklang.dontforget.resources.SynchronizationResource.setUpdates()
+
+POST	/rest/tokens/new							fr.chklang.dontforget.resources.TokenResource.create()
+POST	/rest/tokens/login							fr.chklang.dontforget.resources.TokenResource.login()
 
 
 # Map static resources from the /public folder to the /assets URL path
