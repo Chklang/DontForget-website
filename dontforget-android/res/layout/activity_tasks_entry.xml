@@ -10,6 +10,12 @@
         android:orientation="horizontal" >
 
         <ImageButton
+            android:id="@+id/restore"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="@drawable/restore" />
+
+        <ImageButton
             android:id="@+id/validate"
             android:layout_width="24dp"
             android:layout_height="24dp"

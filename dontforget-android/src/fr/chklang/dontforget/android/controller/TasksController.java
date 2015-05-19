@@ -314,6 +314,19 @@ public class TasksController {
 			protected void onRefreshTasksList() {
 				actualiseTasksList();
 			}
+			
+			@Override
+			protected void onRestoreTask(final Task pTask) {
+				pTask.setStatus(TaskStatus.OPENED);
+				
+				DatabaseManager.transaction(tasksActivity, new DatabaseManager.Transaction() {
+					@Override
+					public void execute() {
+						Task.dao.save(pTask);
+					}
+				});
+				onRefreshTasksList();
+			}
 
 			@Override
 			protected void onValidateTask(final Task pTask) {

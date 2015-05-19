@@ -37,6 +37,8 @@ public abstract class TasksTaskListAdapter extends BaseAdapter {
 	
 	protected abstract void onRefreshTasksList();
 	
+	protected abstract void onRestoreTask(Task pTask);
+	
 	protected abstract void onValidateTask(Task pTask);
 	
 	protected abstract void onTrashTask(Task pTask);
@@ -45,13 +47,14 @@ public abstract class TasksTaskListAdapter extends BaseAdapter {
 	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		ViewGroup linearLayout;
-		ViewGroup lLayoutBadges = null;
-		TextView title = null;
-		ImageButton lValidateButton = null;
-		ImageButton lTrashButton = null;
-		ImageButton lDeleteButton = null;
+		final LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		final ViewGroup linearLayout;
+		final ViewGroup lLayoutBadges;
+		final TextView title;
+		final ImageButton lRestoreButton;
+		final ImageButton lValidateButton;
+		final ImageButton lTrashButton;
+		final ImageButton lDeleteButton;
 
 		final Task lCurrentTask = tasks.get(position);
 
@@ -63,36 +66,67 @@ public abstract class TasksTaskListAdapter extends BaseAdapter {
 			linearLayout = (ViewGroup) view;
 		}
 
-		try {
-			// Otherwise, find the TextView field within the layout
-			title = (TextView) linearLayout.findViewById(R.id.title_task);
-			lValidateButton = (ImageButton) linearLayout.findViewById(R.id.validate);
-			lTrashButton = (ImageButton) linearLayout.findViewById(R.id.trash);
-			lDeleteButton = (ImageButton) linearLayout.findViewById(R.id.delete);
-			lLayoutBadges = (ViewGroup) linearLayout.findViewById(R.id.task_badges);
-		} catch (ClassCastException e) {
-			Log.e("ArrayAdapter", "You must supply a resource ID for a TextView");
-			throw new IllegalStateException("ArrayAdapter requires the resource ID to be a TextView", e);
-		}
+		title = (TextView) linearLayout.findViewById(R.id.title_task);
+		lRestoreButton = (ImageButton) linearLayout.findViewById(R.id.restore);
+		lValidateButton = (ImageButton) linearLayout.findViewById(R.id.validate);
+		lTrashButton = (ImageButton) linearLayout.findViewById(R.id.trash);
+		lDeleteButton = (ImageButton) linearLayout.findViewById(R.id.delete);
+		lLayoutBadges = (ViewGroup) linearLayout.findViewById(R.id.task_badges);
+		
+		final Runnable lSetButtonsVisibility = new Runnable() {
+			@Override
+			public void run() {
+				switch (lCurrentTask.getStatus()) {
+				case OPENED:
+					lRestoreButton.setVisibility(View.GONE);
+					lValidateButton.setVisibility(View.VISIBLE);
+					lTrashButton.setVisibility(View.GONE);
+					lDeleteButton.setVisibility(View.GONE);
+					break;
+				case FINISHED:
+					lRestoreButton.setVisibility(View.VISIBLE);
+					lValidateButton.setVisibility(View.GONE);
+					lTrashButton.setVisibility(View.VISIBLE);
+					lDeleteButton.setVisibility(View.GONE);
+					break;
+				case DELETED:
+					lRestoreButton.setVisibility(View.GONE);
+					lValidateButton.setVisibility(View.VISIBLE);
+					lTrashButton.setVisibility(View.GONE);
+					lDeleteButton.setVisibility(View.VISIBLE);
+					break;
+				}
+			}
+		};
 
 		title.setText(lCurrentTask.getName());
 
 		// Enable buttons
+		lRestoreButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				onRestoreTask(lCurrentTask);
+				lSetButtonsVisibility.run();
+			}
+		});
 		lValidateButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				onValidateTask(lCurrentTask);
+				lSetButtonsVisibility.run();
 			}
 		});
 		lTrashButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				onTrashTask(lCurrentTask);
+				lSetButtonsVisibility.run();
 			}
 		});
 		lDeleteButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				lSetButtonsVisibility.run();
 				onDeleteTask(lCurrentTask);
 			}
 		});
@@ -124,6 +158,7 @@ public abstract class TasksTaskListAdapter extends BaseAdapter {
 			lTextView.setText("@" + lPlace.getName());
 			lLayoutBadges.addView(lTextLayout);
 		}
+		lSetButtonsVisibility.run();
 		return linearLayout;
 	}
 
