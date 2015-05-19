@@ -1,4 +1,4 @@
-package fr.chklang.dontforget.android;
+package fr.chklang.dontforget.android.activity;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,6 +28,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import fr.chklang.dontforget.android.R;
 import fr.chklang.dontforget.android.business.Category;
 import fr.chklang.dontforget.android.business.Place;
 import fr.chklang.dontforget.android.business.Tag;

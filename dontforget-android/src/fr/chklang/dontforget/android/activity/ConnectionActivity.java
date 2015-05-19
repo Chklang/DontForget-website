@@ -1,4 +1,4 @@
-package fr.chklang.dontforget.android;
+package fr.chklang.dontforget.android.activity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -9,6 +9,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+import fr.chklang.dontforget.android.R;
+import fr.chklang.dontforget.android.ServerConfiguration;
 import fr.chklang.dontforget.android.business.Token;
 import fr.chklang.dontforget.android.business.TokenKey;
 import fr.chklang.dontforget.android.dao.TokenDAO;

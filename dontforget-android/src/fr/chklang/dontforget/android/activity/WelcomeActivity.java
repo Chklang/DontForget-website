@@ -1,4 +1,4 @@
-package fr.chklang.dontforget.android;
+package fr.chklang.dontforget.android.activity;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -6,6 +6,7 @@ import java.util.UUID;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import fr.chklang.dontforget.android.R;
 import fr.chklang.dontforget.android.business.Configuration;
 import fr.chklang.dontforget.android.business.Token;
 import fr.chklang.dontforget.android.dao.ConfigurationDAO;
