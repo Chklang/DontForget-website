@@ -78,16 +78,7 @@ public abstract class TasksCategoriesListAdapter extends BaseAdapter {
 			lButtonDelete.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					Collection<Task> lTasksOfThisCategory = Task.dao.findByCategory(lCategory);
-					if (!lTasksOfThisCategory.isEmpty()) {
-						Toast.makeText(context, R.string.tasks_categories_delete_tasks_associated, Toast.LENGTH_LONG).show();
-						return;
-					}
 					onDeleteCategory(lCategory);
-					Category.dao.delete(lCategory.getIdCategory());
-					categories.remove(lCategory);
-					onRefreshCategoriesList();
-					onRefreshTasksList();
 				}
 			});
 		}

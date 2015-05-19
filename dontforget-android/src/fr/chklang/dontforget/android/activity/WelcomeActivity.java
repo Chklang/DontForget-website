@@ -10,7 +10,6 @@ import fr.chklang.dontforget.android.R;
 import fr.chklang.dontforget.android.business.Configuration;
 import fr.chklang.dontforget.android.business.Token;
 import fr.chklang.dontforget.android.dao.ConfigurationDAO;
-import fr.chklang.dontforget.android.dao.TokenDAO;
 import fr.chklang.dontforget.android.database.DatabaseManager;
 
 public class WelcomeActivity extends Activity {
@@ -19,26 +18,27 @@ public class WelcomeActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_welcome);
-		DatabaseManager.initConnection(this); 
 		
-		init();
+		DatabaseManager.transaction(this, new DatabaseManager.Transaction() {
+			@Override
+			public void execute() {
+				init();
+			}
+		});
 	}
 	
 	private void init() {
-		TokenDAO lTokenDAO = new TokenDAO();
-		ConfigurationDAO lConfigurationDAO = new ConfigurationDAO();
-		
 		//Create device uuid if not already defined
-		Configuration lDeviceId = lConfigurationDAO.get("DEVICE_ID");
+		Configuration lDeviceId = Configuration.dao.get("DEVICE_ID");
 		if (lDeviceId == null) {
 			// Generate a device id
 			lDeviceId = new Configuration();
 			lDeviceId.setKey("DEVICE_ID");
 			lDeviceId.setValue(UUID.randomUUID().toString());
-			lConfigurationDAO.save(lDeviceId);
+			Configuration.dao.save(lDeviceId);
 		}
 		
-		Collection<Token> lTokens = lTokenDAO.getAll();
+		Collection<Token> lTokens = Token.dao.getAll();
 		if (lTokens.isEmpty()) {
 			Intent lIntent = new Intent(WelcomeActivity.this, ConnectionActivity.class);
 			lIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

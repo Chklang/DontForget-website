@@ -118,14 +118,14 @@ public class TaskDAO extends AbstractDAO<Task, Integer> {
 	public Collection<Task> findByTag(Tag pTag) {
 		String lQuery = generateSelectFrom("T");
 		lQuery += ", t_task_tag TT WHERE TT.idTask = T.idTask AND TT.idTag = ?";
-		Cursor lCursor = DatabaseManager.getReadableDatabase().rawQuery(lQuery, new String[] {Integer.toString(pTag.getIdTag())});
+		Cursor lCursor = DatabaseManager.rawQuery(lQuery, new String[] {Integer.toString(pTag.getIdTag())});
 		return toListObjects(lCursor);
 	}
 	
 	public Collection<Task> findByPlace(Place pPlace) {
 		String lQuery = generateSelectFrom("T");
 		lQuery += ", t_task_place TP WHERE TP.idTask = T.idTask AND TP.idPlace = ?";
-		Cursor lCursor = DatabaseManager.getReadableDatabase().rawQuery(lQuery, new String[] {Integer.toString(pPlace.getIdPlace())});
+		Cursor lCursor = DatabaseManager.rawQuery(lQuery, new String[] {Integer.toString(pPlace.getIdPlace())});
 		return toListObjects(lCursor);
 	}
 	
@@ -133,21 +133,21 @@ public class TaskDAO extends AbstractDAO<Task, Integer> {
 		ContentValues lValues = new ContentValues();
 		lValues.put("idTask", pTask.getIdTask());
 		lValues.put("idTag", pTag.getIdTag());
-		DatabaseManager.getWrittableDatabase().insert("t_task_tag", null, lValues);
+		DatabaseManager.insert("t_task_tag", null, lValues);
 	}
 	
 	public void removeTagFromTask(Task pTask, Tag pTag) {
-		DatabaseManager.getWrittableDatabase().delete("t_task_tag", "idTask=? AND idTag=?", new String[]{Integer.toString(pTask.getIdTask()), Integer.toString(pTag.getIdTag())});
+		DatabaseManager.delete("t_task_tag", "idTask=? AND idTag=?", new String[]{Integer.toString(pTask.getIdTask()), Integer.toString(pTag.getIdTag())});
 	}
 	
 	public void addPlaceToTask(Task pTask, Place pPlace) {
 		ContentValues lValues = new ContentValues();
 		lValues.put("idTask", pTask.getIdTask());
 		lValues.put("idPlace", pPlace.getIdPlace());
-		DatabaseManager.getWrittableDatabase().insert("t_task_place", null, lValues);
+		DatabaseManager.insert("t_task_place", null, lValues);
 	}
 	
 	public void removePlaceFromTask(Task pTask, Place pPlace) {
-		DatabaseManager.getWrittableDatabase().delete("t_task_place", "idTask=? AND idPlace=?", new String[]{Integer.toString(pTask.getIdTask()), Integer.toString(pPlace.getIdPlace())});
+		DatabaseManager.delete("t_task_place", "idTask=? AND idPlace=?", new String[]{Integer.toString(pTask.getIdTask()), Integer.toString(pPlace.getIdPlace())});
 	}
 }

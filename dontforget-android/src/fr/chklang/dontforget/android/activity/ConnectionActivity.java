@@ -13,7 +13,7 @@ import fr.chklang.dontforget.android.R;
 import fr.chklang.dontforget.android.ServerConfiguration;
 import fr.chklang.dontforget.android.business.Token;
 import fr.chklang.dontforget.android.business.TokenKey;
-import fr.chklang.dontforget.android.dao.TokenDAO;
+import fr.chklang.dontforget.android.database.DatabaseManager;
 import fr.chklang.dontforget.android.dto.TokenDTO;
 import fr.chklang.dontforget.android.helpers.ConfigurationHelper;
 import fr.chklang.dontforget.android.rest.AbstractRest.CallbackOnException;
@@ -67,7 +67,7 @@ public class ConnectionActivity extends Activity {
 		final String lLogin = connection_login.getText().toString();
 		final String lPassword = connection_password.getText().toString();
 
-		ServerConfiguration lServerConfiguration = ServerConfiguration.newConfiguration(lProtocol, lHost, lPort, lContext);
+		final ServerConfiguration lServerConfiguration = ServerConfiguration.newConfiguration(lProtocol, lHost, lPort, lContext);
 
 		Result<TokenDTO> lResult = TokensRest.connexion(lServerConfiguration, lLogin, lPassword, ConfigurationHelper.getDeviceId());
 		lResult.setOnException(new CallbackOnException() {
@@ -76,18 +76,22 @@ public class ConnectionActivity extends Activity {
 				Toast.makeText(ConnectionActivity.this, "Connection error", Toast.LENGTH_LONG).show();
 			}
 		});
-		TokenDTO lTokenDTO = lResult.get();
+		final TokenDTO lTokenDTO = lResult.get();
 		if (lTokenDTO == null) {
 			Toast.makeText(ConnectionActivity.this, "Connection error", Toast.LENGTH_LONG).show();
 		} else {
 			// Save it
-			TokenDAO lTokenDAO = new TokenDAO();
-			Token lToken = lTokenDAO.get(new TokenKey(lLogin, lServerConfiguration));
-			if (lToken == null) {
-				lToken = new Token(lLogin, lServerConfiguration);
-			}
-			lToken.setToken(lTokenDTO.getToken());
-			lTokenDAO.save(lToken);
+			DatabaseManager.transaction(this, new DatabaseManager.Transaction() {
+				@Override
+				public void execute() {
+					Token lToken = Token.dao.get(new TokenKey(lLogin, lServerConfiguration));
+					if (lToken == null) {
+						lToken = new Token(lLogin, lServerConfiguration);
+					}
+					lToken.setToken(lTokenDTO.getToken());
+					Token.dao.save(lToken);
+				}
+			});
 			goToTasks();
 		}
 	}

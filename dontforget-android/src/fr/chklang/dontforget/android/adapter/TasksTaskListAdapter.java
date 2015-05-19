@@ -1,5 +1,6 @@
 package fr.chklang.dontforget.android.adapter;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import fr.chklang.dontforget.android.R;
 import fr.chklang.dontforget.android.business.Place;
 import fr.chklang.dontforget.android.business.Tag;
 import fr.chklang.dontforget.android.business.Task;
+import fr.chklang.dontforget.android.database.DatabaseManager;
 
 /**
  * 
@@ -96,8 +98,19 @@ public abstract class TasksTaskListAdapter extends BaseAdapter {
 		});
 		
 		lLayoutBadges.removeAllViews();
+		
+		final Collection<Tag> lTags = new ArrayList<Tag>();
+		final Collection<Place> lPlaces = new ArrayList<Place>();
+
+		DatabaseManager.transaction(context, new DatabaseManager.Transaction() {
+			@Override
+			public void execute() {
+				lTags.addAll(Tag.dao.getTagsOfTask(lCurrentTask));
+				lPlaces.addAll(Place.dao.getPlacesOfTask(lCurrentTask));
+			}
+		});
+		
 		//Add badges for tags
-		Collection<Tag> lTags = Tag.dao.getTagsOfTask(lCurrentTask);
 		for (Tag lTag : lTags) {
 			View lTextLayout = mInflater.inflate(R.layout.activity_tasks_entry_badge, parent, false);
 			TextView lTextView = (TextView) lTextLayout.findViewById(R.id.badge);
@@ -105,7 +118,6 @@ public abstract class TasksTaskListAdapter extends BaseAdapter {
 			lLayoutBadges.addView(lTextLayout);
 		}
 		
-		Collection<Place> lPlaces = Place.dao.getPlacesOfTask(lCurrentTask);
 		for (Place lPlace : lPlaces) {
 			View lTextLayout = mInflater.inflate(R.layout.activity_tasks_entry_badge, parent, false);
 			TextView lTextView = (TextView) lTextLayout.findViewById(R.id.badge);

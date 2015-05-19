@@ -4,6 +4,7 @@
 package fr.chklang.dontforget.android.business;
 
 import fr.chklang.dontforget.android.ServerConfiguration;
+import fr.chklang.dontforget.android.dao.TokenDAO;
 
 /**
  * @author S0075724
@@ -14,6 +15,8 @@ public class Token extends AbstractBusinessObject {
 	private TokenKey tokenKey;
 	private String token;
 	private long lastSynchro;
+	
+	public static final TokenDAO dao = new TokenDAO();
 	
 	public Token() {
 		super();

@@ -36,7 +36,7 @@ public abstract class AbstractDAO<T extends AbstractBusinessObject, Key> {
 	
 	public void create(T pObject) {
 		ContentValues lValues = onCreate(pObject);
-		long lIdGenerated = DatabaseManager.getWrittableDatabase().insert(getTableName(), null, lValues);
+		long lIdGenerated = DatabaseManager.insert(getTableName(), null, lValues);
 		setKey(lIdGenerated, pObject);
 		pObject.setAlreadyIntoDB(true);
 	}
@@ -46,19 +46,19 @@ public abstract class AbstractDAO<T extends AbstractBusinessObject, Key> {
 		Pair<String, String[]> lWhere = whereKey(getKey(pObject));
 		
 		if (lValues.size() != 0) {
-			DatabaseManager.getWrittableDatabase().update(getTableName(), lValues, lWhere.first, lWhere.second);
+			DatabaseManager.update(getTableName(), lValues, lWhere.first, lWhere.second);
 		}
 	}
 	
 	public void delete(Key pKey) {
 		Pair<String, String[]> lWhere = whereKey(pKey);
-		DatabaseManager.getWrittableDatabase().delete(getTableName(), lWhere.first, lWhere.second);
+		DatabaseManager.delete(getTableName(), lWhere.first, lWhere.second);
 	}
 	
 	protected T getByCriterias(Pair<String, String[]> pCriterias) {
 		String lWhere = pCriterias == null?null:pCriterias.first;
 		String[] lWhereArgs = pCriterias == null?null:pCriterias.second;
-		Cursor lCursor = DatabaseManager.getReadableDatabase().query(getTableName(), getColumnNames(), lWhere, lWhereArgs, null, null, null);
+		Cursor lCursor = DatabaseManager.query(getTableName(), getColumnNames(), lWhere, lWhereArgs, null, null, null);
 		T lResult = toObject(lCursor);
 		if (lResult != null) {
 			lResult.setAlreadyIntoDB(true);
@@ -69,7 +69,7 @@ public abstract class AbstractDAO<T extends AbstractBusinessObject, Key> {
 	protected Collection<T> findByCriterias(Pair<String, String[]> pCriterias) {
 		String lWhere = pCriterias == null?null:pCriterias.first;
 		String[] lWhereArgs = pCriterias == null?null:pCriterias.second;
-		Cursor lCursor = DatabaseManager.getReadableDatabase().query(getTableName(), getColumnNames(), lWhere, lWhereArgs, null, null, null);
+		Cursor lCursor = DatabaseManager.query(getTableName(), getColumnNames(), lWhere, lWhereArgs, null, null, null);
 		Collection<T> lResults = toListObjects(lCursor);
 		for (T lObject : lResults) {
 			lObject.setAlreadyIntoDB(true);

@@ -31,6 +31,7 @@ import fr.chklang.dontforget.android.business.Category;
 import fr.chklang.dontforget.android.business.Place;
 import fr.chklang.dontforget.android.business.Tag;
 import fr.chklang.dontforget.android.business.Task;
+import fr.chklang.dontforget.android.database.DatabaseManager;
 import fr.chklang.dontforget.android.dto.TaskStatus;
 import fr.chklang.dontforget.android.helpers.ConfigurationHelper;
 
@@ -83,21 +84,26 @@ public class TasksController {
 	}
 
 	private void loadData() {
-		categories.clear();
-		categories.addAll(Category.dao.getAll());
-
-		tasks.clear();
-		tasks.addAll(Task.dao.getAll());
-
-		tags.clear();
-		tags.addAll(Tag.dao.getAll());
-
-		places.clear();
-		places.addAll(Place.dao.getAll());
-
-		categoriesAdapter.notifyDataSetChanged();
-		tagsAdapter.notifyDataSetChanged();
-		placesAdapter.notifyDataSetChanged();
+		DatabaseManager.transaction(tasksActivity, new DatabaseManager.Transaction() {
+			@Override
+			public void execute() {
+				categories.clear();
+				categories.addAll(Category.dao.getAll());
+		
+				tasks.clear();
+				tasks.addAll(Task.dao.getAll());
+		
+				tags.clear();
+				tags.addAll(Tag.dao.getAll());
+		
+				places.clear();
+				places.addAll(Place.dao.getAll());
+		
+				categoriesAdapter.notifyDataSetChanged();
+				tagsAdapter.notifyDataSetChanged();
+				placesAdapter.notifyDataSetChanged();
+			}
+		});
 	}
 
 	private void initializeActionsButtons() {
@@ -146,7 +152,7 @@ public class TasksController {
 		tasks_new_button.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				String lTaskText = tasks_new_text.getText().toString();
+				final String lTaskText = tasks_new_text.getText().toString();
 				if (lTaskText == null || lTaskText.isEmpty()) {
 					return;
 				}
@@ -160,61 +166,67 @@ public class TasksController {
 					return;
 				}
 
-				Set<Tag> lTags = new HashSet<Tag>();
-				Set<Place> lPlaces = new HashSet<Place>();
+				final Set<Tag> lTags = new HashSet<Tag>();
+				final Set<Place> lPlaces = new HashSet<Place>();
 
-				Pattern lPatternTags = Pattern.compile(" #([^ ]+)");
-				Matcher lMatcher = lPatternTags.matcher(" " + lTaskText);
-				while (lMatcher.find()) {
-					String lTagString = lMatcher.group(1);
-					Tag lTag = Tag.dao.getByName(lTagString);
-					if (lTag == null) {
-						lTag = new Tag();
-						lTag.setName(lTagString);
-						lTag.setLastUpdate(System.currentTimeMillis());
-						Tag.dao.save(lTag);
+				DatabaseManager.transaction(tasksActivity, new DatabaseManager.Transaction() {
+					@Override
+					public void execute() {
+						String lTaskTextTemp = lTaskText;
+						Pattern lPatternTags = Pattern.compile(" #([^ ]+)");
+						Matcher lMatcher = lPatternTags.matcher(" " + lTaskTextTemp);
+						while (lMatcher.find()) {
+							String lTagString = lMatcher.group(1);
+							Tag lTag = Tag.dao.getByName(lTagString);
+							if (lTag == null) {
+								lTag = new Tag();
+								lTag.setName(lTagString);
+								lTag.setLastUpdate(System.currentTimeMillis());
+								Tag.dao.save(lTag);
+							}
+							lTags.add(lTag);
+							lTaskTextTemp = lTaskTextTemp.replace("#" + lTagString, "");
+						}
+		
+						Pattern lPatternPlaces = Pattern.compile(" @([^ ]+)");
+						lMatcher = lPatternPlaces.matcher(" " + lTaskTextTemp);
+						while (lMatcher.find()) {
+							String lPlaceString = lMatcher.group(1);
+							Place lPlace = Place.dao.getByName(lPlaceString);
+							if (lPlace == null) {
+								lPlace = new Place();
+								lPlace.setName(lPlaceString);
+								lPlace.setLastUpdate(System.currentTimeMillis());
+								Place.dao.save(lPlace);
+							}
+							lPlaces.add(lPlace);
+							lTaskTextTemp = lTaskTextTemp.replace("@" + lPlaceString, "");
+						}
+		
+						while (lTaskTextTemp.contains("  ")) {
+							lTaskTextTemp = lTaskTextTemp.replaceAll("  ", " ");
+						}
+		
+						lTaskTextTemp = lTaskTextTemp.trim();
+		
+						Task lTask = new Task();
+						lTask.setName(lTaskTextTemp);
+						lTask.setIdCategory(currentCategory.getIdCategory());
+						lTask.setStatus(TaskStatus.OPENED);
+						lTask.setLastUpdate(System.currentTimeMillis());
+						Task.dao.save(lTask);
+		
+						for (Tag lTag : lTags) {
+							Task.dao.addTagToTask(lTask, lTag);
+						}
+		
+						for (Place lPlace : lPlaces) {
+							Task.dao.addPlaceToTask(lTask, lPlace);
+						}
+						tasks.add(lTask);
 					}
-					lTags.add(lTag);
-					lTaskText = lTaskText.replace("#" + lTagString, "");
-				}
+				});
 
-				Pattern lPatternPlaces = Pattern.compile(" @([^ ]+)");
-				lMatcher = lPatternPlaces.matcher(" " + lTaskText);
-				while (lMatcher.find()) {
-					String lPlaceString = lMatcher.group(1);
-					Place lPlace = Place.dao.getByName(lPlaceString);
-					if (lPlace == null) {
-						lPlace = new Place();
-						lPlace.setName(lPlaceString);
-						lPlace.setLastUpdate(System.currentTimeMillis());
-						Place.dao.save(lPlace);
-					}
-					lPlaces.add(lPlace);
-					lTaskText = lTaskText.replace("@" + lPlaceString, "");
-				}
-
-				while (lTaskText.contains("  ")) {
-					lTaskText = lTaskText.replaceAll("  ", " ");
-				}
-
-				lTaskText = lTaskText.trim();
-
-				Task lTask = new Task();
-				lTask.setName(lTaskText);
-				lTask.setIdCategory(currentCategory.getIdCategory());
-				lTask.setStatus(TaskStatus.OPENED);
-				lTask.setLastUpdate(System.currentTimeMillis());
-				Task.dao.save(lTask);
-
-				for (Tag lTag : lTags) {
-					Task.dao.addTagToTask(lTask, lTag);
-				}
-
-				for (Place lPlace : lPlaces) {
-					Task.dao.addPlaceToTask(lTask, lPlace);
-				}
-
-				tasks.add(lTask);
 				actualiseTasksList();
 
 				// Reset input text
@@ -304,23 +316,41 @@ public class TasksController {
 			}
 
 			@Override
-			protected void onValidateTask(Task pTask) {
+			protected void onValidateTask(final Task pTask) {
 				pTask.setStatus(TaskStatus.FINISHED);
-				Task.dao.save(pTask);
+
+				DatabaseManager.transaction(tasksActivity, new DatabaseManager.Transaction() {
+					@Override
+					public void execute() {
+						Task.dao.save(pTask);
+					}
+				});
 				onRefreshTasksList();
 			}
 
 			@Override
-			protected void onTrashTask(Task pTask) {
+			protected void onTrashTask(final Task pTask) {
 				pTask.setStatus(TaskStatus.DELETED);
-				Task.dao.save(pTask);
+
+				DatabaseManager.transaction(tasksActivity, new DatabaseManager.Transaction() {
+					@Override
+					public void execute() {
+						Task.dao.save(pTask);
+					}
+				});
 				onRefreshTasksList();
 			}
 
 			@Override
-			protected void onDeleteTask(Task pTask) {
+			protected void onDeleteTask(final Task pTask) {
 				tasks.remove(pTask);
-				Task.dao.delete(pTask.getIdTask());
+
+				DatabaseManager.transaction(tasksActivity, new DatabaseManager.Transaction() {
+					@Override
+					public void execute() {
+						Task.dao.delete(pTask.getIdTask());
+					}
+				});
 				onRefreshTasksList();
 			}
 		};
@@ -342,16 +372,32 @@ public class TasksController {
 			}
 
 			@Override
-			protected void onDeleteCategory(Category pCategory) {
-				if (currentCategory != null && currentCategory.getIdCategory() == pCategory.getIdCategory()) {
-					// Move to "All tasks"
-					currentCategory = null;
-				}
+			protected void onDeleteCategory(final Category pCategory) {
+				DatabaseManager.transaction(tasksActivity, new DatabaseManager.Transaction() {
+					@Override
+					public void execute() {
+						Collection<Task> lTasksOfThisCategory = Task.dao.findByCategory(pCategory);
+						if (!lTasksOfThisCategory.isEmpty()) {
+							Toast.makeText(tasksActivity, R.string.tasks_categories_delete_tasks_associated, Toast.LENGTH_LONG).show();
+							return;
+						}
+						if (currentCategory != null && currentCategory.getIdCategory() == pCategory.getIdCategory()) {
+							// Move to "All tasks"
+							currentCategory = null;
+						}
+						Category.dao.delete(pCategory.getIdCategory());
+						categories.remove(pCategory);
+						onRefreshCategoriesList();
+						onRefreshTasksList();
+					}
+				});
 			}
 
 			@Override
 			protected void onChangeCategory(Category pCategory) {
 				currentCategory = pCategory;
+				actualiseCategoriesList();
+				actualiseTasksList();
 			}
 
 			@Override
@@ -383,22 +429,42 @@ public class TasksController {
 
 			@Override
 			protected void onDeleteTag(final Tag pTag) {
-				Collection<Task> lTasksOfThisTag = Task.dao.findByTag(pTag);
+				final Collection<Task> lTasksOfThisTag = new ArrayList<Task>();
+				DatabaseManager.transaction(tasksActivity, new DatabaseManager.Transaction() {
+					@Override
+					public void execute() {
+						lTasksOfThisTag.addAll(Task.dao.findByTag(pTag));
+					}
+				});
+				
 				if (!lTasksOfThisTag.isEmpty()) {
 					new AlertDialog.Builder(tasksActivity).setMessage(R.string.tasks_tags_create_name_already_used).setCancelable(true)
 							.setPositiveButton(R.string.button_yes, new DialogInterface.OnClickListener() {
 								@Override
 								public void onClick(DialogInterface dialog, int which) {
-									Collection<Task> lTasksOfThisTag = Task.dao.findByTag(pTag);
-									for (Task lTask : lTasksOfThisTag) {
-										Task.dao.removeTagFromTask(lTask, pTag);
-									}
-									effectiveDelete(pTag);
+
+
+									DatabaseManager.transaction(tasksActivity, new DatabaseManager.Transaction() {
+										@Override
+										public void execute() {
+											Collection<Task> lTasksOfThisTag = Task.dao.findByTag(pTag);
+											for (Task lTask : lTasksOfThisTag) {
+												Task.dao.removeTagFromTask(lTask, pTag);
+											}
+											effectiveDelete(pTag);
+										}
+									});
 								}
 							}).setNegativeButton(R.string.button_no, null).show();
 					return;
 				}
-				effectiveDelete(pTag);
+				
+				DatabaseManager.transaction(tasksActivity, new DatabaseManager.Transaction() {
+					@Override
+					public void execute() {
+						effectiveDelete(pTag);
+					}
+				});
 			}
 
 			private void effectiveDelete(Tag pTag) {
@@ -433,7 +499,13 @@ public class TasksController {
 
 			@Override
 			protected void onDeletePlace(final Place pPlace) {
-				Collection<Task> lTasksOfThisPlace = Task.dao.findByPlace(pPlace);
+				final Collection<Task> lTasksOfThisPlace = new ArrayList<Task>();
+				DatabaseManager.transaction(tasksActivity, new DatabaseManager.Transaction() {
+					@Override
+					public void execute() {
+						lTasksOfThisPlace.addAll(Task.dao.findByPlace(pPlace));
+					}
+				});
 				if (!lTasksOfThisPlace.isEmpty()) {
 					new AlertDialog.Builder(tasksActivity)
 						.setMessage(R.string.tasks_places_create_name_already_used)
@@ -441,18 +513,29 @@ public class TasksController {
 						.setPositiveButton(R.string.button_yes, new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
-								Collection<Task> lTasksOfThisPlace = Task.dao.findByPlace(pPlace);
-								for (Task lTask : lTasksOfThisPlace) {
-									Task.dao.removePlaceFromTask(lTask, pPlace);
-								}
-								effectiveDelete(pPlace);
+
+								DatabaseManager.transaction(tasksActivity, new DatabaseManager.Transaction() {
+									@Override
+									public void execute() {
+										Collection<Task> lTasksOfThisPlace = Task.dao.findByPlace(pPlace);
+										for (Task lTask : lTasksOfThisPlace) {
+											Task.dao.removePlaceFromTask(lTask, pPlace);
+										}
+										effectiveDelete(pPlace);
+									}
+								});
 							}
 						})
 						.setNegativeButton(R.string.button_no, null)
 						.show();
 					return;
 				}
-				effectiveDelete(pPlace);
+				DatabaseManager.transaction(tasksActivity, new DatabaseManager.Transaction() {
+					@Override
+					public void execute() {
+						effectiveDelete(pPlace);
+					}
+				});
 			}
 
 			private void effectiveDelete(Place pPlace) {
@@ -506,23 +589,28 @@ public class TasksController {
 		categories_new_button.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				String lCategoryText = categories_new_text.getText().toString();
+				final String lCategoryText = categories_new_text.getText().toString();
 				if (lCategoryText == null || lCategoryText.isEmpty()) {
 					return;
 				}
 
-				if (Category.dao.getByName(lCategoryText) != null) {
-					Toast.makeText(tasksActivity, R.string.tasks_categories_create_name_already_used, Toast.LENGTH_LONG).show();
-					return;
-				}
-				Category lCategory = new Category();
-				lCategory.setLastUpdate(System.currentTimeMillis());
-				lCategory.setName(lCategoryText);
-				Category.dao.save(lCategory);
-				lCategory.setUuid(ConfigurationHelper.getDeviceId() + "_" + lCategory.getIdCategory());
-				Category.dao.save(lCategory);
+				DatabaseManager.transaction(tasksActivity, new DatabaseManager.Transaction() {
+					@Override
+					public void execute() {
+						if (Category.dao.getByName(lCategoryText) != null) {
+							Toast.makeText(tasksActivity, R.string.tasks_categories_create_name_already_used, Toast.LENGTH_LONG).show();
+							return;
+						}
+						Category lCategory = new Category();
+						lCategory.setLastUpdate(System.currentTimeMillis());
+						lCategory.setName(lCategoryText);
+						Category.dao.save(lCategory);
+						lCategory.setUuid(ConfigurationHelper.getDeviceId() + "_" + lCategory.getIdCategory());
+						Category.dao.save(lCategory);
+						categories.add(lCategory);
+					}
+				});
 
-				categories.add(lCategory);
 
 				actualiseCategoriesList();
 			}

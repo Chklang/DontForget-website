@@ -3,6 +3,8 @@
  */
 package fr.chklang.dontforget.android.business;
 
+import fr.chklang.dontforget.android.dao.ConfigurationDAO;
+
 /**
  * @author S0075724
  *
@@ -12,6 +14,8 @@ public class Configuration extends AbstractBusinessObject {
 	private String key;
 	
 	private String value;
+	
+	public static final ConfigurationDAO dao = new ConfigurationDAO();
 
 	/**
 	 * @return the key

@@ -13,10 +13,8 @@ import fr.chklang.dontforget.android.dao.ConfigurationDAO;
 public class ConfigurationHelper {
 
 	public static String getDeviceId() {
-		ConfigurationDAO lConfigurationDAO = new ConfigurationDAO();
-		
 		//Create device uuid if not already defined
-		Configuration lDeviceId = lConfigurationDAO.get("DEVICE_ID");
+		Configuration lDeviceId = Configuration.dao.get("DEVICE_ID");
 		
 		return lDeviceId.getValue();
 	}

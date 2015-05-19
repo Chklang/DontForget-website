@@ -99,14 +99,14 @@ public class PlaceDAO extends AbstractDAO<Place, Integer> {
 	public Collection<Place> getPlacesOfTask(Task pTask) {
 		String lQuery = generateSelectFrom("T");
 		lQuery += ", t_task_place TT WHERE TT.idTask=? AND TT.idPlace = T.idPlace";
-		Cursor lCursor = DatabaseManager.getReadableDatabase().rawQuery(lQuery, new String[] {Integer.toString(pTask.getIdTask())});
+		Cursor lCursor = DatabaseManager.rawQuery(lQuery, new String[] {Integer.toString(pTask.getIdTask())});
 		return toListObjects(lCursor);
 	}
 	
 	public Place getByName(String pName) {
 		String lQuery = generateSelectFrom("T");
 		lQuery += " WHERE T."+COLUMN_NAME+"=+?";
-		Cursor lCursor = DatabaseManager.getReadableDatabase().rawQuery(lQuery, new String[] {pName});
+		Cursor lCursor = DatabaseManager.rawQuery(lQuery, new String[] {pName});
 		return toObject(lCursor);
 	}
 }
