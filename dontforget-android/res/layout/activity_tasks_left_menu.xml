@@ -10,7 +10,7 @@
         android:orientation="vertical" >
 
         <ImageButton
-            android:id="@+id/view_categories"
+            android:id="@+id/tasks_leftmenu_view_categories"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:adjustViewBounds="true"
@@ -18,7 +18,7 @@
             android:scaleType="fitCenter" />
 
         <ImageButton
-            android:id="@+id/view_tags"
+            android:id="@+id/tasks_leftmenu_view_tags"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:adjustViewBounds="true"
@@ -26,7 +26,7 @@
             android:scaleType="fitCenter" />
 
         <ImageButton
-            android:id="@+id/view_places"
+            android:id="@+id/tasks_leftmenu_view_places"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:adjustViewBounds="true"
@@ -35,9 +35,11 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/tasks_leftmenu_menu_categories"
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical" >
+        android:orientation="vertical"
+        android:visibility="gone" >
 
         <LinearLayout
             android:layout_width="fill_parent"
@@ -45,7 +47,7 @@
             android:orientation="horizontal" >
 
             <EditText
-                android:id="@+id/tasks_leftmenu_newcategory_text"
+                android:id="@+id/tasks_leftmenu_categories_new_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -57,7 +59,7 @@
             </EditText>
 
             <ImageButton
-                android:id="@+id/tasks_leftmenu_newcategory_button"
+                android:id="@+id/tasks_leftmenu_categories_new_button"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:adjustViewBounds="true"
@@ -66,7 +68,93 @@
         </LinearLayout>
 
         <ListView
-            android:id="@+id/tasks_menu_list"
+            android:id="@+id/tasks_leftmenu_categories_list"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:choiceMode="singleChoice"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="0dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/tasks_leftmenu_menu_tags"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <EditText
+                android:id="@+id/tasks_leftmenu_tags_new_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="@string/tasks_new_text"
+                android:textColor="#FFF" >
+
+                <requestFocus />
+            </EditText>
+
+            <ImageButton
+                android:id="@+id/tasks_leftmenu_tags_new_button"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:adjustViewBounds="true"
+                android:background="@drawable/add"
+                android:scaleType="fitCenter" />
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/tasks_leftmenu_tags_list"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:choiceMode="singleChoice"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="0dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/tasks_leftmenu_menu_places"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <EditText
+                android:id="@+id/tasks_leftmenu_places_new_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="@string/tasks_new_text"
+                android:textColor="#FFF" >
+
+                <requestFocus />
+            </EditText>
+
+            <ImageButton
+                android:id="@+id/tasks_leftmenu_places_new_button"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:adjustViewBounds="true"
+                android:background="@drawable/add"
+                android:scaleType="fitCenter" />
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/tasks_leftmenu_places_list"
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
             android:layout_gravity="start"

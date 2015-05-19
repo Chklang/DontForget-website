@@ -9,7 +9,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
@@ -41,16 +43,26 @@ public class TasksActivity extends Activity {
 	private String categories_ALL;
 
 	private List<Category> categories = new ArrayList<Category>();
+	private List<Tag> tags = new ArrayList<Tag>();
+	private List<Place> places = new ArrayList<Place>();
 	private List<Task> tasks = new ArrayList<Task>();
 	private List<Task> currentTasks = new ArrayList<Task>();
 
 	private BaseAdapter tasksAdapter;
 	private BaseAdapter categoriesAdapter;
+	private BaseAdapter tagsAdapter;
+	private BaseAdapter placesAdapter;
 	private TaskStatus currentStatus;
 	private Category currentCategory;
 
 	private CategoryDAO categoryDAO = new CategoryDAO();
 	private TaskDAO taskDAO = new TaskDAO();
+	
+	private LeftMenuSection leftMenuSectionSelected = LeftMenuSection.CATEGORIES;
+	
+	private static enum LeftMenuSection {
+		CATEGORIES, TAGS, PLACES
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -65,8 +77,11 @@ public class TasksActivity extends Activity {
 		LayoutInflater mInflater = (LayoutInflater) TasksActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		lLeftMenuContainer.addView(mInflater.inflate(R.layout.activity_tasks_left_menu, lLeftMenuContainer, false));
 
+		initializeLeftMenu();
 		initializeActionsButtons();
 		initializeCategoriesAdapter();
+		initializeTagsAdapter();
+		initializePlacesAdapter();
 		initializeTasksAdapter();
 		refreshCategories();
 		actualiseTasksList();
@@ -77,7 +92,13 @@ public class TasksActivity extends Activity {
 		categories.addAll(categoryDAO.getAll());
 		tasks.clear();
 		tasks.addAll(taskDAO.getAll());
+		tags.clear();
+		tags.addAll(Tag.dao.getAll());
+		places.clear();
+		places.addAll(Place.dao.getAll());
 		categoriesAdapter.notifyDataSetChanged();
+		tagsAdapter.notifyDataSetChanged();
+		placesAdapter.notifyDataSetChanged();
 	}
 
 	private void initializeActionsButtons() {
@@ -90,9 +111,9 @@ public class TasksActivity extends Activity {
 		View tasks_new_button = this.findViewById(R.id.tasks_new_button);
 		
 		//Buttons of left menu
-		View lButtonLeftMenuViewCategories = this.findViewById(R.id.view_categories);
-		View lButtonLeftMenuViewTags = this.findViewById(R.id.view_tags);
-		View lButtonLeftMenuViewPlaces = this.findViewById(R.id.view_places);
+		View lButtonLeftMenuViewCategories = this.findViewById(R.id.tasks_leftmenu_view_categories);
+		View lButtonLeftMenuViewTags = this.findViewById(R.id.tasks_leftmenu_view_tags);
+		View lButtonLeftMenuViewPlaces = this.findViewById(R.id.tasks_leftmenu_view_places);
 
 		lButtonInprogress.setOnClickListener(new OnClickListener() {
 			@Override
@@ -197,8 +218,49 @@ public class TasksActivity extends Activity {
 
 				tasks.add(lTask);
 				actualiseTasksList();
+				
+				//Reset input text
+				tasks_new_text.setText("");
 			}
 		});
+		
+		lButtonLeftMenuViewCategories.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				leftMenuSectionSelected = LeftMenuSection.CATEGORIES;
+				actualizeLeftMenuSelection();
+			}
+		});
+		
+		lButtonLeftMenuViewTags.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				leftMenuSectionSelected = LeftMenuSection.TAGS;
+				actualizeLeftMenuSelection();
+			}
+		});
+		
+		lButtonLeftMenuViewPlaces.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				leftMenuSectionSelected = LeftMenuSection.PLACES;
+				actualizeLeftMenuSelection();
+			}
+		});
+	}
+	
+	private void actualizeLeftMenuSelection() {
+		View lContainerCategories = this.findViewById(R.id.tasks_leftmenu_menu_categories);
+		View lContainerTags = this.findViewById(R.id.tasks_leftmenu_menu_tags);
+		View lContainerPlaces = this.findViewById(R.id.tasks_leftmenu_menu_places);
+		
+		int lCategoriesVisibility = leftMenuSectionSelected==LeftMenuSection.CATEGORIES?View.VISIBLE:View.GONE;
+		int lTagsVisibility = leftMenuSectionSelected==LeftMenuSection.TAGS?View.VISIBLE:View.GONE;
+		int lPlacesVisibility = leftMenuSectionSelected==LeftMenuSection.PLACES?View.VISIBLE:View.GONE;
+		
+		lContainerCategories.setVisibility(lCategoriesVisibility);
+		lContainerTags.setVisibility(lTagsVisibility);
+		lContainerPlaces.setVisibility(lPlacesVisibility);
 	}
 
 	private void actualiseTasksList() {
@@ -226,6 +288,14 @@ public class TasksActivity extends Activity {
 			lTextCategorySelected.setText(currentCategory.getName());
 		}
 		categoriesAdapter.notifyDataSetChanged();
+	}
+
+	private void actualiseTagsList() {
+		tagsAdapter.notifyDataSetChanged();
+	}
+
+	private void actualisePlacesList() {
+		placesAdapter.notifyDataSetChanged();
 	}
 
 	/* Called whenever we call invalidateOptionsMenu() */
@@ -364,8 +434,8 @@ public class TasksActivity extends Activity {
 				LayoutInflater mInflater = (LayoutInflater) TasksActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 				
 				LinearLayout lParent;
-				TextView lText = null;
-				ImageButton lButtonDelete = null;
+				TextView lText;
+				ImageButton lButtonDelete;
 
 				if (convertView == null) {
 					lParent = (LinearLayout) mInflater.inflate(R.layout.activity_tasks_leftmenu_categories_entry, parent, false);
@@ -375,14 +445,8 @@ public class TasksActivity extends Activity {
 
 				try {
 					// Otherwise, find the TextView field within the layout
-					for (int i = 0; i < lParent.getChildCount(); i++) {
-						View lChild = lParent.getChildAt(i);
-						if (lChild.getId() == R.id.tasks_leftmenu_categories_entry_text) {
-							lText = (TextView) lChild;
-						} else if (lChild.getId() == R.id.tasks_leftmenu_categories_entry_delete) {
-							lButtonDelete = (ImageButton) lChild;
-						}
-					}
+					lText = (TextView) lParent.findViewById(R.id.tasks_leftmenu_categories_entry_text);
+					lButtonDelete = (ImageButton) lParent.findViewById(R.id.tasks_leftmenu_categories_entry_delete);
 				} catch (ClassCastException e) {
 					Log.e("ArrayAdapter", "You must supply a resource ID for a TextView");
 					throw new IllegalStateException("ArrayAdapter requires the resource ID to be a TextView", e);
@@ -453,19 +517,209 @@ public class TasksActivity extends Activity {
 				return categories.size() + 1;
 			}
 		};
-		final ListView categories_view = (ListView) findViewById(R.id.tasks_menu_list);
-		final LinearLayout leftmenu = (LinearLayout) findViewById(R.id.tasks_leftmenu);
-		final DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.tasks_menu_layout);
+		final ListView categories_view = (ListView) findViewById(R.id.tasks_leftmenu_categories_list);
 		categories_view.setAdapter(categoriesAdapter);
+	}
+
+	private void initializeTagsAdapter() {
+		tagsAdapter = new BaseAdapter() {
+			@Override
+			public View getView(int position, View convertView, ViewGroup parent) {
+				LayoutInflater mInflater = (LayoutInflater) TasksActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				
+				LinearLayout lParent;
+				TextView lText;
+				ImageButton lButtonDelete;
+
+				if (convertView == null) {
+					lParent = (LinearLayout) mInflater.inflate(R.layout.activity_tasks_leftmenu_tags_entry, parent, false);
+				} else {
+					lParent = (LinearLayout) convertView;
+				}
+
+				try {
+					// Otherwise, find the TextView field within the layout
+					lText = (TextView) lParent.findViewById(R.id.tasks_leftmenu_tags_entry_text);
+					lButtonDelete = (ImageButton) lParent.findViewById(R.id.tasks_leftmenu_tags_entry_delete);
+				} catch (ClassCastException e) {
+					Log.e("ArrayAdapter", "You must supply a resource ID for a TextView");
+					throw new IllegalStateException("ArrayAdapter requires the resource ID to be a TextView", e);
+				}
+
+				final Tag lTag = getCurrentTag(position);
+
+				lText.setText(lTag.getName());
+				lButtonDelete.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						Collection<Task> lTasksOfThisTag = taskDAO.findByTag(lTag);
+						if (!lTasksOfThisTag.isEmpty()) {
+							new AlertDialog.Builder(TasksActivity.this)
+								.setMessage(R.string.tasks_tags_create_name_already_used)
+								.setCancelable(true)
+								.setPositiveButton(R.string.button_yes, new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+										Collection<Task> lTasksOfThisTag = taskDAO.findByTag(lTag);
+										for (Task lTask : lTasksOfThisTag) {
+											Task.dao.removeTagFromTask(lTask, lTag);
+										}
+										Tag.dao.delete(lTag.getIdTag());
+										tags.remove(lTag);
+										actualiseTagsList();
+										actualiseTasksList();
+									}
+								})
+								.setNegativeButton(R.string.button_no, null)
+								.show();
+							return;
+						}
+						//TODO if filter is enabled on this tag, remove it
+						Tag.dao.delete(lTag.getIdTag());
+						tags.remove(lTag);
+						actualiseTagsList();
+						actualiseTasksList();
+					}
+				});
+				lParent.setOnClickListener(new OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
+						//TODO action on selection
+					}
+				});
+				return lParent;
+			}
+
+			@Override
+			public long getItemId(int position) {
+				return getCurrentTag(position).getIdTag();
+			}
+
+			@Override
+			public String getItem(int position) {
+				return getCurrentTag(position).getName();
+			}
+			
+			private Tag getCurrentTag(int position) {
+				return tags.get(position);
+			}
+
+			@Override
+			public int getCount() {
+				return tags.size();
+			}
+		};
+		final ListView tags_view = (ListView) findViewById(R.id.tasks_leftmenu_tags_list);
+		tags_view.setAdapter(tagsAdapter);
+	}
+	
+	private void initializePlacesAdapter() {
+		placesAdapter = new BaseAdapter() {
+			@Override
+			public View getView(int position, View convertView, ViewGroup parent) {
+				LayoutInflater mInflater = (LayoutInflater) TasksActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				
+				LinearLayout lParent;
+				TextView lText;
+				ImageButton lButtonDelete;
+				
+				if (convertView == null) {
+					lParent = (LinearLayout) mInflater.inflate(R.layout.activity_tasks_leftmenu_places_entry, parent, false);
+				} else {
+					lParent = (LinearLayout) convertView;
+				}
+				
+				try {
+					// Otherwise, find the TextView field within the layout
+					lText = (TextView) lParent.findViewById(R.id.tasks_leftmenu_places_entry_text);
+					lButtonDelete = (ImageButton) lParent.findViewById(R.id.tasks_leftmenu_places_entry_delete);
+				} catch (ClassCastException e) {
+					Log.e("ArrayAdapter", "You must supply a resource ID for a TextView");
+					throw new IllegalStateException("ArrayAdapter requires the resource ID to be a TextView", e);
+				}
+				
+				final Place lPlace = getCurrentPlace(position);
+				
+				lText.setText(lPlace.getName());
+				lButtonDelete.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						Collection<Task> lTasksOfThisPlace = taskDAO.findByPlace(lPlace);
+						if (!lTasksOfThisPlace.isEmpty()) {
+							new AlertDialog.Builder(TasksActivity.this)
+								.setMessage(R.string.tasks_places_create_name_already_used)
+								.setCancelable(true)
+								.setPositiveButton(R.string.button_yes, new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+										Collection<Task> lTasksOfThisPlace = taskDAO.findByPlace(lPlace);
+										for (Task lTask : lTasksOfThisPlace) {
+											Task.dao.removePlaceFromTask(lTask, lPlace);
+										}
+										Place.dao.delete(lPlace.getIdPlace());
+										places.remove(lPlace);
+										actualisePlacesList();
+										actualiseTasksList();
+									}
+								})
+								.setNegativeButton(R.string.button_no, null)
+								.show();
+							return;
+						}
+						//TODO if filter is enabled on this place, remove it
+						Place.dao.delete(lPlace.getIdPlace());
+						places.remove(lPlace);
+						actualiseTagsList();
+						actualiseTasksList();
+					}
+				});
+				lParent.setOnClickListener(new OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
+						//TODO action on selection
+					}
+				});
+				return lParent;
+			}
+			
+			@Override
+			public long getItemId(int position) {
+				return getCurrentPlace(position).getIdPlace();
+			}
+			
+			@Override
+			public String getItem(int position) {
+				return getCurrentPlace(position).getName();
+			}
+			
+			private Place getCurrentPlace(int position) {
+				return places.get(position);
+			}
+			
+			@Override
+			public int getCount() {
+				return places.size();
+			}
+		};
+		final ListView places_view = (ListView) findViewById(R.id.tasks_leftmenu_places_list);
+		places_view.setAdapter(placesAdapter);
+	}
+
+	private void initializeLeftMenu() {
+		
+		final LinearLayout lLeftmenu = (LinearLayout) findViewById(R.id.tasks_leftmenu);
+		final DrawerLayout lDrawerLayout = (DrawerLayout) findViewById(R.id.tasks_menu_layout);
 		
 		((ImageButton)this.findViewById(R.id.tasks_open_menu)).setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				mDrawerLayout.openDrawer(leftmenu);				
+				lDrawerLayout.openDrawer(lLeftmenu);				
 			}
 		});
-		ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.drawable.menu, R.string.drawer_open, R.string.drawer_close) {
+		ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, lDrawerLayout, R.drawable.menu, R.string.drawer_open, R.string.drawer_close) {
 
 			/** Called when a drawer has settled in a completely closed state. */
 			public void onDrawerClosed(View view) {
@@ -477,17 +731,18 @@ public class TasksActivity extends Activity {
 			/** Called when a drawer has settled in a completely open state. */
 			public void onDrawerOpened(View drawerView) {
 				super.onDrawerOpened(drawerView);
+				actualizeLeftMenuSelection();
 				invalidateOptionsMenu(); // creates call to
 											// onPrepareOptionsMenu()
 			}
 		};
 
 		// Set the drawer toggle as the DrawerListener
-		mDrawerLayout.setDrawerListener(mDrawerToggle);
+		lDrawerLayout.setDrawerListener(mDrawerToggle);
 		
 		//Enable button to create a category
-		final EditText categories_new_text = (EditText) this.findViewById(R.id.tasks_leftmenu_newcategory_text);
-		final ImageButton categories_new_button = (ImageButton) this.findViewById(R.id.tasks_leftmenu_newcategory_button);
+		final EditText categories_new_text = (EditText) this.findViewById(R.id.tasks_leftmenu_categories_new_text);
+		final ImageButton categories_new_button = (ImageButton) this.findViewById(R.id.tasks_leftmenu_categories_new_button);
 		categories_new_button.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {

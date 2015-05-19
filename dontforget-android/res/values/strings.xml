@@ -3,6 +3,9 @@
 
     <string name="app_name">Don\'t Forget</string>
     <string name="welcome_text">Welcome on Don\'t forget application. Loading&#8230;</string>
+
+    <string name="button_yes">Yes</string>
+    <string name="button_no">No</string>
     
     <string name="tasks_allcategories">All categories</string>
     <string name="tasks_new_text">New task</string>
@@ -10,6 +13,10 @@
     <string name="tasks_categories_delete_tasks_associated">Impossible to delete this category because some tasks are associated to it</string>
     <string name="tasks_categories_create_name_already_used">Impossible to create this category because it already exists</string>
     <string name="tasks_tasks_create_no_category_selected">Please select a category to create a task</string>
+    <string name="tasks_tags_delete_tasks_associated">Impossible to delete this tag because some tasks are associated to it</string>
+    <string name="tasks_tags_create_name_already_used">Some tasks use this tag. Are you sure to delete it?</string>
+    <string name="tasks_places_delete_tasks_associated">Impossible to delete this place because some tasks are associated to it</string>
+    <string name="tasks_places_create_name_already_used">Some tasks use this place. Are you sure to delete it?</string>
     
     <string name="connection_protocol">Protocol</string>
     <string name="connection_host">Server</string>

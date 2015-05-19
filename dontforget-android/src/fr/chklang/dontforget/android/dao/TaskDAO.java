@@ -115,6 +115,20 @@ public class TaskDAO extends AbstractDAO<Task, Integer> {
 		return findByCriterias(Pair.create(COLUMN_IDCATEGORY + "=?", new String[] {Integer.toString(pCategory.getIdCategory())}));
 	}
 	
+	public Collection<Task> findByTag(Tag pTag) {
+		String lQuery = generateSelectFrom("T");
+		lQuery += ", t_task_tag TT WHERE TT.idTask = T.idTask AND TT.idTag = ?";
+		Cursor lCursor = DatabaseManager.getReadableDatabase().rawQuery(lQuery, new String[] {Integer.toString(pTag.getIdTag())});
+		return toListObjects(lCursor);
+	}
+	
+	public Collection<Task> findByPlace(Place pPlace) {
+		String lQuery = generateSelectFrom("T");
+		lQuery += ", t_task_place TP WHERE TP.idTask = T.idTask AND TP.idPlace = ?";
+		Cursor lCursor = DatabaseManager.getReadableDatabase().rawQuery(lQuery, new String[] {Integer.toString(pPlace.getIdPlace())});
+		return toListObjects(lCursor);
+	}
+	
 	public void addTagToTask(Task pTask, Tag pTag) {
 		ContentValues lValues = new ContentValues();
 		lValues.put("idTask", pTask.getIdTask());
@@ -133,7 +147,7 @@ public class TaskDAO extends AbstractDAO<Task, Integer> {
 		DatabaseManager.getWrittableDatabase().insert("t_task_place", null, lValues);
 	}
 	
-	public void removeTagFromTask(Task pTask, Place pPlace) {
+	public void removePlaceFromTask(Task pTask, Place pPlace) {
 		DatabaseManager.getWrittableDatabase().delete("t_task_place", "idTask=? AND idPlace=?", new String[]{Integer.toString(pTask.getIdTask()), Integer.toString(pPlace.getIdPlace())});
 	}
 }

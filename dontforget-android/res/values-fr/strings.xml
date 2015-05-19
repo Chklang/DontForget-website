@@ -4,10 +4,17 @@
 
     <string name="tasks_allcategories">Toutes les catégories</string>
     <string name="tasks_new_text">Nouvelle tâche</string>
+
+    <string name="button_yes">Oui</string>
+    <string name="button_no">Non</string>
     
     <string name="tasks_categories_delete_tasks_associated">Impossible de supprimer la catégorie car des tâches y sont associées</string>
     <string name="tasks_categories_create_name_already_used">Impossible de creer la catégorie car elle existe déjà</string>
     <string name="tasks_tasks_create_no_category_selected">Veuillez d\'abord choisir une catégorie pour créer une tâche</string>
+    <string name="tasks_tags_delete_tasks_associated">Impossible de supprimer le tag car des tâches y sont associées</string>
+    <string name="tasks_tags_create_name_already_used">Impossible de creer le tag car il existe déjà</string>
+    <string name="tasks_places_delete_tasks_associated">Impossible de supprimer le lieu car des tâches y sont associées</string>
+    <string name="tasks_places_create_name_already_used">Impossible de creer le lieu car il existe déjà</string>
     
     <string name="connection_protocol">Protocol</string>
     <string name="connection_host">Serveur</string>
