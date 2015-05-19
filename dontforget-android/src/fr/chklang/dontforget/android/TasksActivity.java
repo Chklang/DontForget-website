@@ -22,7 +22,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -60,6 +59,11 @@ public class TasksActivity extends Activity {
 
 		categories_ALL = getResources().getString(R.string.categories_all);
 		currentStatus = TaskStatus.OPENED;
+		
+		//Attach left menu to navigation drawer
+		ViewGroup lLeftMenuContainer = (ViewGroup) this.findViewById(R.id.tasks_leftmenu);
+		LayoutInflater mInflater = (LayoutInflater) TasksActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		lLeftMenuContainer.addView(mInflater.inflate(R.layout.activity_tasks_left_menu, lLeftMenuContainer, false));
 
 		initializeActionsButtons();
 		initializeCategoriesAdapter();
@@ -77,13 +81,18 @@ public class TasksActivity extends Activity {
 	}
 
 	private void initializeActionsButtons() {
-		ImageView lButtonInprogress = (ImageView) findViewById(R.id.tasks_inprogress);
-		ImageView lButtonFinished = (ImageView) findViewById(R.id.tasks_finished);
-		ImageView lButtonDeleted = (ImageView) findViewById(R.id.tasks_deleted);
-		ImageView lButtonAll = (ImageView) findViewById(R.id.tasks_all);
+		View lButtonInprogress = findViewById(R.id.tasks_inprogress);
+		View lButtonFinished = findViewById(R.id.tasks_finished);
+		View lButtonDeleted = findViewById(R.id.tasks_deleted);
+		View lButtonAll = findViewById(R.id.tasks_all);
 
 		final EditText tasks_new_text = (EditText) this.findViewById(R.id.tasks_new_text);
-		ImageButton tasks_new_button = (ImageButton) this.findViewById(R.id.tasks_new_button);
+		View tasks_new_button = this.findViewById(R.id.tasks_new_button);
+		
+		//Buttons of left menu
+		View lButtonLeftMenuViewCategories = this.findViewById(R.id.view_categories);
+		View lButtonLeftMenuViewTags = this.findViewById(R.id.view_tags);
+		View lButtonLeftMenuViewPlaces = this.findViewById(R.id.view_places);
 
 		lButtonInprogress.setOnClickListener(new OnClickListener() {
 			@Override
