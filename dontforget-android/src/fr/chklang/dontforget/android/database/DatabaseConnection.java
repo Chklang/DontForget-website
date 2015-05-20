@@ -20,6 +20,10 @@ public class DatabaseConnection extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
+		upgrade(db, 0);
+	}
+	
+	private void v1(SQLiteDatabase db) {
 		String lTableCategory = "CREATE TABLE \"t_category\" ("
 				+ "\"idCategory\" INTEGER PRIMARY KEY NOT NULL,"
 				+ "\"name\" VARCHAR NOT NULL,"
@@ -80,20 +84,25 @@ public class DatabaseConnection extends SQLiteOpenHelper {
 		db.execSQL(lTableTaskTag);
 		db.execSQL(lTableToken);
 	}
-	
 	private void v2(SQLiteDatabase db) {
 		String lAddColumnToken = "ALTER TABLE \"t_token\" ADD COLUMN \"lastSynchro\" INTEGER NOT NULL DEFAULT 0";
 		db.execSQL(lAddColumnToken);
 	}
-
-	@Override
-	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+	
+	private void upgrade(SQLiteDatabase db, int oldVersion) {
 		switch (oldVersion) {
+		case 0 :
+			v1(db);
 		case 1 :
 			v2(db);
 		default :
 			break;
 		}
+	}
+
+	@Override
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		upgrade(db, oldVersion);
 	}
 
 }
