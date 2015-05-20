@@ -3,6 +3,7 @@
     <string name="welcome_text">Bienvenue sur l\'application Don\'t Forget. Chargement en cours&#8230;</string>
 
     <string name="tasks_allcategories">Toutes les catégories</string>
+    <string name="tasks_search_text">Filtrer...</string>
     <string name="tasks_new_text">Nouvelle tâche</string>
 
     <string name="button_yes">Oui</string>

@@ -8,6 +8,7 @@
     <string name="button_no">No</string>
     
     <string name="tasks_allcategories">All categories</string>
+    <string name="tasks_search_text">Filter...</string>
     <string name="tasks_new_text">New task</string>
     
     <string name="tasks_categories_delete_tasks_associated">Impossible to delete this category because some tasks are associated to it</string>
