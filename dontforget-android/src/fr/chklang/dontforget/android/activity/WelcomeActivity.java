@@ -9,7 +9,6 @@ import android.os.Bundle;
 import fr.chklang.dontforget.android.R;
 import fr.chklang.dontforget.android.business.Configuration;
 import fr.chklang.dontforget.android.business.Token;
-import fr.chklang.dontforget.android.dao.ConfigurationDAO;
 import fr.chklang.dontforget.android.database.DatabaseManager;
 
 public class WelcomeActivity extends Activity {

@@ -2,7 +2,6 @@ package fr.chklang.dontforget.android.adapter;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Currency;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

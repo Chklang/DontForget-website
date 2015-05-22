@@ -3,10 +3,13 @@
  */
 package fr.chklang.dontforget.android.dao;
 
+import java.util.Collection;
+
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.util.Pair;
 import fr.chklang.dontforget.android.business.Category;
+import fr.chklang.dontforget.android.business.Task;
 import fr.chklang.dontforget.android.helpers.ConfigurationHelper;
 
 /**
@@ -94,5 +97,12 @@ public class CategoryDAO extends AbstractDAO<Category, Integer> {
 	
 	public Category getByName(String pName) {
 		return getByCriterias(Pair.create(COLUMN_NAME+"=?", new String[] {pName}));
+	}
+	public Category getByUuid(String pUuid) {
+		return getByCriterias(Pair.create(COLUMN_UUID+"=?", new String[] {pUuid}));
+	}
+	
+	public Collection<Category> findAfterLastUpdate(long pDate) {
+		return findByCriterias(Pair.create(COLUMN_LASTUPDATE + ">?", new String[]{Long.toString(pDate)}));
 	}
 }

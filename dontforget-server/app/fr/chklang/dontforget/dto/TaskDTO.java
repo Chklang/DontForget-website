@@ -29,11 +29,11 @@ public class TaskDTO extends ObjectNode {
 	
 	private final TaskStatus status;
 	
-	private final Stream<TagDTO> tags;
+	private final Stream<String> tags;
 	
-	private final Stream<PlaceDTO> places;
+	private final Stream<String> places;
 	
-	private final CategoryDTO category;
+	private final String category;
 	
 	private final long lastUpdate;
 
@@ -42,17 +42,17 @@ public class TaskDTO extends ObjectNode {
 		uuid = pJson.get("uuid").asText();
 		text = pJson.get("text").asText();
 		status = TaskStatus.valueOf(pJson.get("status").asText());
-		Collection<TagDTO> lTags = new ArrayList<>();
-		pJson.get("tags").forEach((pNode) -> {
-			lTags.add(new TagDTO(pNode));
+		Collection<String> lTags = new ArrayList<>();
+		pJson.get("tagUuids").forEach((pNode) -> {
+			lTags.add(pNode.asText());
 		});
 		tags = lTags.stream();
-		Collection<PlaceDTO> lPlaces = new ArrayList<>();
-		pJson.get("places").forEach((pNode) -> {
-			lPlaces.add(new PlaceDTO(pNode));
+		Collection<String> lPlaces = new ArrayList<>();
+		pJson.get("placeUuids").forEach((pNode) -> {
+			lTags.add(pNode.asText());
 		});
 		places = lPlaces.stream();
-		category = new CategoryDTO(pJson.get("category"));
+		category = pJson.get("categoryUuid").asText();
 		lastUpdate = pJson.get("lastUpdate").asLong();
 		build();
 	}
@@ -64,14 +64,14 @@ public class TaskDTO extends ObjectNode {
 		status = pTask.getStatus();
 		
 		tags = pTask.getTags().stream().map((pTag) -> {
-			return new TagDTO(pTag);
+			return pTag.getUuid();
 		});
 		
 		places = pTask.getPlaces().stream().map((pPlace) -> {
-			return new PlaceDTO(pPlace);
+			return pPlace.getUuid();
 		});
 		
-		category = new CategoryDTO(pTask.getCategory());
+		category = pTask.getCategory().getUuid();
 		
 		lastUpdate = pTask.getLastUpdate();
 		
@@ -120,19 +120,19 @@ public class TaskDTO extends ObjectNode {
 	/**
 	 * @return the tags
 	 */
-	public Stream<TagDTO> getTags() {
+	public Stream<String> getTags() {
 		return tags;
 	}
 	/**
 	 * @return the places
 	 */
-	public Stream<PlaceDTO> getPlaces() {
+	public Stream<String> getPlaces() {
 		return places;
 	}
 	/**
 	 * @return the category
 	 */
-	public CategoryDTO getCategory() {
+	public String getCategory() {
 		return category;
 	}
 	/**

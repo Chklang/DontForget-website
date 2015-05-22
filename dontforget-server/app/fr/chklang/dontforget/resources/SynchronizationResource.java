@@ -38,6 +38,8 @@ public class SynchronizationResource extends AbstractRest {
 
 	public static Result setUpdates() {
 		SynchronizationDTO lDTO = new SynchronizationDTO(request().body().asJson());
+		
+		User lConnectedUser = getConnectedUser();
 
 		lDTO.getTags().forEach((pTagDTO) -> {
 			insertOrUpdate(pTagDTO);
@@ -53,27 +55,27 @@ public class SynchronizationResource extends AbstractRest {
 
 		lDTO.getTasks().forEach((pTaskDTO) -> {
 			Task lTaskDB = Task.dao.getByUuid(pTaskDTO.getUuid());
-			Category lCategory = insertOrUpdate(pTaskDTO.getCategory());
-			if (lCategory == null) {
+			Category lCategory = Category.dao.getByUuid(pTaskDTO.getCategory());
+			if (lCategory == null || lCategory.getUser().getIdUser() != lConnectedUser.getIdUser()) {
 				// Category isn't assigned to current user
 				return;
 			}
 			Set<Tag> lTags = new HashSet<>();
 			pTaskDTO.getTags().forEach((pTagDTO) -> {
-				Tag lTag = insertOrUpdate(pTagDTO);
-				if (lTag != null) {
+				Tag lTag = Tag.dao.getByUuid(pTagDTO);
+				if (lTag != null && lTag.getUser().getIdUser() != lConnectedUser.getIdUser()) {
 					lTags.add(lTag);
 				}
 			});
 			Set<Place> lPlaces = new HashSet<>();
 			pTaskDTO.getPlaces().forEach((pPlaceDTO) -> {
-				Place lPlace = insertOrUpdate(pPlaceDTO);
-				if (lPlace != null) {
+				Place lPlace = Place.dao.getByUuid(pPlaceDTO);
+				if (lPlace != null && lPlace.getUser().getIdUser() != lConnectedUser.getIdUser()) {
 					lPlaces.add(lPlace);
 				}
 			});
 			if (lTaskDB != null) {
-				if (lTaskDB.getUser().getIdUser() != getConnectedUser().getIdUser()) {
+				if (lTaskDB.getUser().getIdUser() != lConnectedUser.getIdUser()) {
 					return;
 				}
 				// Check if update is necessary
@@ -93,7 +95,7 @@ public class SynchronizationResource extends AbstractRest {
 				lTaskDB.setPlaces(lPlaces);
 				lTaskDB.setTags(lTags);
 				lTaskDB.setCategory(lCategory);
-				lTaskDB.setUser(getConnectedUser());
+				lTaskDB.setUser(lConnectedUser);
 				lTaskDB.setLastUpdate(pTaskDTO.getLastUpdate());
 				lTaskDB.save();
 			}

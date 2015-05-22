@@ -67,9 +67,17 @@ public class ConnectionActivity extends Activity {
 		final String lLogin = connection_login.getText().toString();
 		final String lPassword = connection_password.getText().toString();
 
+		final StringBuilder lDeviceId = new StringBuilder();
+		DatabaseManager.transaction(this, new DatabaseManager.Transaction() {
+			
+			@Override
+			public void execute() {
+				lDeviceId.append(ConfigurationHelper.getDeviceId());
+			}
+		});
 		final ServerConfiguration lServerConfiguration = ServerConfiguration.newConfiguration(lProtocol, lHost, lPort, lContext);
 
-		Result<TokenDTO> lResult = TokensRest.connexion(lServerConfiguration, lLogin, lPassword, ConfigurationHelper.getDeviceId());
+		Result<TokenDTO> lResult = TokensRest.connexion(lServerConfiguration, lLogin, lPassword, lDeviceId.toString());
 		lResult.setOnException(new CallbackOnException() {
 			@Override
 			public void call(Exception pException) {

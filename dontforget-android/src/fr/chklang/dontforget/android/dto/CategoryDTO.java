@@ -3,6 +3,7 @@
  */
 package fr.chklang.dontforget.android.dto;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import fr.chklang.dontforget.android.AbstractDontForgetException;
@@ -14,35 +15,27 @@ import fr.chklang.dontforget.android.AbstractDontForgetException;
  */
 public class CategoryDTO {
 	
-	private int id;
+	private final String name;
 	
-	private String name;
+	private final String uuid;
 	
-	public CategoryDTO() {
-		
-	}
+	private final long lastUpdate;
 	
 	public CategoryDTO(JSONObject pJson) {
 		try {
-			id = pJson.getInt("id");
 			name = pJson.getString("name");
+			uuid = pJson.getString("uuid");
+			lastUpdate = pJson.getLong("lastUpdate");
 		} catch (Exception e) {
 			throw new AbstractDontForgetException(e);//TODO
 		}
 	}
 
-	/**
-	 * @return the id
-	 */
-	public int getId() {
-		return id;
-	}
-
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(int id) {
-		this.id = id;
+	public CategoryDTO(String pName, String pUuid, long pLastUpdate) {
+		super();
+		this.name = pName;
+		this.uuid = pUuid;
+		this.lastUpdate = pLastUpdate;
 	}
 
 	/**
@@ -53,9 +46,30 @@ public class CategoryDTO {
 	}
 
 	/**
-	 * @param name the name to set
+	 * @return the uuid
 	 */
-	public void setName(String name) {
-		this.name = name;
+	public String getUuid() {
+		return uuid;
+	}
+
+	/**
+	 * @return the lastUpdate
+	 */
+	public long getLastUpdate() {
+		return lastUpdate;
+	}
+	
+	public JSONObject toJson() {
+		JSONObject lContent = new JSONObject();
+		
+		try {
+			lContent.put("name", name);
+			lContent.put("uuid", uuid);
+			lContent.put("lastUpdate", lastUpdate);
+		} catch (JSONException e) {
+			throw new AbstractDontForgetException(e);
+		}
+			
+		return lContent;
 	}
 }

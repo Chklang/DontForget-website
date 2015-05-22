@@ -8,6 +8,7 @@ import java.util.Collection;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.util.Pair;
+import fr.chklang.dontforget.android.business.Place;
 import fr.chklang.dontforget.android.business.Tag;
 import fr.chklang.dontforget.android.business.Task;
 import fr.chklang.dontforget.android.database.DatabaseManager;
@@ -108,5 +109,12 @@ public class TagDAO extends AbstractDAO<Tag, Integer> {
 		lQuery += " WHERE T."+COLUMN_NAME+"=+?";
 		Cursor lCursor = DatabaseManager.rawQuery(lQuery, new String[] {pName});
 		return toObject(lCursor);
+	}
+	public Tag getByUuid(String pUuid) {
+		return getByCriterias(Pair.create(COLUMN_UUID+"=?", new String[] {pUuid}));
+	}
+	
+	public Collection<Tag> findAfterLastUpdate(long pDate) {
+		return findByCriterias(Pair.create(COLUMN_LASTUPDATE + ">?", new String[]{Long.toString(pDate)}));
 	}
 }

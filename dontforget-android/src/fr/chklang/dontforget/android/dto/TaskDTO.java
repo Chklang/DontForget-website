@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import fr.chklang.dontforget.android.AbstractDontForgetException;
@@ -17,26 +18,23 @@ import fr.chklang.dontforget.android.AbstractDontForgetException;
  */
 public class TaskDTO {
 	
-	private int id;
+	private final String text;
 	
-	private String text;
+	private final TaskStatus status;
 	
-	private TaskStatus status;
+	private final Collection<String> tagUuids;
 	
-	private Collection<TagDTO> tags;
+	private final Collection<String> placeUuids;
 	
-	private Collection<PlaceDTO> places;
+	private final String categoryUuid;
 	
-	private String categoryName;
-
-	public TaskDTO() {
-		super();
-	}
+	private final String uuid;
+	
+	private final long lastUpdate;
 	
 	public TaskDTO(JSONObject pObject) {
 		super();
 		try {
-			id = pObject.getInt("id");
 			text = pObject.getString("text");
 			String lTempStatus = pObject.getString("status");
 			if (TaskStatus.OPENED.name().equalsIgnoreCase(lTempStatus)) {
@@ -48,39 +46,38 @@ public class TaskDTO {
 			} else {
 				throw new AbstractDontForgetException("TaskStatus." + lTempStatus + " don't exists!");
 			}
-			JSONArray lTagsJson = pObject.getJSONArray("tags");
-			Collection<TagDTO> lTags = new ArrayList<TagDTO>();
+			JSONArray lTagsJson = pObject.getJSONArray("tagUuids");
+			Collection<String> lTags = new ArrayList<String>();
 			for (int i = 0; i < lTagsJson.length(); i++) {
-				JSONObject lTag = lTagsJson.getJSONObject(i);
-				lTags.add(new TagDTO(lTag));
+				lTags.add(lTagsJson.getString(i));
 			}
-			tags = lTags;
-			JSONArray lPlacesJson = pObject.getJSONArray("tags");
-			Collection<PlaceDTO> lPlaces = new ArrayList<PlaceDTO>();
+			tagUuids = lTags;
+			JSONArray lPlacesJson = pObject.getJSONArray("placeUuids");
+			Collection<String> lPlaces = new ArrayList<String>();
 			for (int i = 0; i < lPlacesJson.length(); i++) {
-				JSONObject lPlace = lPlacesJson.getJSONObject(i);
-				lPlaces.add(new PlaceDTO(lPlace));
+				lPlaces.add(lPlacesJson.getString(i));
 			}
-			places = lPlaces;
-			categoryName = pObject.getString("category");
+			placeUuids = lPlaces;
+			categoryUuid = pObject.getString("categoryUuid");
+			uuid = pObject.getString("uuid");
+			lastUpdate = pObject.getLong("lastUpdate");
 		} catch (Exception e) {
 			throw new AbstractDontForgetException(e);
 		}
 	}
 
-	/**
-	 * @return the id
-	 */
-	public int getId() {
-		return id;
+	
+	public TaskDTO(String pText, TaskStatus pStatus, String pCategoryUuid, String pUuid, long pLastUpdate) {
+		super();
+		this.text = pText;
+		this.status = pStatus;
+		this.tagUuids = new ArrayList<String>();
+		this.placeUuids = new ArrayList<String>();
+		this.categoryUuid = pCategoryUuid;
+		this.uuid = pUuid;
+		this.lastUpdate = pLastUpdate;
 	}
 
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(int id) {
-		this.id = id;
-	}
 
 	/**
 	 * @return the text
@@ -89,12 +86,6 @@ public class TaskDTO {
 		return text;
 	}
 
-	/**
-	 * @param text the text to set
-	 */
-	public void setText(String text) {
-		this.text = text;
-	}
 
 	/**
 	 * @return the status
@@ -103,53 +94,74 @@ public class TaskDTO {
 		return status;
 	}
 
-	/**
-	 * @param status the status to set
-	 */
-	public void setStatus(TaskStatus status) {
-		this.status = status;
-	}
 
 	/**
-	 * @return the tags
+	 * @return the tagUuids
 	 */
-	public Collection<TagDTO> getTags() {
-		return tags;
+	public Collection<String> getTagUuids() {
+		return tagUuids;
 	}
 
-	/**
-	 * @param tags the tags to set
-	 */
-	public void setTags(Collection<TagDTO> tags) {
-		this.tags = tags;
-	}
 
 	/**
-	 * @return the places
+	 * @return the placeUuids
 	 */
-	public Collection<PlaceDTO> getPlaces() {
-		return places;
+	public Collection<String> getPlaceUuids() {
+		return placeUuids;
 	}
 
-	/**
-	 * @param places the places to set
-	 */
-	public void setPlaces(Collection<PlaceDTO> places) {
-		this.places = places;
-	}
 
 	/**
-	 * @return the categoryName
+	 * @return the categoryUuid
 	 */
-	public String getCategoryName() {
-		return categoryName;
+	public String getCategoryUuid() {
+		return categoryUuid;
 	}
 
+
 	/**
-	 * @param categoryName the categoryName to set
+	 * @return the uuid
 	 */
-	public void setCategoryName(String categoryName) {
-		this.categoryName = categoryName;
+	public String getUuid() {
+		return uuid;
+	}
+
+
+	/**
+	 * @return the lastUpdate
+	 */
+	public long getLastUpdate() {
+		return lastUpdate;
+	}
+
+
+	public JSONObject toJson() {
+		JSONObject lContent = new JSONObject();
+		
+		try {
+			lContent.put("text", text);
+			lContent.put("status", status);
+			
+			JSONArray lTags = new JSONArray();
+			for (String lTag : tagUuids) {
+				lTags.put(lTag);
+			}
+			lContent.put("tagUuids", lTags);
+			
+			JSONArray lPlaces = new JSONArray();
+			for (String lPlace : placeUuids) {
+				lPlaces.put(lPlace);
+			}
+			lContent.put("placeUuids", lPlaces);
+			
+			lContent.put("categoryUuid", categoryUuid);
+			lContent.put("uuid", uuid);
+			lContent.put("lastUpdate", lastUpdate);
+		} catch (JSONException e) {
+			throw new AbstractDontForgetException(e);
+		}
+			
+		return lContent;
 	}
 
 }
