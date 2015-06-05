@@ -11,9 +11,13 @@ import android.content.Context;
 import android.util.Pair;
 import fr.chklang.dontforget.android.ServerConfiguration;
 import fr.chklang.dontforget.android.business.Category;
+import fr.chklang.dontforget.android.business.CategoryToDelete;
 import fr.chklang.dontforget.android.business.Place;
+import fr.chklang.dontforget.android.business.PlaceToDelete;
 import fr.chklang.dontforget.android.business.Tag;
+import fr.chklang.dontforget.android.business.TagToDelete;
 import fr.chklang.dontforget.android.business.Task;
+import fr.chklang.dontforget.android.business.TaskToDelete;
 import fr.chklang.dontforget.android.business.Token;
 import fr.chklang.dontforget.android.database.DatabaseManager;
 import fr.chklang.dontforget.android.dto.CategoryDTO;
@@ -38,32 +42,51 @@ public class SynchronizationHelper {
 			}
 		});
 	}
-	
+
 	private static void runStartSynchronizations() {
 		Collection<Token> lTokens = Token.dao.getAll();
 		Collection<Pair<Token, Result<SynchronizationDTO>>> lSynchronizationsPromesses = new ArrayList<Pair<Token, Result<SynchronizationDTO>>>();
 		Collection<Pair<Token, SynchronizationDTO>> lSynchronizations = new ArrayList<Pair<Token, SynchronizationDTO>>();
-		
-		//First, update local storage with each declared servers
+
+		// First, update local storage with each declared servers
 		for (Token lToken : lTokens) {
 			Result<SynchronizationDTO> lSynchronizationPromesse = getSynchronizationDTO(lToken);
 			lSynchronizationsPromesses.add(Pair.create(lToken, lSynchronizationPromesse));
 		}
-		
+
 		for (Pair<Token, Result<SynchronizationDTO>> lEntry : lSynchronizationsPromesses) {
 			SynchronizationDTO lSynchronizationDTO = lEntry.second.get();
 			if (lSynchronizationDTO == null) {
-				//Problem connection, ignore token
+				// Problem connection, ignore token
 				continue;
 			}
 			lSynchronizations.add(Pair.create(lEntry.first, lSynchronizationDTO));
-			updateLocalWithSynchronizationDTO(lSynchronizationDTO);
 		}
 		
-		Collection<Pair<Token, Result<Boolean>>> lReUpdateServer = new ArrayList<Pair<Token, Result<Boolean>>>();
-		//Now, update each servers with the updated data
+		//Update categories, tags and places
 		for (Pair<Token, SynchronizationDTO> lEntry : lSynchronizations) {
-			SynchronizationDTO lSynchronizationDTOToSave = getUpdateServerWithSynchronizationDTO(lEntry.first.getLastSynchro(), lEntry.second);
+			updateLocalWithSynchronizationDTOCategoriesTagsAndPlaces(lEntry.second);
+		}
+		
+		//Update tasks
+		for (Pair<Token, SynchronizationDTO> lEntry : lSynchronizations) {
+			updateLocalWithSynchronizationDTOTasks(lEntry.second);
+		}
+
+		// Delete old tasks
+		for (Pair<Token, SynchronizationDTO> lEntry : lSynchronizations) {
+			updateLocalWithSynchronizationDTODeleteTasks(lEntry.first, lEntry.second);
+		}
+
+		// Delete old tags, places and categories
+		for (Pair<Token, SynchronizationDTO> lEntry : lSynchronizations) {
+			updateLocalWithSynchronizationDTODeleteTagsPlacesAndCategories(lEntry.first, lEntry.second);
+		}
+
+		Collection<Pair<Token, Result<Boolean>>> lReUpdateServer = new ArrayList<Pair<Token, Result<Boolean>>>();
+		// Now, update each servers with the updated data
+		for (Pair<Token, SynchronizationDTO> lEntry : lSynchronizations) {
+			SynchronizationDTO lSynchronizationDTOToSave = getUpdateServerWithSynchronizationDTO(lEntry.first, lEntry.second);
 			Result<Boolean> lPromesse = updateServer(lEntry.first, lSynchronizationDTOToSave);
 			lReUpdateServer.add(Pair.create(lEntry.first, lPromesse));
 		}
@@ -71,191 +94,110 @@ public class SynchronizationHelper {
 		for (Pair<Token, Result<Boolean>> lEntry : lReUpdateServer) {
 			Boolean lResult = lEntry.second.get();
 			if (lResult.booleanValue()) {
-				//Update ok, save token
+				//Update the token
 				lEntry.first.setLastSynchro(System.currentTimeMillis());
 				Token.dao.save(lEntry.first);
 			}
 		}
+		//Delete old entries into logs
+		cleanObjectsDeleted();
 	}
-	
+
 	private static Result<SynchronizationDTO> getSynchronizationDTO(Token pToken) {
-		String lProtocol = pToken.getTokenKey().getProtocol();
-		String lHost = pToken.getTokenKey().getHost();
-		int lPort = pToken.getTokenKey().getPort();
-		String lContext = pToken.getTokenKey().getContext();
+		String lProtocol = pToken.getProtocol();
+		String lHost = pToken.getHost();
+		int lPort = pToken.getPort();
+		String lContext = pToken.getContext();
 		ServerConfiguration lServerConfiguration = new ServerConfiguration(lProtocol, lHost, lPort, lContext);
 		return SynchronizationRest.connexion(lServerConfiguration, pToken.getLastSynchro());
 	}
-	
+
 	private static Result<Boolean> updateServer(Token pToken, SynchronizationDTO pSynchronizationDTO) {
-		String lProtocol = pToken.getTokenKey().getProtocol();
-		String lHost = pToken.getTokenKey().getHost();
-		int lPort = pToken.getTokenKey().getPort();
-		String lContext = pToken.getTokenKey().getContext();
+		String lProtocol = pToken.getProtocol();
+		String lHost = pToken.getHost();
+		int lPort = pToken.getPort();
+		String lContext = pToken.getContext();
 		ServerConfiguration lServerConfiguration = new ServerConfiguration(lProtocol, lHost, lPort, lContext);
 		return SynchronizationRest.update(lServerConfiguration, pSynchronizationDTO);
 	}
-	
-	private static void updateLocalWithSynchronizationDTO(SynchronizationDTO pSynchronizationDTO) {
-		Collection<Category> lCategoriesIntoDBBeforeUpdate = Category.dao.getAll();
-		
-		SynchronizationDTO lUpdateServer = new SynchronizationDTO();
-		
+
+	private static void updateLocalWithSynchronizationDTOCategoriesTagsAndPlaces(SynchronizationDTO pSynchronizationDTO) {
+		// Update/create categories
 		for (CategoryDTO lCategoryDTO : pSynchronizationDTO.getCategories()) {
-			boolean lIsFound = false;
-			for (Category lCategory : lCategoriesIntoDBBeforeUpdate) {
-				if (lCategory.getUuid().equals(lCategoryDTO.getUuid())) {
-					//Update it
-					lIsFound = true;
-					lCategoriesIntoDBBeforeUpdate.remove(lCategory);
-					
-					//Update category
-					if (lCategory.getLastUpdate() < lCategoryDTO.getLastUpdate()) {
-						//Update local storage
-						lCategory.setName(lCategoryDTO.getName().trim());
-						lCategory.setLastUpdate(lCategoryDTO.getLastUpdate());
-						Category.dao.save(lCategory);
-					} else if (lCategory.getLastUpdate() > lCategoryDTO.getLastUpdate()) {
-						//Update server storage
-						lCategoryDTO = new CategoryDTO(lCategory.getName(), lCategory.getUuid(), lCategory.getLastUpdate());
-						lUpdateServer.getCategories().add(lCategoryDTO);
-					}
-					
-					break;
-				}
-			}
-			if (!lIsFound) {
-				//Create it
-				Category lCategory = new Category();
+			Category lCategory = Category.dao.getByUuid(lCategoryDTO.getUuid());
+			if (lCategory == null) {
+				// Create it
+				lCategory = new Category();
 				lCategory.setName(lCategoryDTO.getName().trim());
 				lCategory.setLastUpdate(lCategoryDTO.getLastUpdate());
 				lCategory.setUuid(lCategoryDTO.getUuid());
 				Category.dao.save(lCategory);
-			}
-		}
-		//TODO Delete old categories
-		
-		
-		Collection<Tag> lTagsIntoDBBeforeUpdate = Tag.dao.getAll();
-		
-		for (TagDTO lTagDTO : pSynchronizationDTO.getTags()) {
-			boolean lIsFound = false;
-			for (Tag lTag : lTagsIntoDBBeforeUpdate) {
-				if (lTag.getUuid().equals(lTagDTO.getUuid())) {
-					//Update it
-					lIsFound = true;
-					lTagsIntoDBBeforeUpdate.remove(lTag);
-					
-					//Update Tag
-					if (lTag.getLastUpdate() < lTagDTO.getLastUpdate()) {
-						//Update local storage
-						lTag.setName(lTagDTO.getName().trim());
-						lTag.setLastUpdate(lTagDTO.getLastUpdate());
-						Tag.dao.save(lTag);
-					} else if (lTag.getLastUpdate() > lTagDTO.getLastUpdate()) {
-						//Update server storage
-						lTagDTO = new TagDTO(lTag.getName(), lTag.getUuid(), lTag.getLastUpdate());
-						lUpdateServer.getTags().add(lTagDTO);
-					}
-					
-					break;
+			} else {
+				// Update it
+				if (lCategory.getLastUpdate() < lCategoryDTO.getLastUpdate()) {
+					// Update local storage
+					lCategory.setName(lCategoryDTO.getName().trim());
+					lCategory.setLastUpdate(lCategoryDTO.getLastUpdate());
+					Category.dao.save(lCategory);
 				}
 			}
-			if (!lIsFound) {
-				//Create it
-				Tag lTag = new Tag();
+		}
+
+		// Update/create tags
+		for (TagDTO lTagDTO : pSynchronizationDTO.getTags()) {
+			Tag lTag = Tag.dao.getByUuid(lTagDTO.getUuid());
+			if (lTag == null) {
+				// Create it
+				lTag = new Tag();
 				lTag.setName(lTagDTO.getName().trim());
 				lTag.setLastUpdate(lTagDTO.getLastUpdate());
 				lTag.setUuid(lTagDTO.getUuid());
 				Tag.dao.save(lTag);
-			}
-		}
-		//TODO Delete old tags
-		
-		
-		Collection<Place> lPlacesIntoDBBeforeUpdate = Place.dao.getAll();
-		
-		for (PlaceDTO lPlaceDTO : pSynchronizationDTO.getPlaces()) {
-			boolean lIsFound = false;
-			for (Place lPlace : lPlacesIntoDBBeforeUpdate) {
-				if (lPlace.getUuid().equals(lPlaceDTO.getUuid())) {
-					//Update it
-					lIsFound = true;
-					lPlacesIntoDBBeforeUpdate.remove(lPlace);
-					
-					//Update Place
-					if (lPlace.getLastUpdate() < lPlaceDTO.getLastUpdate()) {
-						//Update local storage
-						lPlace.setName(lPlaceDTO.getName().trim());
-						lPlace.setLastUpdate(lPlaceDTO.getLastUpdate());
-						Place.dao.save(lPlace);
-					} else if (lPlace.getLastUpdate() > lPlaceDTO.getLastUpdate()) {
-						//Update server storage
-						lPlaceDTO = new PlaceDTO(lPlace.getName(), lPlace.getUuid(), lPlace.getLastUpdate());
-						lUpdateServer.getPlaces().add(lPlaceDTO);
-					}
-					
-					break;
+			} else {
+				// Update it
+				if (lTag.getLastUpdate() < lTagDTO.getLastUpdate()) {
+					// Update local storage
+					lTag.setName(lTagDTO.getName().trim());
+					lTag.setLastUpdate(lTagDTO.getLastUpdate());
+					Tag.dao.save(lTag);
 				}
 			}
-			if (!lIsFound) {
-				//Create it
-				Place lPlace = new Place();
+		}
+
+		// Update/create places
+		for (PlaceDTO lPlaceDTO : pSynchronizationDTO.getPlaces()) {
+			Place lPlace = Place.dao.getByUuid(lPlaceDTO.getUuid());
+			if (lPlace == null) {
+				// Create it
+				lPlace = new Place();
 				lPlace.setName(lPlaceDTO.getName().trim());
 				lPlace.setLastUpdate(lPlaceDTO.getLastUpdate());
 				lPlace.setUuid(lPlaceDTO.getUuid());
 				Place.dao.save(lPlace);
-			}
-		}
-		//TODO Delete old places
-		
-		
-		Collection<Task> lTasksIntoDBBeforeUpdate = Task.dao.getAll();
-		
-		for (TaskDTO lTaskDTO : pSynchronizationDTO.getTasks()) {
-			boolean lIsFound = false;
-			Task lTask = null;
-			for (Task lTaskDB : lTasksIntoDBBeforeUpdate) {
-				if (lTaskDB.getUuid().equals(lTaskDTO.getUuid())) {
-					//Update it
-					lIsFound = true;
-					lTasksIntoDBBeforeUpdate.remove(lTaskDB);
-					
-					//Update Task
-					if (lTaskDB.getLastUpdate() < lTaskDTO.getLastUpdate()) {
-						lTask = lTaskDB;
-						//Update local storage
-						Category lCategory = Category.dao.getByUuid(lTaskDTO.getCategoryUuid());
-						if (lCategory == null) {
-							//TODO Error, ignore task for the moment
-							continue;
-						}
-						lTaskDB.setName(lTaskDTO.getText().trim());
-						lTaskDB.setIdCategory(lCategory.getIdCategory());
-						lTaskDB.setStatus(lTaskDTO.getStatus());
-						lTaskDB.setLastUpdate(lTaskDTO.getLastUpdate());
-						lTaskDB.setUuid(lTaskDTO.getUuid());
-						Task.dao.save(lTaskDB);
-					} else if (lTaskDB.getLastUpdate() > lTaskDTO.getLastUpdate()) {
-						//Update server storage
-						Category lCategory = Category.dao.get(lTaskDB.getIdCategory());
-						if (lCategory == null) {
-							//TODO Error, ignore task for the moment
-							continue;
-						}
-						lTaskDTO = new TaskDTO(lTaskDB.getName(), lTaskDB.getStatus(), lCategory.getUuid(), lTaskDB.getUuid(), lTaskDB.getLastUpdate());
-						lUpdateServer.getTasks().add(lTaskDTO);
-					}
-					
-					break;
+			} else {
+				// Update it
+				if (lPlace.getLastUpdate() < lPlaceDTO.getLastUpdate()) {
+					// Update local storage
+					lPlace.setName(lPlaceDTO.getName().trim());
+					lPlace.setLastUpdate(lPlaceDTO.getLastUpdate());
+					Place.dao.save(lPlace);
 				}
 			}
-			if (!lIsFound) {
-				//Create it
+		}
+
+	}
+
+	private static void updateLocalWithSynchronizationDTOTasks(SynchronizationDTO pSynchronizationDTO) {
+		// Update/create tasks
+		for (TaskDTO lTaskDTO : pSynchronizationDTO.getTasks()) {
+			boolean lIsUpdateLinks = false;
+			Task lTask = Task.dao.getByUuid(lTaskDTO.getUuid());
+			if (lTask == null) {
+				// Create it
 				lTask = new Task();
 				Category lCategory = Category.dao.getByUuid(lTaskDTO.getCategoryUuid());
 				if (lCategory == null) {
-					//TODO Error, ignore task for the moment
+					// TODO Error, ignore task for the moment
 					continue;
 				}
 				lTask.setName(lTaskDTO.getText().trim());
@@ -264,14 +206,32 @@ public class SynchronizationHelper {
 				lTask.setLastUpdate(lTaskDTO.getLastUpdate());
 				lTask.setUuid(lTaskDTO.getUuid());
 				Task.dao.save(lTask);
+				lIsUpdateLinks = true;
+			} else {
+				// Update it
+				if (lTask.getLastUpdate() < lTaskDTO.getLastUpdate()) {
+					// Update local storage
+					Category lCategory = Category.dao.getByUuid(lTaskDTO.getCategoryUuid());
+					if (lCategory == null) {
+						// TODO Error, ignore task for the moment
+						continue;
+					}
+					lTask.setName(lTaskDTO.getText().trim());
+					lTask.setIdCategory(lCategory.getIdCategory());
+					lTask.setStatus(lTaskDTO.getStatus());
+					lTask.setLastUpdate(lTaskDTO.getLastUpdate());
+					lTask.setUuid(lTaskDTO.getUuid());
+					Task.dao.save(lTask);
+					lIsUpdateLinks = true;
+				}
 			}
-			
-			if (lTask == null) {
-				//So we mustn't update it
+
+			if (lIsUpdateLinks) {
+				// So we mustn't update it
 				continue;
 			}
-			
-			//Attach tags
+
+			// Attach tags
 			Collection<String> lTagsOfTask = new HashSet<String>();
 			for (Tag lTag : Tag.dao.getTagsOfTask(lTask)) {
 				lTagsOfTask.add(lTag.getUuid());
@@ -279,15 +239,17 @@ public class SynchronizationHelper {
 			for (String lTagUUID : lTaskDTO.getTagUuids()) {
 				Tag lTag = Tag.dao.getByUuid(lTagUUID);
 				if (lTag == null) {
-					//TODO This tag was deleted here
+					// TODO This tag was deleted here
+					// This problem must never comes because task must be more
+					// recent on server than local storage
 					continue;
 				}
 				if (!lTagsOfTask.contains(lTagUUID)) {
 					Task.dao.addTagToTask(lTask, lTag);
 				}
 			}
-			
-			//Attach places
+
+			// Attach places
 			Collection<String> lPlacesOfTask = new HashSet<String>();
 			for (Place lPlace : Place.dao.getPlacesOfTask(lTask)) {
 				lPlacesOfTask.add(lPlace.getUuid());
@@ -295,7 +257,9 @@ public class SynchronizationHelper {
 			for (String lPlaceUUID : lTaskDTO.getPlaceUuids()) {
 				Place lPlace = Place.dao.getByUuid(lPlaceUUID);
 				if (lPlace == null) {
-					//TODO This place was deleted here
+					// This place was deleted here
+					// This problem must never comes because task must be more
+					// recent on server than local storage
 					continue;
 				}
 				if (!lPlacesOfTask.contains(lPlaceUUID)) {
@@ -303,62 +267,162 @@ public class SynchronizationHelper {
 				}
 			}
 		}
-		//TODO Delete old tasks
 	}
-	
-	private static SynchronizationDTO getUpdateServerWithSynchronizationDTO(long pDateRef, SynchronizationDTO pOriginalSynchronizationDTO) {
+
+	private static void updateLocalWithSynchronizationDTODeleteTasks(Token pToken, SynchronizationDTO pSynchronizationDTO) {
+		for (String lIdTaskToDelete : pSynchronizationDTO.getUuidTasksToDelete()) {
+			Task lTask = Task.dao.getByUuid(lIdTaskToDelete);
+			if (lTask != null && lTask.getLastUpdate() < pToken.getLastSynchro()) {
+				TaskToDelete lTaskToDelete = new TaskToDelete();
+				lTaskToDelete.setUuidTask(lTask.getUuid());
+				lTaskToDelete.setDateDeletion(System.currentTimeMillis());
+				TaskToDelete.dao.create(lTaskToDelete);
+				Task.dao.delete(lTask.getIdTask());
+			}
+		}
+	}
+
+	private static void updateLocalWithSynchronizationDTODeleteTagsPlacesAndCategories(Token pToken, SynchronizationDTO pSynchronizationDTO) {
+		for (String lIdTagToDelete : pSynchronizationDTO.getUuidTagsToDelete()) {
+			Tag lTag = Tag.dao.getByUuid(lIdTagToDelete);
+			if (lTag != null && lTag.getLastUpdate() < pToken.getLastSynchro()) {
+				if (Task.dao.findByTag(lTag).isEmpty()) {
+					TagToDelete lTagToDelete = new TagToDelete();
+					lTagToDelete.setUuidTag(lTag.getUuid());
+					lTagToDelete.setDateDeletion(System.currentTimeMillis());
+					TagToDelete.dao.create(lTagToDelete);
+					Tag.dao.delete(lTag.getIdTag());
+				}
+			}
+		}
+		for (String lIdPlaceToDelete : pSynchronizationDTO.getUuidPlacesToDelete()) {
+			Place lPlace = Place.dao.getByUuid(lIdPlaceToDelete);
+			if (lPlace != null && lPlace.getLastUpdate() < pToken.getLastSynchro()) {
+				if (Task.dao.findByPlace(lPlace).isEmpty()) {
+					PlaceToDelete lPlaceToDelete = new PlaceToDelete();
+					lPlaceToDelete.setUuidPlace(lPlace.getUuid());
+					lPlaceToDelete.setDateDeletion(System.currentTimeMillis());
+					PlaceToDelete.dao.create(lPlaceToDelete);
+					Place.dao.delete(lPlace.getIdPlace());
+				}
+			}
+		}
+		for (String lIdCategoryToDelete : pSynchronizationDTO.getUuidCategoriesToDelete()) {
+			Category lCategory = Category.dao.getByUuid(lIdCategoryToDelete);
+			if (lCategory != null && lCategory.getLastUpdate() < pToken.getLastSynchro()) {
+				if (Task.dao.findByCategory(lCategory).isEmpty()) {
+					CategoryToDelete lCategoryToDelete = new CategoryToDelete();
+					lCategoryToDelete.setUuidCategory(lCategory.getUuid());
+					lCategoryToDelete.setDateDeletion(System.currentTimeMillis());
+					CategoryToDelete.dao.create(lCategoryToDelete);
+					Category.dao.delete(lCategory.getIdCategory());
+				}
+			}
+		}
+	}
+
+	private static SynchronizationDTO getUpdateServerWithSynchronizationDTO(Token pToken, SynchronizationDTO pOriginalSynchronizationDTO) {
+		long lDateRef = pToken.getLastSynchro();
 		SynchronizationDTO lSynchronizationDTO = new SynchronizationDTO();
-		
-		Collection<Category> lCategoriesDB = Category.dao.findAfterLastUpdate(pDateRef);
-		for (Category lCategory : lCategoriesDB) {
+
+		for (Category lCategoryLocal : Category.dao.findAfterLastUpdate(lDateRef)) {
 			boolean lMustAdd = true;
 			for (CategoryDTO lCategoryDTO : pOriginalSynchronizationDTO.getCategories()) {
-				if (lCategory.getUuid().equals(lCategoryDTO.getUuid())) {
-					if (lCategory.getLastUpdate() > lCategoryDTO.getLastUpdate()) {
-						lMustAdd = true;
+				if (lCategoryLocal.getUuid().equals(lCategoryDTO.getUuid())) {
+					if (lCategoryLocal.getLastUpdate() < lCategoryDTO.getLastUpdate()) {
+						lMustAdd = false;
 					}
 					break;
 				}
 			}
 			if (lMustAdd) {
-				CategoryDTO lCategoryDTO = new CategoryDTO(lCategory.getName(), lCategory.getUuid(), lCategory.getLastUpdate());
+				CategoryDTO lCategoryDTO = new CategoryDTO(lCategoryLocal.getName(), lCategoryLocal.getUuid(), lCategoryLocal.getLastUpdate());
 				lSynchronizationDTO.getCategories().add(lCategoryDTO);
 			}
 		}
-		
-		Collection<Tag> lTagsDB = Tag.dao.findAfterLastUpdate(pDateRef);
-		for (Tag lTag : lTagsDB) {
+
+		for (Tag lTagLocal : Tag.dao.findAfterLastUpdate(lDateRef)) {
 			boolean lMustAdd = true;
 			for (TagDTO lTagDTO : pOriginalSynchronizationDTO.getTags()) {
-				if (lTag.getUuid().equals(lTagDTO.getUuid())) {
-					if (lTag.getLastUpdate() > lTagDTO.getLastUpdate()) {
-						lMustAdd = true;
+				if (lTagLocal.getUuid().equals(lTagDTO.getUuid())) {
+					if (lTagLocal.getLastUpdate() < lTagDTO.getLastUpdate()) {
+						lMustAdd = false;
 					}
 					break;
 				}
 			}
 			if (lMustAdd) {
-				TagDTO lTagDTO = new TagDTO(lTag.getName(), lTag.getUuid(), lTag.getLastUpdate());
+				TagDTO lTagDTO = new TagDTO(lTagLocal.getName(), lTagLocal.getUuid(), lTagLocal.getLastUpdate());
 				lSynchronizationDTO.getTags().add(lTagDTO);
 			}
 		}
-		
-		Collection<Place> lPlacesDB = Place.dao.findAfterLastUpdate(pDateRef);
-		for (Place lPlace : lPlacesDB) {
+
+		for (Place lPlaceLocal : Place.dao.findAfterLastUpdate(lDateRef)) {
 			boolean lMustAdd = true;
 			for (PlaceDTO lPlaceDTO : pOriginalSynchronizationDTO.getPlaces()) {
-				if (lPlace.getUuid().equals(lPlaceDTO.getUuid())) {
-					if (lPlace.getLastUpdate() > lPlaceDTO.getLastUpdate()) {
+				if (lPlaceLocal.getUuid().equals(lPlaceDTO.getUuid())) {
+					if (lPlaceLocal.getLastUpdate() < lPlaceDTO.getLastUpdate()) {
 						lMustAdd = true;
 					}
 					break;
 				}
 			}
 			if (lMustAdd) {
-				PlaceDTO lPlaceDTO = new PlaceDTO(lPlace.getName(), lPlace.getUuid(), lPlace.getLastUpdate());
+				PlaceDTO lPlaceDTO = new PlaceDTO(lPlaceLocal.getName(), lPlaceLocal.getUuid(), lPlaceLocal.getLastUpdate());
 				lSynchronizationDTO.getPlaces().add(lPlaceDTO);
 			}
 		}
+
+		for (Task lTaskLocal : Task.dao.findAfterLastUpdate(lDateRef)) {
+			boolean lMustAdd = true;
+			for (TaskDTO lTaskDTO : pOriginalSynchronizationDTO.getTasks()) {
+				if (lTaskLocal.getUuid().equals(lTaskDTO.getUuid())) {
+					if (lTaskLocal.getLastUpdate() < lTaskDTO.getLastUpdate()) {
+						lMustAdd = true;
+					}
+					break;
+				}
+			}
+			if (lMustAdd) {
+				Category lCategory = Category.dao.get(lTaskLocal.getIdCategory());
+				if (lCategory == null) {
+					//TODO case very strange!
+					continue;
+				}
+				TaskDTO lTaskDTO = new TaskDTO(lTaskLocal.getName(), lTaskLocal.getStatus(), lCategory.getUuid(), lTaskLocal.getUuid(), lTaskLocal.getLastUpdate());
+				for (Tag lTagLinked : Tag.dao.getTagsOfTask(lTaskLocal)) {
+					lTaskDTO.getTagUuids().add(lTagLinked.getUuid());
+				}
+				for (Place lPlaceLinked : Place.dao.getPlacesOfTask(lTaskLocal)) {
+					lTaskDTO.getPlaceUuids().add(lPlaceLinked.getUuid());
+				}
+				lSynchronizationDTO.getTasks().add(lTaskDTO);
+			}
+		}
+
+		for (TaskToDelete lTaskToDelete : TaskToDelete.dao.findAfterDate(pToken.getLastSynchro())) {
+			lSynchronizationDTO.getUuidTasksToDelete().add(lTaskToDelete.getUuidTask());
+		}
+
+		for (TagToDelete lTagToDelete : TagToDelete.dao.findAfterDate(pToken.getLastSynchro())) {
+			lSynchronizationDTO.getUuidTagsToDelete().add(lTagToDelete.getUuidTag());
+		}
+
+		for (PlaceToDelete lPlaceToDelete : PlaceToDelete.dao.findAfterDate(pToken.getLastSynchro())) {
+			lSynchronizationDTO.getUuidPlacesToDelete().add(lPlaceToDelete.getUuidPlace());
+		}
+
+		for (CategoryToDelete lCategoryToDelete : CategoryToDelete.dao.findAfterDate(pToken.getLastSynchro())) {
+			lSynchronizationDTO.getUuidCategoriesToDelete().add(lCategoryToDelete.getUuidCategory());
+		}
 		return lSynchronizationDTO;
+	}
+
+	private static void cleanObjectsDeleted() {
+		TaskToDelete.dao.deleteBeforeLastToken();
+		TagToDelete.dao.deleteBeforeLastToken();
+		PlaceToDelete.dao.deleteBeforeLastToken();
+		CategoryToDelete.dao.deleteBeforeLastToken();
+
 	}
 }

@@ -10,8 +10,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import fr.chklang.dontforget.dao.TokenDAO;
 import play.db.ebean.Model;
+import fr.chklang.dontforget.dao.TokenDAO;
 
 /**
  * @author S0075724
@@ -36,6 +36,9 @@ public class Token extends Model {
 	
 	@Column(name="deviceId", length=36)
 	private String deviceId;
+	
+	@Column(name="lastUpdate", nullable=false)
+	private long lastUpdate;
 	
 	public static final TokenDAO dao = new TokenDAO();
 
@@ -93,5 +96,19 @@ public class Token extends Model {
 	 */
 	public void setDeviceId(String deviceId) {
 		this.deviceId = deviceId;
+	}
+
+	/**
+	 * @return the lastUpdate
+	 */
+	public long getLastUpdate() {
+		return lastUpdate;
+	}
+
+	/**
+	 * @param lastUpdate the lastUpdate to set
+	 */
+	public void setLastUpdate(long lastUpdate) {
+		this.lastUpdate = lastUpdate;
 	}
 }

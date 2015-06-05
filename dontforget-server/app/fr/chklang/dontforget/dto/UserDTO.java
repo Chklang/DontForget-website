@@ -19,8 +19,6 @@ public class UserDTO extends ObjectNode {
 	private final String codelang;
 	
 	private final long dateInscription;
-	
-	private final long lastUpdate;
 
 	public UserDTO(JsonNode pJson) {
 		super(mapper.getNodeFactory());
@@ -30,7 +28,6 @@ public class UserDTO extends ObjectNode {
 		mail = pJson.get("mail").asText();
 		codelang = pJson.get("codelang").asText();
 		dateInscription = pJson.get("dateInscription").asLong();
-		lastUpdate = pJson.get("lastUpdate").asLong();
 	}
 	
 	public UserDTO(User pUser) {
@@ -41,7 +38,6 @@ public class UserDTO extends ObjectNode {
 		mail = pUser.getMail();
 		codelang = pUser.getCodelang();
 		dateInscription = pUser.getDateInscription();
-		lastUpdate = pUser.getLastUpdate();
 		
 		build();
 	}
@@ -52,8 +48,6 @@ public class UserDTO extends ObjectNode {
 		this.put("mail", mail);
 		this.put("codelang", codelang);
 		this.put("dateInscription", dateInscription);
-		
-		this.put("lastUpdate", lastUpdate);
 	}
 
 	public int getId() {
@@ -74,9 +68,5 @@ public class UserDTO extends ObjectNode {
 
 	public long getDateInscription() {
 		return dateInscription;
-	}
-
-	public long getLastUpdate() {
-		return lastUpdate;
 	}
 }

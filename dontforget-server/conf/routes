@@ -32,6 +32,7 @@ POST	/rest/synchronization						fr.chklang.dontforget.resources.SynchronizationR
 
 POST	/rest/tokens/new							fr.chklang.dontforget.resources.TokenResource.create()
 POST	/rest/tokens/login							fr.chklang.dontforget.resources.TokenResource.login()
+POST	/rest/tokens/update/:date					fr.chklang.dontforget.resources.TokenResource.saveUpdatedToken(date:Long)
 
 
 # Map static resources from the /public folder to the /assets URL path

@@ -16,6 +16,11 @@ public class SynchronizationDTO {
 	private final Collection<PlaceDTO> places;
 	private final Collection<CategoryDTO> categories;
 	
+	private final Collection<String> uuidTasksToDelete;
+	private final Collection<String> uuidTagsToDelete;
+	private final Collection<String> uuidPlacesToDelete;
+	private final Collection<String> uuidCategoriesToDelete;
+	
 	public SynchronizationDTO(JSONObject pObject) {
 		this();
 		
@@ -47,6 +52,30 @@ public class SynchronizationDTO {
 				CategoryDTO lCategoryDTO = new CategoryDTO(lCategoriesJSON.getJSONObject(i));
 				categories.add(lCategoryDTO);
 			}
+			
+			JSONArray lUuidTasksToDeleteJson = pObject.getJSONArray("uuidTasksToDelete");
+			int lNbUuidTasksToDelete = lUuidTasksToDeleteJson.length();
+			for (int i=0; i<lNbUuidTasksToDelete; i++) {
+				uuidTasksToDelete.add(lUuidTasksToDeleteJson.getString(i));
+			}
+			
+			JSONArray lIdTagsToDeleteJson = pObject.getJSONArray("uuidTagsToDelete");
+			int lNbIdTagsToDelete = lIdTagsToDeleteJson.length();
+			for (int i=0; i<lNbIdTagsToDelete; i++) {
+				uuidTagsToDelete.add(lIdTagsToDeleteJson.getString(i));
+			}
+			
+			JSONArray lIdPlacesToDeleteJson = pObject.getJSONArray("uuidPlacesToDelete");
+			int lNbIdPlacesToDelete = lIdPlacesToDeleteJson.length();
+			for (int i=0; i<lNbIdPlacesToDelete; i++) {
+				uuidPlacesToDelete.add(lIdPlacesToDeleteJson.getString(i));
+			}
+			
+			JSONArray lIdCategoriesToDeleteJson = pObject.getJSONArray("uuidCategoriesToDelete");
+			int lNbIdCategoriesToDelete = lIdCategoriesToDeleteJson.length();
+			for (int i=0; i<lNbIdCategoriesToDelete; i++) {
+				uuidCategoriesToDelete.add(lIdCategoriesToDeleteJson.getString(i));
+			}
 		} catch (Exception e) {
 			throw new AbstractDontForgetException(e);
 		}
@@ -58,6 +87,11 @@ public class SynchronizationDTO {
 		tags = new ArrayList<TagDTO>();
 		places = new ArrayList<PlaceDTO>();
 		categories = new ArrayList<CategoryDTO>();
+		
+		uuidTasksToDelete = new ArrayList<String>();
+		uuidTagsToDelete = new ArrayList<String>();
+		uuidPlacesToDelete = new ArrayList<String>();
+		uuidCategoriesToDelete = new ArrayList<String>();
 	}
 
 	/**
@@ -87,6 +121,34 @@ public class SynchronizationDTO {
 	public Collection<CategoryDTO> getCategories() {
 		return categories;
 	}
+
+	/**
+	 * @return the idTasksToDelete
+	 */
+	public Collection<String> getUuidTasksToDelete() {
+		return uuidTasksToDelete;
+	}
+
+	/**
+	 * @return the idTagsToDelete
+	 */
+	public Collection<String> getUuidTagsToDelete() {
+		return uuidTagsToDelete;
+	}
+
+	/**
+	 * @return the idPlacesToDelete
+	 */
+	public Collection<String> getUuidPlacesToDelete() {
+		return uuidPlacesToDelete;
+	}
+
+	/**
+	 * @return the idCategoriesToDelete
+	 */
+	public Collection<String> getUuidCategoriesToDelete() {
+		return uuidCategoriesToDelete;
+	}
 	
 	public JSONObject toJson() {
 		JSONObject lContent = new JSONObject();
@@ -115,6 +177,30 @@ public class SynchronizationDTO {
 				lTasks.put(lTask.toJson());
 			}
 			lContent.put("tasks", lTasks);
+			
+			JSONArray lUuidTasksToDelete = new JSONArray();
+			for (String lUuidTaskToDelete : uuidTasksToDelete) {
+				lUuidTasksToDelete.put(lUuidTaskToDelete);
+			}
+			lContent.put("uuidTasksToDelete", lUuidTasksToDelete);
+			
+			JSONArray lUuidTagsToDelete = new JSONArray();
+			for (String lUuidTagToDelete : uuidTagsToDelete) {
+				lUuidTagsToDelete.put(lUuidTagToDelete);
+			}
+			lContent.put("uuidTagsToDelete", lUuidTagsToDelete);
+			
+			JSONArray lUuidPlacesToDelete = new JSONArray();
+			for (String lUuidPlaceToDelete : uuidPlacesToDelete) {
+				lUuidPlacesToDelete.put(lUuidPlaceToDelete);
+			}
+			lContent.put("uuidPlacesToDelete", lUuidPlacesToDelete);
+			
+			JSONArray lUuidCategoriesToDelete = new JSONArray();
+			for (String lUuidCategoryToDelete : uuidCategoriesToDelete) {
+				lUuidCategoriesToDelete.put(lUuidCategoryToDelete);
+			}
+			lContent.put("uuidCategoriesToDelete", lUuidCategoriesToDelete);
 		} catch (JSONException e) {
 			throw new AbstractDontForgetException(e);
 		}

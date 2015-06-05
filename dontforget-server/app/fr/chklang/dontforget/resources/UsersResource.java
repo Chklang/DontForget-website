@@ -86,6 +86,7 @@ public class UsersResource extends AbstractRest {
 
 	public static Result disconnect() {
 		SessionHelper.clearPlayerId(session());
+		SessionHelper.clearTokenId(session());
 		return ok();
 	}
 

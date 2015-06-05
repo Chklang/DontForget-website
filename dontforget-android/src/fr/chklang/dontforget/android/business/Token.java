@@ -3,7 +3,6 @@
  */
 package fr.chklang.dontforget.android.business;
 
-import fr.chklang.dontforget.android.ServerConfiguration;
 import fr.chklang.dontforget.android.dao.TokenDAO;
 
 /**
@@ -12,33 +11,99 @@ import fr.chklang.dontforget.android.dao.TokenDAO;
  */
 public class Token extends AbstractBusinessObject {
 
-	private TokenKey tokenKey;
+	private int idToken;
+	private String pseudo;
+	private String protocol;
+	private String host;
+	private int port;
+	private String context;
 	private String token;
 	private long lastSynchro;
 	
 	public static final TokenDAO dao = new TokenDAO();
-	
-	public Token() {
-		super();
-	}
-	
-	public Token(String pPseudo, ServerConfiguration pServerConfiguration) {
-		super();
-		tokenKey = new TokenKey(pPseudo, pServerConfiguration);
+
+	/**
+	 * @return the idToken
+	 */
+	public int getIdToken() {
+		return idToken;
 	}
 
 	/**
-	 * @return the tokenKey
+	 * @param idToken the idToken to set
 	 */
-	public TokenKey getTokenKey() {
-		return tokenKey;
+	public void setIdToken(int idToken) {
+		this.idToken = idToken;
 	}
 
 	/**
-	 * @param tokenKey the tokenKey to set
+	 * @return the pseudo
 	 */
-	public void setTokenKey(TokenKey tokenKey) {
-		this.tokenKey = tokenKey;
+	public String getPseudo() {
+		return pseudo;
+	}
+
+	/**
+	 * @param pseudo the pseudo to set
+	 */
+	public void setPseudo(String pseudo) {
+		this.pseudo = pseudo;
+	}
+
+	/**
+	 * @return the protocol
+	 */
+	public String getProtocol() {
+		return protocol;
+	}
+
+	/**
+	 * @param protocol the protocol to set
+	 */
+	public void setProtocol(String protocol) {
+		this.protocol = protocol;
+	}
+
+	/**
+	 * @return the host
+	 */
+	public String getHost() {
+		return host;
+	}
+
+	/**
+	 * @param host the host to set
+	 */
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	/**
+	 * @return the port
+	 */
+	public int getPort() {
+		return port;
+	}
+
+	/**
+	 * @param port the port to set
+	 */
+	public void setPort(int port) {
+		this.port = port;
+	}
+
+	/**
+	 * @return the context
+	 */
+	public String getContext() {
+		return context;
+	}
+
+	/**
+	 * @param context the context to set
+	 */
+	public void setContext(String context) {
+		this.context = context;
 	}
 
 	/**
@@ -73,9 +138,14 @@ public class Token extends AbstractBusinessObject {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((context == null) ? 0 : context.hashCode());
+		result = prime * result + ((host == null) ? 0 : host.hashCode());
+		result = prime * result + idToken;
 		result = prime * result + (int) (lastSynchro ^ (lastSynchro >>> 32));
+		result = prime * result + port;
+		result = prime * result + ((protocol == null) ? 0 : protocol.hashCode());
+		result = prime * result + ((pseudo == null) ? 0 : pseudo.hashCode());
 		result = prime * result + ((token == null) ? 0 : token.hashCode());
-		result = prime * result + ((tokenKey == null) ? 0 : tokenKey.hashCode());
 		return result;
 	}
 
@@ -88,23 +158,43 @@ public class Token extends AbstractBusinessObject {
 		if (getClass() != obj.getClass())
 			return false;
 		Token other = (Token) obj;
+		if (context == null) {
+			if (other.context != null)
+				return false;
+		} else if (!context.equals(other.context))
+			return false;
+		if (host == null) {
+			if (other.host != null)
+				return false;
+		} else if (!host.equals(other.host))
+			return false;
+		if (idToken != other.idToken)
+			return false;
 		if (lastSynchro != other.lastSynchro)
+			return false;
+		if (port != other.port)
+			return false;
+		if (protocol == null) {
+			if (other.protocol != null)
+				return false;
+		} else if (!protocol.equals(other.protocol))
+			return false;
+		if (pseudo == null) {
+			if (other.pseudo != null)
+				return false;
+		} else if (!pseudo.equals(other.pseudo))
 			return false;
 		if (token == null) {
 			if (other.token != null)
 				return false;
 		} else if (!token.equals(other.token))
 			return false;
-		if (tokenKey == null) {
-			if (other.tokenKey != null)
-				return false;
-		} else if (!tokenKey.equals(other.tokenKey))
-			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "Token [tokenKey=" + tokenKey + ", token=" + token + ", lastSynchro=" + lastSynchro + "]";
+		return "Token [idToken=" + idToken + ", pseudo=" + pseudo + ", protocol=" + protocol + ", host=" + host + ", port=" + port + ", context=" + context + ", token=" + token
+				+ ", lastSynchro=" + lastSynchro + "]";
 	}
 }

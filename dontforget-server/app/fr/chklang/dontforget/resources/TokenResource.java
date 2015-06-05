@@ -83,9 +83,21 @@ public class TokenResource extends AbstractRest {
 			}
 
 			SessionHelper.setPlayerId(session(), lUser);
+			SessionHelper.setTokenId(session(), lToken);
 			
 			
 			return ok(new UserDTO(lUser));
+		});
+	}
+	
+	public static Result saveUpdatedToken(long pDate) {
+		return executeAndVerifyToken(() -> {
+			final Token lToken = getConnectedToken();
+			lToken.setLastUpdate(pDate);
+			lToken.save();
+			
+			//And update old tokens
+			return ok();
 		});
 	}
 }

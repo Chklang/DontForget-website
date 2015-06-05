@@ -14,6 +14,8 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.TxRunnable;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import fr.chklang.dontforget.business.Token;
+import fr.chklang.dontforget.business.TokenKey;
 import fr.chklang.dontforget.business.User;
 import fr.chklang.dontforget.exceptions.WebException;
 import fr.chklang.dontforget.helpers.SessionHelper;
@@ -60,6 +62,23 @@ public abstract class AbstractRest extends Controller {
 		return lResult.result;
 	}
 	
+	protected static Result executeAndVerifyToken(final Callable<Result> pCallable) {
+		final WrapperResult lResult = new WrapperResult();
+		Ebean.execute(new TxRunnable() {  
+			public void run() {
+				try {
+					verifyToken();
+					lResult.result = pCallable.call();
+				} catch (WebException e) {
+					throw e;
+				} catch (Throwable e) {
+					throw new WebException(status(500), e);
+				}
+			}
+		});
+		return lResult.result;
+	}
+	
 	protected static String getValueAsString(JsonNode pNode, String pKey) {
 		if (pNode == null) {
 			return null;
@@ -85,9 +104,24 @@ public abstract class AbstractRest extends Controller {
 		}
 	}
 	
+	protected static void verifyToken() {
+		if (!SessionHelper.hasTokenId(session())) {
+			throw new WebException(status(401), "Identification requise");
+		}
+	}
+	
 	protected static User getConnectedUser() {
 		User lUser = User.dao.byId(SessionHelper.getUserId(session()));
 		return lUser;
+	}
+	
+	protected static Token getConnectedToken() {
+		int lIdUser = SessionHelper.getUserId(session());
+		String lTokenString = SessionHelper.getTokenId(session());
+		TokenKey lTokenKey = new TokenKey();
+		lTokenKey.setIdUser(lIdUser);
+		lTokenKey.setToken(lTokenString);
+		return Token.dao.byId(lTokenKey);
 	}
 	
 	

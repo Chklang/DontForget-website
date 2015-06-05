@@ -89,12 +89,65 @@ public class DatabaseConnection extends SQLiteOpenHelper {
 		db.execSQL(lAddColumnToken);
 	}
 	
+	private void v3(SQLiteDatabase db) {
+		String lTableLogPlace = "CREATE TABLE \"t_place_to_delete\" ("+
+			"\"uuidPlace\" VARCHAR NOT NULL ,"+
+			"\"dateDeletion\" INTEGER NOT NULL ,"+
+			"PRIMARY KEY (\"uuidPlace\", \"dateDeletion\")"+
+		")";
+		String lTableLogTag = "CREATE TABLE \"t_tag_to_delete\" ("+
+			"\"uuidTag\" VARCHAR NOT NULL ,"+
+			"\"dateDeletion\" INTEGER NOT NULL ,"+
+			"PRIMARY KEY (\"uuidTag\", \"dateDeletion\")"+
+		")";
+		String lTableLogCategory = "CREATE TABLE \"t_category_to_delete\" ("+
+			"\"uuidCategory\" VARCHAR NOT NULL ,"+
+			"\"dateDeletion\" INTEGER NOT NULL ,"+
+			"PRIMARY KEY (\"uuidCategory\", \"dateDeletion\")"+
+		")";
+		String lTableLogTask = "CREATE TABLE \"t_task_to_delete\" ("+
+			"\"uuidTask\" VARCHAR NOT NULL ,"+
+			"\"dateDeletion\" INTEGER NOT NULL ,"+
+			"PRIMARY KEY (\"uuidTask\", \"dateDeletion\")"+
+		")";
+		
+		String lCopyTokenTable = "CREATE TABLE t_token_copy ("+
+			"idToken	INTEGER PRIMARY KEY NOT NULL,"+
+			"pseudo VARCHAR NOT NULL,"+
+			"protocol VARCHAR NOT NULL,"+
+			"host VARCHAR NOT NULL,"+
+			"port INTEGER NOT NULL,"+
+			"context VARCHAR NOT NULL,"+
+			"token VARCHAR NOT NULL,"+
+			"lastSynchro INTEGER NOT NULL DEFAULT 0,"+
+			"UNIQUE (pseudo, protocol, host, port, context)"+
+		")";
+		String lCopyTokenData = "INSERT INTO t_token_copy ("+
+				"idToken, pseudo, protocol, host, port, context, token, lastSynchro"+
+			") SELECT "+
+				"rowid, pseudo, protocol, host, port, context, token, lastSynchro "+
+			"FROM t_token";
+		String lDeleteOldTableTokens = "DROP TABLE t_token";
+		String lRenameTableToken = "ALTER TABLE t_token_copy RENAME TO t_token";
+		
+		db.execSQL(lTableLogPlace);
+		db.execSQL(lTableLogTag);
+		db.execSQL(lTableLogCategory);
+		db.execSQL(lTableLogTask);
+		db.execSQL(lCopyTokenTable);
+		db.execSQL(lCopyTokenData);
+		db.execSQL(lDeleteOldTableTokens);
+		db.execSQL(lRenameTableToken);
+	}
+	
 	private void upgrade(SQLiteDatabase db, int oldVersion) {
 		switch (oldVersion) {
 		case 0 :
 			v1(db);
 		case 1 :
 			v2(db);
+		case 2 :
+			v3(db);
 		default :
 			break;
 		}

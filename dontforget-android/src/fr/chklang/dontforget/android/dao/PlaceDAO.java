@@ -8,7 +8,6 @@ import java.util.Collection;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.util.Pair;
-import fr.chklang.dontforget.android.business.Category;
 import fr.chklang.dontforget.android.business.Place;
 import fr.chklang.dontforget.android.business.Task;
 import fr.chklang.dontforget.android.database.DatabaseManager;

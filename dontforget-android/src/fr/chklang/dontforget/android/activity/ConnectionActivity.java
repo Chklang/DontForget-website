@@ -12,7 +12,6 @@ import android.widget.Toast;
 import fr.chklang.dontforget.android.R;
 import fr.chklang.dontforget.android.ServerConfiguration;
 import fr.chklang.dontforget.android.business.Token;
-import fr.chklang.dontforget.android.business.TokenKey;
 import fr.chklang.dontforget.android.database.DatabaseManager;
 import fr.chklang.dontforget.android.dto.TokenDTO;
 import fr.chklang.dontforget.android.helpers.ConfigurationHelper;
@@ -92,10 +91,15 @@ public class ConnectionActivity extends Activity {
 			DatabaseManager.transaction(this, new DatabaseManager.Transaction() {
 				@Override
 				public void execute() {
-					Token lToken = Token.dao.get(new TokenKey(lLogin, lServerConfiguration));
+					Token lToken = Token.dao.findByPseudoProtocolHostPortAndContext(lLogin, lServerConfiguration);
 					if (lToken == null) {
-						lToken = new Token(lLogin, lServerConfiguration);
+						lToken = new Token();
 					}
+					lToken.setPseudo(lLogin);
+					lToken.setProtocol(lServerConfiguration.getProtocol());
+					lToken.setHost(lServerConfiguration.getHost());
+					lToken.setPort(lServerConfiguration.getPort());
+					lToken.setContext(lServerConfiguration.getContext());
 					lToken.setToken(lTokenDTO.getToken());
 					Token.dao.save(lToken);
 				}
