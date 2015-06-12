@@ -3,7 +3,9 @@
  */
 package fr.chklang.dontforget.android.business;
 
+import fr.chklang.dontforget.android.ServerConfiguration;
 import fr.chklang.dontforget.android.dao.TokenDAO;
+import fr.chklang.dontforget.android.dto.SynchronizationDTO;
 
 /**
  * @author S0075724
@@ -196,5 +198,13 @@ public class Token extends AbstractBusinessObject {
 	public String toString() {
 		return "Token [idToken=" + idToken + ", pseudo=" + pseudo + ", protocol=" + protocol + ", host=" + host + ", port=" + port + ", context=" + context + ", token=" + token
 				+ ", lastSynchro=" + lastSynchro + "]";
+	}
+	
+	public ServerConfiguration toServerConfiguration() {
+		String lProtocol = getProtocol();
+		String lHost = getHost();
+		int lPort = getPort();
+		String lContext = getContext();
+		return new ServerConfiguration(lProtocol, lHost, lPort, lContext);
 	}
 }

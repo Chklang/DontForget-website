@@ -29,6 +29,9 @@ public class TagToDelete extends Model {
 	@Column(name="dateDeletion")
 	private long dateDeletion;
 	
+	@Column(name="idUser")
+	private int idUser;
+	
 	public static final TagToDeleteDAO dao = new TagToDeleteDAO();
 
 	/**
@@ -59,11 +62,26 @@ public class TagToDelete extends Model {
 		this.dateDeletion = dateDeletion;
 	}
 
+	/**
+	 * @return the idUser
+	 */
+	public int getIdUser() {
+		return idUser;
+	}
+
+	/**
+	 * @param idUser the idUser to set
+	 */
+	public void setIdUser(int idUser) {
+		this.idUser = idUser;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + (int) (dateDeletion ^ (dateDeletion >>> 32));
+		result = prime * result + idUser;
 		result = prime * result + ((uuidTag == null) ? 0 : uuidTag.hashCode());
 		return result;
 	}
@@ -79,6 +97,8 @@ public class TagToDelete extends Model {
 		TagToDelete other = (TagToDelete) obj;
 		if (dateDeletion != other.dateDeletion)
 			return false;
+		if (idUser != other.idUser)
+			return false;
 		if (uuidTag == null) {
 			if (other.uuidTag != null)
 				return false;
@@ -89,6 +109,6 @@ public class TagToDelete extends Model {
 
 	@Override
 	public String toString() {
-		return "TagToDelete [uuidTag=" + uuidTag + ", dateDeletion=" + dateDeletion + "]";
+		return "TagToDelete [uuidTag=" + uuidTag + ", dateDeletion=" + dateDeletion + ", idUser=" + idUser + "]";
 	}
 }

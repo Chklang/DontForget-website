@@ -76,7 +76,7 @@ public class ConnectionActivity extends Activity {
 		});
 		final ServerConfiguration lServerConfiguration = ServerConfiguration.newConfiguration(lProtocol, lHost, lPort, lContext);
 
-		Result<TokenDTO> lResult = TokensRest.connexion(lServerConfiguration, lLogin, lPassword, lDeviceId.toString());
+		Result<TokenDTO> lResult = TokensRest.create(lServerConfiguration, lLogin, lPassword, lDeviceId.toString());
 		lResult.setOnException(new CallbackOnException() {
 			@Override
 			public void call(Exception pException) {

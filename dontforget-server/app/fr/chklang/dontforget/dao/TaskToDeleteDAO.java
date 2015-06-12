@@ -3,7 +3,12 @@ package fr.chklang.dontforget.dao;
 import java.util.List;
 
 import play.db.ebean.Model.Finder;
+
+import com.avaje.ebean.Ebean;
+import com.avaje.ebean.Update;
+
 import fr.chklang.dontforget.business.TaskToDelete;
+import fr.chklang.dontforget.business.User;
 
 public class TaskToDeleteDAO extends Finder<String, TaskToDelete> {
 
@@ -16,5 +21,11 @@ public class TaskToDeleteDAO extends Finder<String, TaskToDelete> {
 	
 	public List<TaskToDelete> findAfterDate(long pDate) {
 		return this.where().ge("dateDeletion", pDate).findList();
+	}
+	
+	public void deleteOldObjects(User pUser) {
+		Update<TaskToDelete> lQuery = Ebean.createUpdate(TaskToDelete.class, "DELETE FROM T_TASK_TO_DELETE p WHERE p.idUser = :idUser AND p.dateDeletion < (SELECT MIN(t.lastUpdate) FROM T_TOKEN t WHERE t.idUser = :idUser)");
+		lQuery.setParameter("idUser", pUser.getIdUser());
+		lQuery.execute();
 	}
 }

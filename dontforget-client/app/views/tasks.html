@@ -72,8 +72,8 @@
 					<span class="glyphicon glyphicon-trash"></span>
 				</button>
 				{{task.text}}
-				<span class="badge" ng-repeat="place in task.places" ng-click="allTasksAddToFilters('@' + place.name)" tooltip="{{'dontforget.tasks.saved_tasks_button_add_to_filter' | translate}}">@{{place.name}} </span>
-				<span class="badge" ng-repeat="tag in task.tags" ng-click="allTasksAddToFilters('#' + tag.name)" tooltip="{{'dontforget.tasks.saved_tasks_button_add_to_filter' | translate}}">#{{tag.name}} </span>
+				<span class="badge" ng-repeat="place in task.places" ng-click="allTasksAddToFilters('@' + allPlacesByUuid[place].name)" tooltip="{{'dontforget.tasks.saved_tasks_button_add_to_filter' | translate}}">@{{allPlacesByUuid[place].name}} </span>
+				<span class="badge" ng-repeat="tag in task.tags" ng-click="allTasksAddToFilters('#' + allTagsByUuid[tag].name)" tooltip="{{'dontforget.tasks.saved_tasks_button_add_to_filter' | translate}}">#{{allTagsByUuid[tag].name}} </span>
 			</li>
 		</ul>
 	</form>

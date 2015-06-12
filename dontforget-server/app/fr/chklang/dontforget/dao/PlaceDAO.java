@@ -20,8 +20,8 @@ public class PlaceDAO extends Finder<Integer, Place> {
 		return this.where().eq("user", pUser).findList();
 	}
 	
-	public Place findByPlaceAndUser(User pUser, String pPlace) {
-		return this.where().eq("user", pUser).eq("name", pPlace).findUnique();
+	public List<Place> findByPlaceAndUser(User pUser, String pPlace) {
+		return this.where().eq("user", pUser).eq("name", pPlace).findList();
 	}
 	
 	public Collection<Place> findByLastUpdate(long pLastUpdate, User pUser) {

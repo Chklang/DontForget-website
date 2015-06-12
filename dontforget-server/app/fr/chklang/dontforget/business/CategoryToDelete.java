@@ -29,6 +29,9 @@ public class CategoryToDelete extends Model {
 	@Column(name="dateDeletion")
 	private long dateDeletion;
 	
+	@Column(name="idUser")
+	private int idUser;
+	
 	public static final CategoryToDeleteDAO dao = new CategoryToDeleteDAO();
 
 	/**
@@ -59,11 +62,26 @@ public class CategoryToDelete extends Model {
 		this.dateDeletion = dateDeletion;
 	}
 
+	/**
+	 * @return the idUser
+	 */
+	public int getIdUser() {
+		return idUser;
+	}
+
+	/**
+	 * @param idUser the idUser to set
+	 */
+	public void setIdUser(int idUser) {
+		this.idUser = idUser;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + (int) (dateDeletion ^ (dateDeletion >>> 32));
+		result = prime * result + idUser;
 		result = prime * result + ((uuidCategory == null) ? 0 : uuidCategory.hashCode());
 		return result;
 	}
@@ -79,6 +97,8 @@ public class CategoryToDelete extends Model {
 		CategoryToDelete other = (CategoryToDelete) obj;
 		if (dateDeletion != other.dateDeletion)
 			return false;
+		if (idUser != other.idUser)
+			return false;
 		if (uuidCategory == null) {
 			if (other.uuidCategory != null)
 				return false;
@@ -89,6 +109,6 @@ public class CategoryToDelete extends Model {
 
 	@Override
 	public String toString() {
-		return "CategoryToDelete [uuidCategory=" + uuidCategory + ", dateDeletion=" + dateDeletion + "]";
+		return "CategoryToDelete [uuidCategory=" + uuidCategory + ", dateDeletion=" + dateDeletion + ", idUser=" + idUser + "]";
 	}
 }

@@ -36,6 +36,7 @@ import fr.chklang.dontforget.android.business.Task;
 import fr.chklang.dontforget.android.database.DatabaseManager;
 import fr.chklang.dontforget.android.dto.TaskStatus;
 import fr.chklang.dontforget.android.helpers.ConfigurationHelper;
+import fr.chklang.dontforget.android.helpers.SynchronizationHelper;
 
 @SuppressWarnings("deprecation")
 public class TasksController {
@@ -92,6 +93,10 @@ public class TasksController {
 		loadData();
 		actualiseTasksList();
 	}
+	
+	private void refreshAllData() {
+		loadData();
+	}
 
 	private void loadData() {
 		DatabaseManager.transaction(tasksActivity, new DatabaseManager.Transaction() {
@@ -129,6 +134,7 @@ public class TasksController {
 		View lButtonLeftMenuViewCategories = this.tasksActivity.getLeftMenuLayout().getButtonLeftMenuViewCategories();
 		View lButtonLeftMenuViewTags = this.tasksActivity.getLeftMenuLayout().getButtonLeftMenuViewTags();
 		View lButtonLeftMenuViewPlaces = this.tasksActivity.getLeftMenuLayout().getButtonLeftMenuViewPlaces();
+		View lButtonLeftMenuSynchronization = this.tasksActivity.getLeftMenuLayout().getButtonLeftMenuSynchronization();
 
 		lButtonInprogress.setOnClickListener(new OnClickListener() {
 			@Override
@@ -160,6 +166,18 @@ public class TasksController {
 				currentStatus = null;
 				tasksAdapter.setStatus(null);
 				actualiseTasksList();
+			}
+		});
+		lButtonLeftMenuSynchronization.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				SynchronizationHelper.startSynchronizations(tasksActivity, new Runnable() {
+					@Override
+					public void run() {
+						refreshAllData();						
+					}
+				});
+				Toast.makeText(tasksActivity, "Synchronisation démarée", Toast.LENGTH_SHORT).show();
 			}
 		});
 

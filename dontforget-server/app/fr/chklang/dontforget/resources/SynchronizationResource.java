@@ -1,8 +1,11 @@
 package fr.chklang.dontforget.resources;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
 
 import play.mvc.Result;
 import fr.chklang.dontforget.business.Category;
@@ -20,6 +23,12 @@ import fr.chklang.dontforget.dto.PlaceDTO;
 import fr.chklang.dontforget.dto.SynchronizationDTO;
 import fr.chklang.dontforget.dto.TagDTO;
 import fr.chklang.dontforget.dto.TaskDTO;
+import fr.chklang.dontforget.exceptions.WebException;
+import fr.chklang.dontforget.helpers.CategoryAdapterForUpdate;
+import fr.chklang.dontforget.helpers.PlaceAdapterForUpdate;
+import fr.chklang.dontforget.helpers.SynchronizationHelper;
+import fr.chklang.dontforget.helpers.TagAdapterForUpdate;
+
 
 public class SynchronizationResource extends AbstractRest {
 
@@ -53,13 +62,11 @@ public class SynchronizationResource extends AbstractRest {
 			final User lConnectedUser = getConnectedUser();
 			
 			//Insert or update elements
-			lDTO.getTags().forEach((pTagDTO) -> insertOrUpdate(lConnectedUser, pTagDTO));
-	
-			lDTO.getPlaces().forEach((pPlaceDTO) -> insertOrUpdate(lConnectedUser, pPlaceDTO));
-	
-			lDTO.getCategories().forEach((pCategoryDTO) -> insertOrUpdate(lConnectedUser, pCategoryDTO));
-	
-			lDTO.getTasks().forEach((pTaskDTO) -> insertOrUpdate(lConnectedUser, pTaskDTO));
+			final Map<String, String> lUpdatesTags = SynchronizationHelper.updateDTOs(lConnectedUser, Arrays.asList(lDTO.getTags().toArray(TagDTO[]::new)), new TagAdapterForUpdate());
+			final Map<String, String> lUpdatesPlaces = SynchronizationHelper.updateDTOs(lConnectedUser, Arrays.asList(lDTO.getPlaces().toArray(PlaceDTO[]::new)), new PlaceAdapterForUpdate());
+			final Map<String, String> lUpdatesCategories = SynchronizationHelper.updateDTOs(lConnectedUser, Arrays.asList(lDTO.getCategories().toArray(CategoryDTO[]::new)), new CategoryAdapterForUpdate());
+
+			lDTO.getTasks().forEach((pTaskDTO) -> insertOrUpdate(lConnectedUser, pTaskDTO, lUpdatesTags, lUpdatesPlaces, lUpdatesCategories));
 	
 			final Token lToken = getConnectedToken();
 			//Delete old elements
@@ -143,23 +150,55 @@ public class SynchronizationResource extends AbstractRest {
 		lTaskDB.delete();
 	}
 
-	private static void insertOrUpdate(User lConnectedUser, TaskDTO pTaskDTO) {
+	private static void insertOrUpdate(User lConnectedUser, TaskDTO pTaskDTO, Map<String, String> pUpdatesTags, Map<String, String> pUpdatesPlaces, Map<String, String> pUpdatesCategories) {
 		Task lTaskDB = Task.dao.getByUuid(pTaskDTO.getUuid());
-		Category lCategory = Category.dao.getByUuid(pTaskDTO.getCategory());
+
+		String lUuidCategory = pTaskDTO.getCategory();
+		Set<String> lCategoriesUuidAlreadyPassed = new HashSet<>();
+		while (pUpdatesCategories.containsKey(lUuidCategory)) {
+			if (lCategoriesUuidAlreadyPassed.contains(lUuidCategory)) {
+				//Infinite loop detected!
+				throw new WebException(status(500), "Infinite loop to replace uuid category " + pTaskDTO.getCategory());
+			}
+			lCategoriesUuidAlreadyPassed.add(lUuidCategory);
+			lUuidCategory = pUpdatesCategories.get(lUuidCategory);
+		}
+		Category lCategory = Category.dao.getByUuid(lUuidCategory);
+		
 		if (lCategory == null || lCategory.getUser().getIdUser() != lConnectedUser.getIdUser()) {
 			// Category isn't assigned to current user
 			return;
 		}
 		Set<Tag> lTags = new HashSet<>();
 		pTaskDTO.getTags().forEach((pTagDTO) -> {
-			Tag lTag = Tag.dao.getByUuid(pTagDTO);
+			String lUuidTag = pTagDTO;
+			Set<String> lUuidAlreadyPassed = new HashSet<>();
+			while (pUpdatesTags.containsKey(lUuidTag)) {
+				if (lUuidAlreadyPassed.contains(lUuidTag)) {
+					//Infinite loop detected!
+					throw new WebException(status(500), "Infinite loop to replace uuid tag " + pTagDTO);
+				}
+				lUuidAlreadyPassed.add(lUuidTag);
+				lUuidTag = pUpdatesTags.get(lUuidTag);
+			}
+			Tag lTag = Tag.dao.getByUuid(lUuidTag);
 			if (lTag != null && lTag.getUser().getIdUser() != lConnectedUser.getIdUser()) {
 				lTags.add(lTag);
 			}
 		});
 		Set<Place> lPlaces = new HashSet<>();
 		pTaskDTO.getPlaces().forEach((pPlaceDTO) -> {
-			Place lPlace = Place.dao.getByUuid(pPlaceDTO);
+			String lUuidPlace = pPlaceDTO;
+			Set<String> lUuidAlreadyPassed = new HashSet<>();
+			while (pUpdatesPlaces.containsKey(lUuidPlace)) {
+				if (lUuidAlreadyPassed.contains(lUuidPlace)) {
+					//Infinite loop detected!
+					throw new WebException(status(500), "Infinite loop to replace uuid tag " + pPlaceDTO);
+				}
+				lUuidAlreadyPassed.add(lUuidPlace);
+				lUuidPlace = pUpdatesPlaces.get(lUuidPlace);
+			}
+			Place lPlace = Place.dao.getByUuid(lUuidPlace);
 			if (lPlace != null && lPlace.getUser().getIdUser() != lConnectedUser.getIdUser()) {
 				lPlaces.add(lPlace);
 			}
@@ -189,74 +228,5 @@ public class SynchronizationResource extends AbstractRest {
 			lTaskDB.setLastUpdate(pTaskDTO.getLastUpdate());
 			lTaskDB.save();
 		}
-	}
-
-	private static Tag insertOrUpdate(User pConnectedUser, TagDTO pTagDTO) {
-		Tag lTagDB = Tag.dao.getByUuid(pTagDTO.getUuid());
-		if (lTagDB != null) {
-			if (lTagDB.getUser().getIdUser() != pConnectedUser.getIdUser()) {
-				return null;
-			}
-			// Check if update is necessary
-			if (lTagDB.getLastUpdate() < pTagDTO.getLastUpdate()) {
-				lTagDB.setName(pTagDTO.getName());
-				lTagDB.setLastUpdate(pTagDTO.getLastUpdate());
-				lTagDB.save();
-			}
-		} else {
-			// Create it
-			lTagDB = new Tag();
-			lTagDB.setName(pTagDTO.getName());
-			lTagDB.setUser(pConnectedUser);
-			lTagDB.setLastUpdate(pTagDTO.getLastUpdate());
-			lTagDB.save();
-		}
-		return lTagDB;
-	}
-
-	private static Place insertOrUpdate(User pConnectedUser, PlaceDTO pPlaceDTO) {
-		Place lPlaceDB = Place.dao.getByUuid(pPlaceDTO.getUuid());
-		if (lPlaceDB != null) {
-			if (lPlaceDB.getUser().getIdUser() != pConnectedUser.getIdUser()) {
-				return null;
-			}
-			// Check if update is necessary
-			if (lPlaceDB.getLastUpdate() < pPlaceDTO.getLastUpdate()) {
-				lPlaceDB.setName(pPlaceDTO.getName());
-				lPlaceDB.setLastUpdate(pPlaceDTO.getLastUpdate());
-				lPlaceDB.save();
-			}
-		} else {
-			// Create it
-			lPlaceDB = new Place();
-			lPlaceDB.setName(pPlaceDTO.getName());
-			lPlaceDB.setUser(pConnectedUser);
-			lPlaceDB.setLastUpdate(pPlaceDTO.getLastUpdate());
-			lPlaceDB.save();
-		}
-		return lPlaceDB;
-	}
-
-	private static Category insertOrUpdate(User pConnectedUser, CategoryDTO pCategoryDTO) {
-		Category lCategoryDB = Category.dao.getByUuid(pCategoryDTO.getUuid());
-		if (lCategoryDB != null) {
-			if (lCategoryDB.getUser().getIdUser() != pConnectedUser.getIdUser()) {
-				return null;
-			}
-			// Check if update is necessary
-			if (lCategoryDB.getLastUpdate() < pCategoryDTO.getLastUpdate()) {
-				lCategoryDB.setName(pCategoryDTO.getName());
-				lCategoryDB.setLastUpdate(pCategoryDTO.getLastUpdate());
-				lCategoryDB.save();
-			}
-		} else {
-			// Create it
-			lCategoryDB = new Category();
-			lCategoryDB.setName(pCategoryDTO.getName());
-			lCategoryDB.setUser(pConnectedUser);
-			lCategoryDB.setLastUpdate(pCategoryDTO.getLastUpdate());
-			lCategoryDB.save();
-		}
-		return lCategoryDB;
 	}
 }

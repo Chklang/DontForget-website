@@ -43,11 +43,7 @@ public class CategoriesResource extends AbstractRest {
 			if (StringUtils.isEmpty(lText)) {
 				return status(412);
 			}
-			Category lCategoryDB = Category.dao.findByNameAndUser(lText, getConnectedUser());
-			if (lCategoryDB != null) {
-				return status(409);
-			}
-			lCategoryDB = new Category();
+			Category lCategoryDB = new Category();
 			lCategoryDB.setName(lText);
 			lCategoryDB.setUser(getConnectedUser());
 			lCategoryDB.save();
@@ -56,13 +52,17 @@ public class CategoriesResource extends AbstractRest {
 		});
 	}
 	
-	public static Result delete(String pTaskCategoryName) {
+	public static Result delete(String pTaskCategoryUuid) {
 		return executeAndVerifyConnect(() -> {
 			User lConnectedUser = getConnectedUser();
 			
-			Category lCategoryDB = Category.dao.findByNameAndUser(pTaskCategoryName, lConnectedUser);
+			Category lCategoryDB = Category.dao.getByUuid(pTaskCategoryUuid);
 			if (lCategoryDB == null) {
-				return notFound(pTaskCategoryName);
+				return notFound(pTaskCategoryUuid);
+			}
+			
+			if (lCategoryDB.getUser().getIdUser() != lConnectedUser.getIdUser()) {
+				return unauthorized();
 			}
 
 			Set<Task> lTasksToMove = Task.dao.findByCategoryAndUser(lCategoryDB, lConnectedUser);
@@ -76,18 +76,26 @@ public class CategoriesResource extends AbstractRest {
 		});
 	}
 	
-	public static Result moveAndDelete(String pTaskCategoryName, String pCategoryReceiver) {
+	public static Result moveAndDelete(String pTaskCategoryUuid, String pCategoryUuidReceiver) {
 		return executeAndVerifyConnect(() -> {
 			User lConnectedUser = getConnectedUser();
 			
-			Category lCategoryDB = Category.dao.findByNameAndUser(pTaskCategoryName, lConnectedUser);
+			Category lCategoryDB = Category.dao.getByUuid(pTaskCategoryUuid);
 			if (lCategoryDB == null) {
-				return notFound(pTaskCategoryName);
+				return notFound(pTaskCategoryUuid);
 			}
 			
-			Category lCategoryReceiver = Category.dao.findByNameAndUser(pCategoryReceiver, lConnectedUser);
+			Category lCategoryReceiver = Category.dao.getByUuid(pCategoryUuidReceiver);
 			if (lCategoryReceiver == null) {
-				return notFound(pCategoryReceiver);
+				return notFound(pCategoryUuidReceiver);
+			}
+			
+			if (lCategoryDB.getUser().getIdUser() != lConnectedUser.getIdUser()) {
+				return unauthorized();
+			}
+			
+			if (lCategoryReceiver.getUser().getIdUser() != lConnectedUser.getIdUser()) {
+				return unauthorized();
 			}
 			
 			Set<Task> lTasksToMove = Task.dao.findByCategoryAndUser(lCategoryDB, lConnectedUser);
@@ -101,21 +109,20 @@ public class CategoriesResource extends AbstractRest {
 		});
 	}
 	
-	public static Result update(String pTaskCategoryName) {
+	public static Result update(String pTaskCategoryUuid) {
 		return executeAndVerifyConnect(() -> {
-			Category lCategoryDB = Category.dao.findByNameAndUser(pTaskCategoryName, getConnectedUser());
+			User lConnectedUser = getConnectedUser();
+			Category lCategoryDB = Category.dao.getByUuid(pTaskCategoryUuid);
 			if (lCategoryDB == null) {
 				return notFound();
 			}
+			
+			if (lCategoryDB.getUser().getIdUser() != lConnectedUser.getIdUser()) {
+				return unauthorized();
+			}
 
 			String lName = request().body().asText();
-			if (!StringUtils.isEmpty(lName) && !lCategoryDB.getName().equals(lName)) {
-				Category lCategoryDB2 = Category.dao.findByNameAndUser(lName, getConnectedUser());
-				if (lCategoryDB2 != null) {
-					return conflict();
-				}
-				lCategoryDB.setName(lName);
-			}
+			lCategoryDB.setName(lName);
 			lCategoryDB.save();
 			return ok(new CategoryDTO(lCategoryDB));
 		});

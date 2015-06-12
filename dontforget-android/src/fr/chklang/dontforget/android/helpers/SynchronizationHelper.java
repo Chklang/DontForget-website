@@ -5,7 +5,10 @@ package fr.chklang.dontforget.android.helpers;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import android.content.Context;
 import android.util.Pair;
@@ -27,6 +30,7 @@ import fr.chklang.dontforget.android.dto.TagDTO;
 import fr.chklang.dontforget.android.dto.TaskDTO;
 import fr.chklang.dontforget.android.rest.AbstractRest.Result;
 import fr.chklang.dontforget.android.rest.SynchronizationRest;
+import fr.chklang.dontforget.android.rest.TokensRest;
 
 /**
  * @author S0075724
@@ -34,23 +38,37 @@ import fr.chklang.dontforget.android.rest.SynchronizationRest;
  */
 public class SynchronizationHelper {
 
-	public static void startSynchronizations(Context pContext) {
+	public static void startSynchronizations(Context pContext, final Runnable pCallback) {
 		DatabaseManager.transaction(pContext, new DatabaseManager.Transaction() {
 			@Override
 			public void execute() {
 				runStartSynchronizations();
 			}
 		});
+		pCallback.run();
 	}
 
 	private static void runStartSynchronizations() {
+		final long currentTime = System.currentTimeMillis();
+		
 		Collection<Token> lTokens = Token.dao.getAll();
 		Collection<Pair<Token, Result<SynchronizationDTO>>> lSynchronizationsPromesses = new ArrayList<Pair<Token, Result<SynchronizationDTO>>>();
 		Collection<Pair<Token, SynchronizationDTO>> lSynchronizations = new ArrayList<Pair<Token, SynchronizationDTO>>();
+		Map<Token, ServerConfiguration> lTokensWithServersConfiguration = new HashMap<Token, ServerConfiguration>();
 
-		// First, update local storage with each declared servers
+		// Connect to servers
 		for (Token lToken : lTokens) {
-			Result<SynchronizationDTO> lSynchronizationPromesse = getSynchronizationDTO(lToken);
+			ServerConfiguration lServerConfiguration = lToken.toServerConfiguration();
+			Result<Boolean> lResult = TokensRest.connexion(lServerConfiguration, lToken, ConfigurationHelper.getDeviceId());
+			if (lResult.get().booleanValue()) {
+				lTokensWithServersConfiguration.put(lToken, lServerConfiguration);
+			}
+		}
+		
+		// First, update local storage with each declared servers
+		for (Entry<Token, ServerConfiguration> lEntry : lTokensWithServersConfiguration.entrySet()) {
+			Token lToken = lEntry.getKey();
+			Result<SynchronizationDTO> lSynchronizationPromesse = getSynchronizationDTO(lToken, lEntry.getValue());
 			lSynchronizationsPromesses.add(Pair.create(lToken, lSynchronizationPromesse));
 		}
 
@@ -75,12 +93,12 @@ public class SynchronizationHelper {
 
 		// Delete old tasks
 		for (Pair<Token, SynchronizationDTO> lEntry : lSynchronizations) {
-			updateLocalWithSynchronizationDTODeleteTasks(lEntry.first, lEntry.second);
+			updateLocalWithSynchronizationDTODeleteTasks(lEntry.first, lEntry.second, currentTime);
 		}
 
 		// Delete old tags, places and categories
 		for (Pair<Token, SynchronizationDTO> lEntry : lSynchronizations) {
-			updateLocalWithSynchronizationDTODeleteTagsPlacesAndCategories(lEntry.first, lEntry.second);
+			updateLocalWithSynchronizationDTODeleteTagsPlacesAndCategories(lEntry.first, lEntry.second, currentTime);
 		}
 
 		Collection<Pair<Token, Result<Boolean>>> lReUpdateServer = new ArrayList<Pair<Token, Result<Boolean>>>();
@@ -95,21 +113,21 @@ public class SynchronizationHelper {
 			Boolean lResult = lEntry.second.get();
 			if (lResult.booleanValue()) {
 				//Update the token
-				lEntry.first.setLastSynchro(System.currentTimeMillis());
+				lEntry.first.setLastSynchro(currentTime);
 				Token.dao.save(lEntry.first);
+				//Send update date
+				ServerConfiguration lServerConfiguration = lEntry.first.toServerConfiguration();
+				TokensRest.sendUpdateToken(lServerConfiguration, currentTime);
 			}
 		}
+		
+		
 		//Delete old entries into logs
 		cleanObjectsDeleted();
 	}
 
-	private static Result<SynchronizationDTO> getSynchronizationDTO(Token pToken) {
-		String lProtocol = pToken.getProtocol();
-		String lHost = pToken.getHost();
-		int lPort = pToken.getPort();
-		String lContext = pToken.getContext();
-		ServerConfiguration lServerConfiguration = new ServerConfiguration(lProtocol, lHost, lPort, lContext);
-		return SynchronizationRest.connexion(lServerConfiguration, pToken.getLastSynchro());
+	private static Result<SynchronizationDTO> getSynchronizationDTO(Token pToken, ServerConfiguration pServerConfiguration) {
+		return SynchronizationRest.connexion(pServerConfiguration, pToken.getLastSynchro());
 	}
 
 	private static Result<Boolean> updateServer(Token pToken, SynchronizationDTO pSynchronizationDTO) {
@@ -269,27 +287,27 @@ public class SynchronizationHelper {
 		}
 	}
 
-	private static void updateLocalWithSynchronizationDTODeleteTasks(Token pToken, SynchronizationDTO pSynchronizationDTO) {
+	private static void updateLocalWithSynchronizationDTODeleteTasks(Token pToken, SynchronizationDTO pSynchronizationDTO, long currentTime) {
 		for (String lIdTaskToDelete : pSynchronizationDTO.getUuidTasksToDelete()) {
 			Task lTask = Task.dao.getByUuid(lIdTaskToDelete);
 			if (lTask != null && lTask.getLastUpdate() < pToken.getLastSynchro()) {
 				TaskToDelete lTaskToDelete = new TaskToDelete();
 				lTaskToDelete.setUuidTask(lTask.getUuid());
-				lTaskToDelete.setDateDeletion(System.currentTimeMillis());
+				lTaskToDelete.setDateDeletion(currentTime);
 				TaskToDelete.dao.create(lTaskToDelete);
 				Task.dao.delete(lTask.getIdTask());
 			}
 		}
 	}
 
-	private static void updateLocalWithSynchronizationDTODeleteTagsPlacesAndCategories(Token pToken, SynchronizationDTO pSynchronizationDTO) {
+	private static void updateLocalWithSynchronizationDTODeleteTagsPlacesAndCategories(Token pToken, SynchronizationDTO pSynchronizationDTO, long currentTime) {
 		for (String lIdTagToDelete : pSynchronizationDTO.getUuidTagsToDelete()) {
 			Tag lTag = Tag.dao.getByUuid(lIdTagToDelete);
 			if (lTag != null && lTag.getLastUpdate() < pToken.getLastSynchro()) {
 				if (Task.dao.findByTag(lTag).isEmpty()) {
 					TagToDelete lTagToDelete = new TagToDelete();
 					lTagToDelete.setUuidTag(lTag.getUuid());
-					lTagToDelete.setDateDeletion(System.currentTimeMillis());
+					lTagToDelete.setDateDeletion(currentTime);
 					TagToDelete.dao.create(lTagToDelete);
 					Tag.dao.delete(lTag.getIdTag());
 				}
@@ -301,7 +319,7 @@ public class SynchronizationHelper {
 				if (Task.dao.findByPlace(lPlace).isEmpty()) {
 					PlaceToDelete lPlaceToDelete = new PlaceToDelete();
 					lPlaceToDelete.setUuidPlace(lPlace.getUuid());
-					lPlaceToDelete.setDateDeletion(System.currentTimeMillis());
+					lPlaceToDelete.setDateDeletion(currentTime);
 					PlaceToDelete.dao.create(lPlaceToDelete);
 					Place.dao.delete(lPlace.getIdPlace());
 				}
@@ -313,7 +331,7 @@ public class SynchronizationHelper {
 				if (Task.dao.findByCategory(lCategory).isEmpty()) {
 					CategoryToDelete lCategoryToDelete = new CategoryToDelete();
 					lCategoryToDelete.setUuidCategory(lCategory.getUuid());
-					lCategoryToDelete.setDateDeletion(System.currentTimeMillis());
+					lCategoryToDelete.setDateDeletion(currentTime);
 					CategoryToDelete.dao.create(lCategoryToDelete);
 					Category.dao.delete(lCategory.getIdCategory());
 				}

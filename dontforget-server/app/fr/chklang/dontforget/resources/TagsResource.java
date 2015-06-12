@@ -37,13 +37,13 @@ public class TagsResource extends AbstractRest {
 		});
 	}
 	
-	public static Result delete(String pName) {
+	public static Result delete(String pUuid) {
 		return executeAndVerifyConnect(() -> {
-			Tag lTag = Tag.dao.findByTagAndUser(getConnectedUser(), pName);
+			Tag lTag = Tag.dao.getByUuid(pUuid);
 			if (lTag == null) {
 				return notFound();
 			}
-			if (!lTag.getUser().equals(getConnectedUser())) {
+			if (lTag.getUser().getIdUser() != getConnectedUser().getIdUser()) {
 				return unauthorized();
 			}
 			lTag.delete();

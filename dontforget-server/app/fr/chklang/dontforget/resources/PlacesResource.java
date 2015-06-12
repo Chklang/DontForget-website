@@ -37,13 +37,13 @@ public class PlacesResource extends AbstractRest {
 		});
 	}
 	
-	public static Result delete(String pName) {
+	public static Result delete(String pUuid) {
 		return executeAndVerifyConnect(() -> {
-			Place lPlace = Place.dao.findByPlaceAndUser(getConnectedUser(), pName);
+			Place lPlace = Place.dao.getByUuid(pUuid);
 			if (lPlace == null) {
 				return notFound();
 			}
-			if (!lPlace.getUser().equals(getConnectedUser())) {
+			if (lPlace.getUser().getIdUser() != getConnectedUser().getIdUser()) {
 				return unauthorized();
 			}
 			lPlace.delete();

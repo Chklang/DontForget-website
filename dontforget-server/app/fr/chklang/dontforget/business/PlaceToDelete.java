@@ -29,6 +29,9 @@ public class PlaceToDelete extends Model {
 	@Column(name="dateDeletion")
 	private long dateDeletion;
 	
+	@Column(name="idUser")
+	private int idUser;
+	
 	public static final PlaceToDeleteDAO dao = new PlaceToDeleteDAO();
 
 	/**
@@ -59,11 +62,26 @@ public class PlaceToDelete extends Model {
 		this.dateDeletion = dateDeletion;
 	}
 
+	/**
+	 * @return the idUser
+	 */
+	public int getIdUser() {
+		return idUser;
+	}
+
+	/**
+	 * @param idUser the idUser to set
+	 */
+	public void setIdUser(int idUser) {
+		this.idUser = idUser;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + (int) (dateDeletion ^ (dateDeletion >>> 32));
+		result = prime * result + idUser;
 		result = prime * result + ((uuidPlace == null) ? 0 : uuidPlace.hashCode());
 		return result;
 	}
@@ -79,6 +97,8 @@ public class PlaceToDelete extends Model {
 		PlaceToDelete other = (PlaceToDelete) obj;
 		if (dateDeletion != other.dateDeletion)
 			return false;
+		if (idUser != other.idUser)
+			return false;
 		if (uuidPlace == null) {
 			if (other.uuidPlace != null)
 				return false;
@@ -89,6 +109,7 @@ public class PlaceToDelete extends Model {
 
 	@Override
 	public String toString() {
-		return "PlaceToDelete [uuidPlace=" + uuidPlace + ", dateDeletion=" + dateDeletion + "]";
+		return "PlaceToDelete [uuidPlace=" + uuidPlace + ", dateDeletion=" + dateDeletion + ", idUser=" + idUser + "]";
 	}
+
 }

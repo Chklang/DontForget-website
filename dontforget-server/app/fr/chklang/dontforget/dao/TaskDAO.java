@@ -5,6 +5,8 @@ import java.util.Set;
 
 import play.db.ebean.Model.Finder;
 import fr.chklang.dontforget.business.Category;
+import fr.chklang.dontforget.business.Place;
+import fr.chklang.dontforget.business.Tag;
 import fr.chklang.dontforget.business.Task;
 import fr.chklang.dontforget.business.User;
 
@@ -23,6 +25,14 @@ public class TaskDAO extends Finder<Integer, Task> {
 	
 	public Set<Task> findByCategoryAndUser(Category pCategory, User pUser) {
 		return this.where().eq("category", pCategory).eq("user", pUser).findSet();
+	}
+	
+	public Set<Task> findByTagAndUser(Tag pTag, User pUser) {
+		return this.where().in("tags", pTag).eq("user", pUser).findSet();
+	}
+	
+	public Set<Task> findByPlaceAndUser(Place pPlace, User pUser) {
+		return this.where().in("places", pPlace).eq("user", pUser).findSet();
 	}
 	
 	public Collection<Task> findByLastUpdate(long pLastUpdate, User pUser) {

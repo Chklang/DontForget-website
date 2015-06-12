@@ -29,6 +29,9 @@ public class TaskToDelete extends Model {
 	@Column(name="dateDeletion")
 	private long dateDeletion;
 	
+	@Column(name="idUser")
+	private int idUser;
+	
 	public static final TaskToDeleteDAO dao = new TaskToDeleteDAO();
 
 	/**
@@ -59,11 +62,26 @@ public class TaskToDelete extends Model {
 		this.dateDeletion = dateDeletion;
 	}
 
+	/**
+	 * @return the idUser
+	 */
+	public int getIdUser() {
+		return idUser;
+	}
+
+	/**
+	 * @param idUser the idUser to set
+	 */
+	public void setIdUser(int idUser) {
+		this.idUser = idUser;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + (int) (dateDeletion ^ (dateDeletion >>> 32));
+		result = prime * result + idUser;
 		result = prime * result + ((uuidTask == null) ? 0 : uuidTask.hashCode());
 		return result;
 	}
@@ -79,6 +97,8 @@ public class TaskToDelete extends Model {
 		TaskToDelete other = (TaskToDelete) obj;
 		if (dateDeletion != other.dateDeletion)
 			return false;
+		if (idUser != other.idUser)
+			return false;
 		if (uuidTask == null) {
 			if (other.uuidTask != null)
 				return false;
@@ -89,6 +109,6 @@ public class TaskToDelete extends Model {
 
 	@Override
 	public String toString() {
-		return "TaskToDelete [uuidTask=" + uuidTask + ", dateDeletion=" + dateDeletion + "]";
+		return "TaskToDelete [uuidTask=" + uuidTask + ", dateDeletion=" + dateDeletion + ", idUser=" + idUser + "]";
 	}
 }

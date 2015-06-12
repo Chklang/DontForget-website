@@ -32,6 +32,14 @@
             android:adjustViewBounds="true"
             android:background="@drawable/place"
             android:scaleType="fitCenter" />
+
+        <ImageButton
+            android:id="@+id/tasks_leftmenu_synchronization"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/place"
+            android:scaleType="fitCenter" />
     </LinearLayout>
 
     <LinearLayout
