@@ -431,7 +431,13 @@ public class SynchronizationHelper {
 				}
 				if (!lTagsOfTask.contains(lTagUUID)) {
 					Task.dao.addTagToTask(lTask, lTag);
+				} else {
+					lTagsOfTask.remove(lTagUUID);
 				}
+			}
+			for (String lTagUUID : lTaskDTO.getTagUuids()) {
+				Tag lTag = Tag.dao.getByUuid(lTagUUID);
+				Task.dao.removeTagFromTask(lTask, lTag);
 			}
 
 			// Attach places
@@ -449,7 +455,13 @@ public class SynchronizationHelper {
 				}
 				if (!lPlacesOfTask.contains(lPlaceUUID)) {
 					Task.dao.addPlaceToTask(lTask, lPlace);
+				} else {
+					lPlacesOfTask.remove(lPlaceUUID);
 				}
+			}
+			for (String lPlaceUUID : lTaskDTO.getPlaceUuids()) {
+				Place lPlace = Place.dao.getByUuid(lPlaceUUID);
+				Task.dao.removePlaceFromTask(lTask, lPlace);
 			}
 		}
 	}
