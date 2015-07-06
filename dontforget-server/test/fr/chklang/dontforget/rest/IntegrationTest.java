@@ -1,5 +1,7 @@
 package fr.chklang.dontforget.rest;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -49,7 +51,7 @@ public class IntegrationTest {
 			Assert.assertEquals("La création de l'utilisateur devrait échouer", 200, lTestRequestHelper.getStatus());
 			JsonNode lCategoriesJson = lTestRequestHelper.getBodyAsJson();
 			Assert.assertTrue("Au moins une categorie doit avoir été trouvée, pas " + lCategoriesJson.size(), lCategoriesJson.size() > 0);
-			String lFirstCategory = lCategoriesJson.get(0).get("name").asText();
+			String lFirstCategory = lCategoriesJson.get(0).get("uuid").asText();
 			
 			lTestRequestHelper.post("users/create", lUserCreate);
 			Assert.assertEquals("La création de l'utilisateur devrait échouer", 409, lTestRequestHelper.getStatus());
@@ -67,15 +69,32 @@ public class IntegrationTest {
 			lTestRequestHelper.post("categories/"+lFirstCategory+"/tasks", lTaskString);
 			Assert.assertEquals("La création de la tâche a échoué", 200, lTestRequestHelper.getStatus());
 			lResponse = lTestRequestHelper.getBodyAsJson();
+
+			lTestRequestHelper.get("tags");
+			JsonNode lResponseTags = lTestRequestHelper.getBodyAsJson();
+			Map<String, String> lMapTagsUuidsNames = new HashMap<>();
+			lResponseTags.forEach((pTag) -> {
+				lMapTagsUuidsNames.put(pTag.get("uuid").asText(), pTag.get("name").asText());
+			});
+
+			lTestRequestHelper.get("places");
+			JsonNode lResponsePlaces = lTestRequestHelper.getBodyAsJson();
+			Map<String, String> lMapPlacesUuidsNames = new HashMap<>();
+			lResponsePlaces.forEach((pTag) -> {
+				lMapPlacesUuidsNames.put(pTag.get("uuid").asText(), pTag.get("name").asText());
+			});
+			
 			Assert.assertTrue("Le résultat doit être un objet", lResponse.isObject());
 			Assert.assertEquals("La tâche créée ne correspond pas à la tâche récupérée", "Nouvelle tâche", lResponse.get("text").asText());
 			Assert.assertEquals("Un tag doit avoit été trouvé", 1, lResponse.get("tags").size());
 			Assert.assertEquals("Un lieu doit avoit été trouvé", 1, lResponse.get("places").size());
 			lResponse.get("tags").forEach((lEntry) -> {
-				Assert.assertEquals("Le tag renvoyé n'est pas bon", "test", lEntry.get("name").asText());
+				String lTagName = lMapTagsUuidsNames.get(lEntry.asText());
+				Assert.assertEquals("Le tag renvoyé n'est pas bon", "test", lTagName);
 			});
 			lResponse.get("places").forEach((lEntry) -> {
-				Assert.assertEquals("Le lieu renvoyé n'est pas bon", "maison", lEntry.get("name").asText());
+				String lPlaceName = lMapPlacesUuidsNames.get(lEntry.asText());
+				Assert.assertEquals("Le lieu renvoyé n'est pas bon", "maison", lPlaceName);
 			});
 			
 			lTestRequestHelper.get("tags");
