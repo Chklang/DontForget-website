@@ -1,6 +1,7 @@
 package fr.chklang.dontforget.business;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -47,7 +48,7 @@ public class Category extends Model {
 	private String uuid;
 	
 	@OneToMany(targetEntity=Task.class, fetch=FetchType.LAZY, mappedBy="category")
-	private Collection<Task> tasks;
+	private List<Task> tasks;
 	
 	public static final CategoryDAO dao = new CategoryDAO();
 
@@ -128,14 +129,14 @@ public class Category extends Model {
 	/**
 	 * @return the tasks
 	 */
-	public Collection<Task> getTasks() {
+	public List<Task> getTasks() {
 		return tasks;
 	}
 
 	/**
 	 * @param tasks the tasks to set
 	 */
-	public void setTasks(Collection<Task> tasks) {
+	public void setTasks(List<Task> tasks) {
 		this.tasks = tasks;
 	}
 
