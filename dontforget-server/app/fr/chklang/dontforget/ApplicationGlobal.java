@@ -42,6 +42,7 @@ public class ApplicationGlobal extends GlobalSettings {
 		Map<String, List<String>> lTasksCategories = (Map<String, List<String>>) lTasksCategoriesObject;
 		
 		CategoriesManager lTasksCategoriesManager = CategoriesManager.getInstance();
+		lTasksCategoriesManager.reset();
 		
 		for (Entry<String, List<String>> lEntry : lTasksCategories.entrySet()) {
 			String lLanguage = lEntry.getKey();

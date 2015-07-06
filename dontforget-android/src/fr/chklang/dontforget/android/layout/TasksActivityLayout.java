@@ -29,6 +29,8 @@ public class TasksActivityLayout {
 	private final View buttonDeleted;
 	private final View buttonAll;
 
+	private final EditText tasks_search_text;
+	private final View tasks_search_button;
 	private final EditText tasks_new_text;
 	private final View tasks_new_button;
 	private final ListView tasks_view;
@@ -46,6 +48,8 @@ public class TasksActivityLayout {
 		buttonDeleted = mainView.findViewById(R.id.tasks_deleted);
 		buttonAll = mainView.findViewById(R.id.tasks_all);
 
+		tasks_search_text = (EditText) mainView.findViewById(R.id.tasks_search_text);
+		tasks_search_button = mainView.findViewById(R.id.tasks_search_button);
 		tasks_new_text = (EditText) mainView.findViewById(R.id.tasks_new_text);
 		tasks_new_button = mainView.findViewById(R.id.tasks_new_button);
 		tasks_view = (ListView) mainView.findViewById(R.id.tasks_elements);
@@ -105,6 +109,20 @@ public class TasksActivityLayout {
 	 */
 	public View getButtonAll() {
 		return buttonAll;
+	}
+
+	/**
+	 * @return the tasks_search_text
+	 */
+	public EditText getTasks_search_text() {
+		return tasks_search_text;
+	}
+
+	/**
+	 * @return the tasks_search_button
+	 */
+	public View getTasks_search_button() {
+		return tasks_search_button;
 	}
 
 	/**

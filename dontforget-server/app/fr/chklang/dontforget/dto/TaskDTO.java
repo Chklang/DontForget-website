@@ -4,8 +4,8 @@
 package fr.chklang.dontforget.dto;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.stream.Stream;
+import java.util.Arrays;
+import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,11 +29,11 @@ public class TaskDTO extends ObjectNode {
 	
 	private final TaskStatus status;
 	
-	private final Stream<TagDTO> tags;
+	private final List<String> tags;
 	
-	private final Stream<PlaceDTO> places;
+	private final List<String> places;
 	
-	private final CategoryDTO category;
+	private final String category;
 	
 	private final long lastUpdate;
 
@@ -42,17 +42,15 @@ public class TaskDTO extends ObjectNode {
 		uuid = pJson.get("uuid").asText();
 		text = pJson.get("text").asText();
 		status = TaskStatus.valueOf(pJson.get("status").asText());
-		Collection<TagDTO> lTags = new ArrayList<>();
-		pJson.get("tags").forEach((pNode) -> {
-			lTags.add(new TagDTO(pNode));
+		tags = new ArrayList<>();
+		pJson.get("tagUuids").forEach((pNode) -> {
+			tags.add(pNode.asText());
 		});
-		tags = lTags.stream();
-		Collection<PlaceDTO> lPlaces = new ArrayList<>();
-		pJson.get("places").forEach((pNode) -> {
-			lPlaces.add(new PlaceDTO(pNode));
+		places = new ArrayList<>();
+		pJson.get("placeUuids").forEach((pNode) -> {
+			places.add(pNode.asText());
 		});
-		places = lPlaces.stream();
-		category = new CategoryDTO(pJson.get("category"));
+		category = pJson.get("categoryUuid").asText();
 		lastUpdate = pJson.get("lastUpdate").asLong();
 		build();
 	}
@@ -63,15 +61,15 @@ public class TaskDTO extends ObjectNode {
 		text = pTask.getText();
 		status = pTask.getStatus();
 		
-		tags = pTask.getTags().stream().map((pTag) -> {
-			return new TagDTO(pTag);
-		});
+		tags = Arrays.asList(pTask.getTags().stream().map((pTag) -> {
+			return pTag.getUuid();
+		}).toArray(String[]::new));
 		
-		places = pTask.getPlaces().stream().map((pPlace) -> {
-			return new PlaceDTO(pPlace);
-		});
+		places = Arrays.asList(pTask.getPlaces().stream().map((pPlace) -> {
+			return pPlace.getUuid();
+		}).toArray(String[]::new));
 		
-		category = new CategoryDTO(pTask.getCategory());
+		category = pTask.getCategory().getUuid();
 		
 		lastUpdate = pTask.getLastUpdate();
 		
@@ -120,19 +118,19 @@ public class TaskDTO extends ObjectNode {
 	/**
 	 * @return the tags
 	 */
-	public Stream<TagDTO> getTags() {
+	public List<String> getTags() {
 		return tags;
 	}
 	/**
 	 * @return the places
 	 */
-	public Stream<PlaceDTO> getPlaces() {
+	public List<String> getPlaces() {
 		return places;
 	}
 	/**
 	 * @return the category
 	 */
-	public CategoryDTO getCategory() {
+	public String getCategory() {
 		return category;
 	}
 	/**

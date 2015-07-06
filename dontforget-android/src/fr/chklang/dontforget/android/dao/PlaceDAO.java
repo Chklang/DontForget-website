@@ -109,4 +109,11 @@ public class PlaceDAO extends AbstractDAO<Place, Integer> {
 		Cursor lCursor = DatabaseManager.rawQuery(lQuery, new String[] {pName});
 		return toObject(lCursor);
 	}
+	public Place getByUuid(String pUuid) {
+		return getByCriterias(Pair.create(COLUMN_UUID+"=?", new String[] {pUuid}));
+	}
+	
+	public Collection<Place> findAfterLastUpdate(long pDate) {
+		return findByCriterias(Pair.create(COLUMN_LASTUPDATE + ">=?", new String[]{Long.toString(pDate)}));
+	}
 }

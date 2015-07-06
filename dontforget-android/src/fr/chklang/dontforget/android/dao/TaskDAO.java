@@ -128,6 +128,9 @@ public class TaskDAO extends AbstractDAO<Task, Integer> {
 		Cursor lCursor = DatabaseManager.rawQuery(lQuery, new String[] {Integer.toString(pPlace.getIdPlace())});
 		return toListObjects(lCursor);
 	}
+	public Task getByUuid(String pUuid) {
+		return getByCriterias(Pair.create(COLUMN_UUID+"=?", new String[] {pUuid}));
+	}
 	
 	public void addTagToTask(Task pTask, Tag pTag) {
 		ContentValues lValues = new ContentValues();
@@ -149,5 +152,9 @@ public class TaskDAO extends AbstractDAO<Task, Integer> {
 	
 	public void removePlaceFromTask(Task pTask, Place pPlace) {
 		DatabaseManager.delete("t_task_place", "idTask=? AND idPlace=?", new String[]{Integer.toString(pTask.getIdTask()), Integer.toString(pPlace.getIdPlace())});
+	}
+	
+	public Collection<Task> findAfterLastUpdate(long pDate) {
+		return findByCriterias(Pair.create(COLUMN_LASTUPDATE + ">=?", new String[]{Long.toString(pDate)}));
 	}
 }

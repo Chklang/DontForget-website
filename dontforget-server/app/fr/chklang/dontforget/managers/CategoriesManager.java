@@ -65,6 +65,10 @@ public class CategoriesManager {
 		return Collections.unmodifiableList(lResults);
 	}
 	
+	public void reset() {
+		values.clear();
+	}
+	
 	public static CategoriesManager getInstance() {
 		return SINGLETON;
 	}

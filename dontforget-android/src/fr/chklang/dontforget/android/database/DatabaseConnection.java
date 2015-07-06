@@ -20,6 +20,10 @@ public class DatabaseConnection extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
+		upgrade(db, 0);
+	}
+	
+	private void v1(SQLiteDatabase db) {
 		String lTableCategory = "CREATE TABLE \"t_category\" ("
 				+ "\"idCategory\" INTEGER PRIMARY KEY NOT NULL,"
 				+ "\"name\" VARCHAR NOT NULL,"
@@ -80,20 +84,100 @@ public class DatabaseConnection extends SQLiteOpenHelper {
 		db.execSQL(lTableTaskTag);
 		db.execSQL(lTableToken);
 	}
-	
 	private void v2(SQLiteDatabase db) {
 		String lAddColumnToken = "ALTER TABLE \"t_token\" ADD COLUMN \"lastSynchro\" INTEGER NOT NULL DEFAULT 0";
 		db.execSQL(lAddColumnToken);
 	}
-
-	@Override
-	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+	
+	private void v3(SQLiteDatabase db) {
+		String lTableLogPlace = "CREATE TABLE \"t_place_to_delete\" ("+
+			"\"uuidPlace\" VARCHAR NOT NULL ,"+
+			"\"dateDeletion\" INTEGER NOT NULL ,"+
+			"PRIMARY KEY (\"uuidPlace\", \"dateDeletion\")"+
+		")";
+		String lTableLogTag = "CREATE TABLE \"t_tag_to_delete\" ("+
+			"\"uuidTag\" VARCHAR NOT NULL ,"+
+			"\"dateDeletion\" INTEGER NOT NULL ,"+
+			"PRIMARY KEY (\"uuidTag\", \"dateDeletion\")"+
+		")";
+		String lTableLogCategory = "CREATE TABLE \"t_category_to_delete\" ("+
+			"\"uuidCategory\" VARCHAR NOT NULL ,"+
+			"\"dateDeletion\" INTEGER NOT NULL ,"+
+			"PRIMARY KEY (\"uuidCategory\", \"dateDeletion\")"+
+		")";
+		String lTableLogTask = "CREATE TABLE \"t_task_to_delete\" ("+
+			"\"uuidTask\" VARCHAR NOT NULL ,"+
+			"\"dateDeletion\" INTEGER NOT NULL ,"+
+			"PRIMARY KEY (\"uuidTask\", \"dateDeletion\")"+
+		")";
+		
+		String lCopyTokenTable = "CREATE TABLE t_token_copy ("+
+			"idToken	INTEGER PRIMARY KEY NOT NULL,"+
+			"pseudo VARCHAR NOT NULL,"+
+			"protocol VARCHAR NOT NULL,"+
+			"host VARCHAR NOT NULL,"+
+			"port INTEGER NOT NULL,"+
+			"context VARCHAR NOT NULL,"+
+			"token VARCHAR NOT NULL,"+
+			"lastSynchro INTEGER NOT NULL DEFAULT 0,"+
+			"UNIQUE (pseudo, protocol, host, port, context)"+
+		")";
+		String lCopyTokenData = "INSERT INTO t_token_copy ("+
+				"idToken, pseudo, protocol, host, port, context, token, lastSynchro"+
+			") SELECT "+
+				"rowid, pseudo, protocol, host, port, context, token, lastSynchro "+
+			"FROM t_token";
+		String lDeleteOldTableTokens = "DROP TABLE t_token";
+		String lRenameTableToken = "ALTER TABLE t_token_copy RENAME TO t_token";
+		
+		db.execSQL(lTableLogPlace);
+		db.execSQL(lTableLogTag);
+		db.execSQL(lTableLogCategory);
+		db.execSQL(lTableLogTask);
+		db.execSQL(lCopyTokenTable);
+		db.execSQL(lCopyTokenData);
+		db.execSQL(lDeleteOldTableTokens);
+		db.execSQL(lRenameTableToken);
+	}
+	
+	private void v4(SQLiteDatabase db) {
+		String lTableCategory = "CREATE TABLE \"t_category_copy\" ("
+				+ "\"idCategory\" INTEGER PRIMARY KEY NOT NULL,"
+				+ "\"name\" VARCHAR NOT NULL,"
+				+ "\"lastUpdate\" INTEGER NOT NULL,"
+				+ "\"uuid\" VARCHAR)";
+		String lCopyCategoryData = "INSERT INTO t_category_copy ("+
+				"idCategory, name, lastUpdate, uuid"+
+			") SELECT "+
+				"idCategory, name, lastUpdate, uuid "+
+			"FROM t_category";
+		String lDeleteOldTableCategorys = "DROP TABLE t_category";
+		String lRenameTableCategory = "ALTER TABLE t_category_copy RENAME TO t_category";
+		
+		db.execSQL(lTableCategory);
+		db.execSQL(lCopyCategoryData);
+		db.execSQL(lDeleteOldTableCategorys);
+		db.execSQL(lRenameTableCategory);
+	}
+	
+	private void upgrade(SQLiteDatabase db, int oldVersion) {
 		switch (oldVersion) {
+		case 0 :
+			v1(db);
 		case 1 :
 			v2(db);
+		case 2 :
+			v3(db);
+		case 3 :
+			v4(db);
 		default :
 			break;
 		}
+	}
+
+	@Override
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		upgrade(db, oldVersion);
 	}
 
 }

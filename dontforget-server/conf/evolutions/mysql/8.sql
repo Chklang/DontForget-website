@@ -1,0 +1,11 @@
+# --- !Ups
+
+ALTER TABLE t_category DROP INDEX uq_T_TASK_CATEGORY_1;
+ALTER TABLE t_place DROP INDEX uq_T_PLACE_1;
+ALTER TABLE t_tag DROP INDEX uq_T_TAG_1;
+
+# --- !Downs
+
+ALTER TABLE t_category ADD CONSTRAINT uq_T_TASK_CATEGORY_1 UNIQUE(idUser, name);
+ALTER TABLE t_place ADD CONSTRAINT uq_T_PLACE_1 UNIQUE(idUser, name);
+ALTER TABLE t_tag ADD CONSTRAINT uq_T_TAG_1 UNIQUE(idUser, name);

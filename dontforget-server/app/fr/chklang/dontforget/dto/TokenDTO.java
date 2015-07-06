@@ -10,11 +10,13 @@ public class TokenDTO extends ObjectNode {
 	
 	private static final ObjectMapper mapper = new ObjectMapper();
 	
-	private String pseudo;
+	private final String pseudo;
 	
-	private String token;
+	private final String token;
 	
-	private String deviceId;
+	private final String deviceId;
+	
+	private final long lastUpdate;
 
 	public TokenDTO(JsonNode pJson) {
 		super(mapper.getNodeFactory());
@@ -22,6 +24,7 @@ public class TokenDTO extends ObjectNode {
 		pseudo = pJson.get("pseudo").asText();
 		token = pJson.get("token").asText();
 		deviceId = pJson.get("deviceId").asText();
+		lastUpdate = pJson.get("lastUpdate").asLong();
 	}
 	
 	public TokenDTO(Token pToken) {
@@ -30,6 +33,7 @@ public class TokenDTO extends ObjectNode {
 		pseudo = pToken.getUser().getPseudo();
 		token = pToken.getToken();
 		deviceId = pToken.getDeviceId();
+		lastUpdate = pToken.getLastUpdate();
 		
 		build();
 	}
@@ -38,6 +42,7 @@ public class TokenDTO extends ObjectNode {
 		this.put("pseudo", pseudo);
 		this.put("token", token);
 		this.put("deviceId", deviceId);
+		this.put("lastUpdate", lastUpdate);
 	}
 
 	/**
@@ -48,24 +53,10 @@ public class TokenDTO extends ObjectNode {
 	}
 
 	/**
-	 * @param pseudo the pseudo to set
-	 */
-	public void setPseudo(String pseudo) {
-		this.pseudo = pseudo;
-	}
-
-	/**
 	 * @return the token
 	 */
 	public String getToken() {
 		return token;
-	}
-
-	/**
-	 * @param token the token to set
-	 */
-	public void setToken(String token) {
-		this.token = token;
 	}
 
 	/**
@@ -76,10 +67,10 @@ public class TokenDTO extends ObjectNode {
 	}
 
 	/**
-	 * @param deviceId the deviceId to set
+	 * @return the lastUpdate
 	 */
-	public void setDeviceId(String deviceId) {
-		this.deviceId = deviceId;
+	public long getLastUpdate() {
+		return lastUpdate;
 	}
 
 }

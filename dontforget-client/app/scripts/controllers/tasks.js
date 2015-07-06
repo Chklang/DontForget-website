@@ -16,17 +16,32 @@
 		
 		//Helper because browser don't like to wrap functions in few cases
 		var execute = function (f) { f();};
+		
+		var lTagsAreLoaded = false;
+		var lPlacesAreLoaded = false;
 
 		//All tags
 		var lAllTags = [];
+		$scope.allTagsByUuid = {};
 		Tags.getAll(function (pResults) {
 			lAllTags = pResults;
+			angular.forEach(lAllTags, function (pElt) {
+				$scope.allTagsByUuid[pElt.uuid] = pElt;
+			});
+			lTagsAreLoaded = true;
+			loadTaskCallback();
 		});
 		
 		//All places
 		var lAllPlaces = [];
+		$scope.allPlacesByUuid = {};
 		Places.getAll(function (pResults) {
 			lAllPlaces = pResults;
+			angular.forEach(lAllPlaces, function (pElt) {
+				$scope.allPlacesByUuid[pElt.uuid] = pElt;
+			});
+			lPlacesAreLoaded = true;
+			loadTaskCallback();
 		});
 		
 		//Drop down with tags or places when user create a new task
@@ -34,9 +49,14 @@
 
 		//Load tasks
 		$scope.allTasks = [];
-		Tasks.getAll(function (pResults) {
-			$scope.allTasks = pResults;
-		});
+		var loadTaskCallback = function () {
+			if (!lTagsAreLoaded || !lPlacesAreLoaded) {
+				return;
+			}
+			Tasks.getAll(function (pResults) {
+				$scope.allTasks = pResults;
+			});
+		};
 		
 		$scope.allTasksFilter = "";
 		$scope.allTasksModeView = "OPENED";
@@ -59,7 +79,7 @@
 				angular.forEach(pResults, function (pEntry) {
 					pEntry.active = false;
 				});
-				$scope.currentCategory = pResults[0].name;
+				$scope.currentCategory = pResults[0].uuid;
 				pResults[0].active = true;
 			});
 			
@@ -85,7 +105,7 @@
 					if (pNom === "" || pNom === null || pNom == undefined) {
 						Dialog.alert("dontforget.tasks.modals.create_category_empty_name.title", "dontforget.tasks.modals.create_category_empty_name.text");
 					} else {
-						Categories.update(pCategory.name, pNom, function (pCategoryDto) {
+						Categories.update(pCategory.uuid, pNom, function (pCategoryDto) {
 							var lOldName = pCategory.name;
 							pCategory.name = pCategoryDto.name;
 							//Update all tasks which use this category
@@ -94,10 +114,6 @@
 									element.category = pCategoryDto;
 								}
 							});
-							
-							if ($scope.currentCategory != null && $scope.currentCategory == lOldName) {
-								$scope.currentCategory = pCategoryDto.name;
-							}
 						});
 					}
 				});
@@ -106,10 +122,10 @@
 			$scope.deleteCategogy = function (pCategory) {
 				var lText = $translate.instant("dontforget.tasks.modals.delete_category.text", {name:pCategory.name});
 				Dialog.confirm("dontforget.tasks.modals.delete_category.title", lText).then(function (pValue) {
-		        	Categories.delete(pCategory.name, function (pCategoryDto) {
+		        	Categories.delete(pCategory.uuid, function (pCategoryDto) {
 						var lNewCategoriesList = [];
 						angular.forEach($scope.categories, function (element) {
-							if (element.name != pCategory.name) {
+							if (element.uuid != pCategory.uuid) {
 								lNewCategoriesList.push(element);
 							}
 						});
@@ -126,9 +142,9 @@
 				} else {
 					$scope.category_all_is_chosen = false;
 				}
-				$scope.currentCategory = pCategory.name;
+				$scope.currentCategory = pCategory.uuid;
 				angular.forEach($scope.categories, function (pEntry) {
-					pEntry.active = $scope.currentCategory == pEntry.name;
+					pEntry.active = $scope.currentCategory == pEntry.uuid;
 				});
 			};
 		});
@@ -450,7 +466,7 @@
 			var lLastValueAllTasksFilter = null;
 			
 			$scope.allTasksIsShowed = function (pTask) {
-				if ($scope.currentCategory != null && $scope.currentCategory != pTask.category.name) {
+				if ($scope.currentCategory != null && $scope.currentCategory != pTask.category) {
 					return false;
 				}
 				if ($scope.allTasksModeView != 'ALL' && pTask.status != $scope.allTasksModeView) {
@@ -465,10 +481,10 @@
 				}
 				var lTextTask = pTask.text;
 				angular.forEach(pTask.tags, function (pEntry) {
-					lTextTask += " #" + pEntry.name;
+					lTextTask += " #" + $scope.allTagsByUuid[pEntry].name;
 				});
 				angular.forEach(pTask.places, function (pEntry) {
-					lTextTask += " @" + pEntry.name;
+					lTextTask += " @" + $scope.allPlacesByUuid[pEntry].name;
 				});
 				return lRegExpAllTasksFilter.test(lTextTask);
 			};

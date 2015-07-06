@@ -12,7 +12,6 @@ import android.widget.Toast;
 import fr.chklang.dontforget.android.R;
 import fr.chklang.dontforget.android.ServerConfiguration;
 import fr.chklang.dontforget.android.business.Token;
-import fr.chklang.dontforget.android.business.TokenKey;
 import fr.chklang.dontforget.android.database.DatabaseManager;
 import fr.chklang.dontforget.android.dto.TokenDTO;
 import fr.chklang.dontforget.android.helpers.ConfigurationHelper;
@@ -30,11 +29,16 @@ public class ConnectionActivity extends Activity {
 	private EditText connection_password;
 	private Button connection_send;
 	private Button connection_skip;
+	
+	private int tokenId = -1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_connection);
+		
+		Intent lIntent = getIntent();
+		tokenId = lIntent.getIntExtra("tokenId", -1);
 
 		connection_protocol = (Spinner) this.findViewById(R.id.connection_protocol);
 		connection_host = (EditText) this.findViewById(R.id.connection_host);
@@ -57,6 +61,32 @@ public class ConnectionActivity extends Activity {
 				goToTasks();
 			}
 		});
+		
+		if (tokenId != -1) {
+			//Load token information
+			DatabaseManager.transaction(this, new DatabaseManager.Transaction() {
+				@Override
+				public void execute() {
+					Token lToken = Token.dao.get(tokenId);
+					if (lToken == null) {
+						return;
+					}
+					int lNbElementsProtocol = connection_protocol.getCount();
+					for (int  i = 0; i < lNbElementsProtocol; i++) {
+						Object lValue = connection_protocol.getItemAtPosition(i);
+						String lValueString = String.valueOf(lValue);
+						if (lToken.getProtocol().equals(lValueString)) {
+							connection_protocol.setSelection(i);
+							break;
+						}
+					}
+					connection_host.setText(lToken.getHost());
+					connection_port.setText(Integer.toString(lToken.getPort()));
+					connection_context.setText(lToken.getContext());
+					connection_login.setText(lToken.getPseudo());
+				}
+			});
+		}
 	}
 
 	private void connection() {
@@ -67,9 +97,17 @@ public class ConnectionActivity extends Activity {
 		final String lLogin = connection_login.getText().toString();
 		final String lPassword = connection_password.getText().toString();
 
+		final StringBuilder lDeviceId = new StringBuilder();
+		DatabaseManager.transaction(this, new DatabaseManager.Transaction() {
+			
+			@Override
+			public void execute() {
+				lDeviceId.append(ConfigurationHelper.getDeviceId());
+			}
+		});
 		final ServerConfiguration lServerConfiguration = ServerConfiguration.newConfiguration(lProtocol, lHost, lPort, lContext);
 
-		Result<TokenDTO> lResult = TokensRest.connexion(lServerConfiguration, lLogin, lPassword, ConfigurationHelper.getDeviceId());
+		Result<TokenDTO> lResult = TokensRest.create(lServerConfiguration, lLogin, lPassword, lDeviceId.toString());
 		lResult.setOnException(new CallbackOnException() {
 			@Override
 			public void call(Exception pException) {
@@ -84,10 +122,15 @@ public class ConnectionActivity extends Activity {
 			DatabaseManager.transaction(this, new DatabaseManager.Transaction() {
 				@Override
 				public void execute() {
-					Token lToken = Token.dao.get(new TokenKey(lLogin, lServerConfiguration));
+					Token lToken = Token.dao.findByPseudoProtocolHostPortAndContext(lLogin, lServerConfiguration);
 					if (lToken == null) {
-						lToken = new Token(lLogin, lServerConfiguration);
+						lToken = new Token();
 					}
+					lToken.setPseudo(lLogin);
+					lToken.setProtocol(lServerConfiguration.getProtocol());
+					lToken.setHost(lServerConfiguration.getHost());
+					lToken.setPort(lServerConfiguration.getPort());
+					lToken.setContext(lServerConfiguration.getContext());
 					lToken.setToken(lTokenDTO.getToken());
 					Token.dao.save(lToken);
 				}

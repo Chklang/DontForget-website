@@ -1,12 +1,16 @@
 package fr.chklang.dontforget.business;
 
+import java.util.Collection;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -41,6 +45,9 @@ public class Category extends Model {
 	
 	@Column(name="uuid", unique=true, nullable=true)
 	private String uuid;
+	
+	@OneToMany(targetEntity=Task.class, fetch=FetchType.LAZY, mappedBy="category")
+	private Collection<Task> tasks;
 	
 	public static final CategoryDAO dao = new CategoryDAO();
 
@@ -116,6 +123,20 @@ public class Category extends Model {
 	 */
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
+	}
+
+	/**
+	 * @return the tasks
+	 */
+	public Collection<Task> getTasks() {
+		return tasks;
+	}
+
+	/**
+	 * @param tasks the tasks to set
+	 */
+	public void setTasks(Collection<Task> tasks) {
+		this.tasks = tasks;
 	}
 
 	@Override

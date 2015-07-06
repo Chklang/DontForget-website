@@ -20,10 +20,6 @@ public class CategoryDAO extends Finder<Integer, Category> {
 		return this.where().eq("user", pUser).findSet();
 	}
 	
-	public Category findByNameAndUser(String pName, User pUser) {
-		return this.where().eq("name", pName).eq("user", pUser).findUnique();
-	}
-	
 	public Collection<Category> findByLastUpdate(long pLastUpdate, User pUser) {
 		return this.where().ge("lastUpdate", pLastUpdate).eq("user", pUser).findList();
 	}

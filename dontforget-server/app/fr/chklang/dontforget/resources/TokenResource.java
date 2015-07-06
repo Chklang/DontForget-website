@@ -11,6 +11,10 @@ import play.mvc.Result;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import fr.chklang.dontforget.business.CategoryToDelete;
+import fr.chklang.dontforget.business.PlaceToDelete;
+import fr.chklang.dontforget.business.TagToDelete;
+import fr.chklang.dontforget.business.TaskToDelete;
 import fr.chklang.dontforget.business.Token;
 import fr.chklang.dontforget.business.TokenKey;
 import fr.chklang.dontforget.business.User;
@@ -83,9 +87,25 @@ public class TokenResource extends AbstractRest {
 			}
 
 			SessionHelper.setPlayerId(session(), lUser);
+			SessionHelper.setTokenId(session(), lToken);
 			
 			
 			return ok(new UserDTO(lUser));
+		});
+	}
+	
+	public static Result saveUpdatedToken(long pDate) {
+		return executeAndVerifyToken(() -> {
+			final Token lToken = getConnectedToken();
+			lToken.setLastUpdate(pDate);
+			lToken.save();
+			
+			//And update old tokens
+			CategoryToDelete.dao.deleteOldObjects(lToken.getUser());
+			TagToDelete.dao.deleteOldObjects(lToken.getUser());
+			PlaceToDelete.dao.deleteOldObjects(lToken.getUser());
+			TaskToDelete.dao.deleteOldObjects(lToken.getUser());
+			return ok();
 		});
 	}
 }

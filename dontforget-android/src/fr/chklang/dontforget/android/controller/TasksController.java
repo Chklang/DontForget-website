@@ -12,6 +12,8 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.BaseAdapter;
@@ -34,6 +36,7 @@ import fr.chklang.dontforget.android.business.Task;
 import fr.chklang.dontforget.android.database.DatabaseManager;
 import fr.chklang.dontforget.android.dto.TaskStatus;
 import fr.chklang.dontforget.android.helpers.ConfigurationHelper;
+import fr.chklang.dontforget.android.helpers.SynchronizationHelper;
 
 @SuppressWarnings("deprecation")
 public class TasksController {
@@ -46,19 +49,25 @@ public class TasksController {
 	private List<Tag> tags = new ArrayList<Tag>();
 	private List<Place> places = new ArrayList<Place>();
 	private List<Task> tasks = new ArrayList<Task>();
-	private List<Task> currentTasks = new ArrayList<Task>();
 
-	private BaseAdapter tasksAdapter;
+	private TasksTaskListAdapter tasksAdapter;
 	private BaseAdapter categoriesAdapter;
 	private BaseAdapter tagsAdapter;
 	private BaseAdapter placesAdapter;
 	private TaskStatus currentStatus;
 	private Category currentCategory;
+	
+	private String lastFilter;
+	
+	private Pattern lastFilterPattern;
 
 	private LeftMenuSection leftMenuSectionSelected = LeftMenuSection.CATEGORIES;
 
 	public TasksController(TasksActivity pTasksActivity) {
 		tasksActivity = pTasksActivity;
+		
+		lastFilter = "";
+		lastFilterPattern = null;
 	}
 
 	private static enum LeftMenuSection {
@@ -79,8 +88,14 @@ public class TasksController {
 		initializePlacesAdapter();
 		initializeTasksAdapter();
 		
+		initializeFilter();
+		
 		loadData();
 		actualiseTasksList();
+	}
+	
+	private void refreshAllData() {
+		loadData();
 	}
 
 	private void loadData() {
@@ -119,11 +134,13 @@ public class TasksController {
 		View lButtonLeftMenuViewCategories = this.tasksActivity.getLeftMenuLayout().getButtonLeftMenuViewCategories();
 		View lButtonLeftMenuViewTags = this.tasksActivity.getLeftMenuLayout().getButtonLeftMenuViewTags();
 		View lButtonLeftMenuViewPlaces = this.tasksActivity.getLeftMenuLayout().getButtonLeftMenuViewPlaces();
+		View lButtonLeftMenuSynchronization = this.tasksActivity.getLeftMenuLayout().getButtonLeftMenuSynchronization();
 
 		lButtonInprogress.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				currentStatus = TaskStatus.OPENED;
+				tasksAdapter.setStatus(currentStatus);
 				actualiseTasksList();
 			}
 		});
@@ -131,6 +148,7 @@ public class TasksController {
 			@Override
 			public void onClick(View v) {
 				currentStatus = TaskStatus.FINISHED;
+				tasksAdapter.setStatus(currentStatus);
 				actualiseTasksList();
 			}
 		});
@@ -138,6 +156,7 @@ public class TasksController {
 			@Override
 			public void onClick(View v) {
 				currentStatus = TaskStatus.DELETED;
+				tasksAdapter.setStatus(currentStatus);
 				actualiseTasksList();
 			}
 		});
@@ -145,7 +164,20 @@ public class TasksController {
 			@Override
 			public void onClick(View v) {
 				currentStatus = null;
+				tasksAdapter.setStatus(null);
 				actualiseTasksList();
+			}
+		});
+		lButtonLeftMenuSynchronization.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				SynchronizationHelper.startSynchronizations(tasksActivity, new Runnable() {
+					@Override
+					public void run() {
+						refreshAllData();						
+					}
+				});
+				Toast.makeText(tasksActivity, "Synchronisation démarée", Toast.LENGTH_SHORT).show();
 			}
 		});
 
@@ -258,6 +290,38 @@ public class TasksController {
 			}
 		});
 	}
+	
+	private void initializeFilter() {
+		this.tasksActivity.getMainLayout().getTasks_search_text().addTextChangedListener(new TextWatcher() {
+			
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+			}
+			
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+			}
+			
+			@Override
+			public void afterTextChanged(Editable s) {
+				String lFilter = s.toString().trim();
+				if (!lastFilter.equals(lFilter)) {
+					//Actualize list view elements
+					lastFilter = lFilter;
+					lastFilterPattern = Pattern.compile(lastFilter, Pattern.CASE_INSENSITIVE);
+					tasksAdapter.setPattern(lastFilterPattern);
+					actualiseTasksList();
+				}
+			}
+		});
+		
+		this.tasksActivity.getMainLayout().getTasks_search_button().setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				tasksActivity.getMainLayout().getTasks_search_text().setText("");
+			}
+		});
+	}
 
 	private void actualizeLeftMenuSelection() {
 		View lContainerCategories = this.tasksActivity.getLeftMenuLayout().getContainerCategories();
@@ -274,19 +338,6 @@ public class TasksController {
 	}
 
 	private void actualiseTasksList() {
-		currentTasks.clear();
-		for (Task lTask : tasks) {
-			if (currentCategory == null || currentCategory.getIdCategory() == lTask.getIdCategory()) {
-				if (currentStatus == null) {
-					currentTasks.add(lTask);
-					continue;
-				}
-				if (currentStatus == lTask.getStatus()) {
-					currentTasks.add(lTask);
-					continue;
-				}
-			}
-		}
 		tasksAdapter.notifyDataSetChanged();
 	}
 
@@ -309,7 +360,7 @@ public class TasksController {
 	}
 
 	private void initializeTasksAdapter() {
-		tasksAdapter = new TasksTaskListAdapter(tasksActivity, currentTasks) {
+		tasksAdapter = new TasksTaskListAdapter(tasksActivity, tasks) {
 			@Override
 			protected void onRefreshTasksList() {
 				actualiseTasksList();
@@ -409,6 +460,7 @@ public class TasksController {
 			@Override
 			protected void onChangeCategory(Category pCategory) {
 				currentCategory = pCategory;
+				tasksAdapter.setCategory(currentCategory);
 				actualiseCategoriesList();
 				actualiseTasksList();
 

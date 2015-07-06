@@ -14,6 +14,8 @@
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:orientation="vertical" >
 
             <LinearLayout
@@ -125,6 +127,31 @@
                 android:orientation="horizontal" >
 
                 <EditText
+                    android:id="@+id/tasks_search_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:hint="@string/tasks_search_text" >
+
+                    <requestFocus />
+                </EditText>
+
+                <ImageButton
+                    android:id="@+id/tasks_search_button"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:adjustViewBounds="true"
+                    android:background="@drawable/delete"
+                    android:scaleType="fitCenter" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+
+                <EditText
                     android:id="@+id/tasks_new_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -147,7 +174,7 @@
             <ListView
                 android:id="@+id/tasks_elements"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
+                android:layout_height="match_parent" >
             </ListView>
         </LinearLayout>
     </FrameLayout>

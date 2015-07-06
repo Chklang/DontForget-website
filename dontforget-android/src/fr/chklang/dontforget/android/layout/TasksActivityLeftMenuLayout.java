@@ -21,6 +21,7 @@ public class TasksActivityLeftMenuLayout {
 	private final View buttonLeftMenuViewCategories;
 	private final View buttonLeftMenuViewTags;
 	private final View buttonLeftMenuViewPlaces;
+	private final View buttonLeftMenuSynchronization;
 	
 	//Categories
 	private final EditText categories_new_text;
@@ -46,6 +47,7 @@ public class TasksActivityLeftMenuLayout {
 		buttonLeftMenuViewCategories = mainView.findViewById(R.id.tasks_leftmenu_view_categories);
 		buttonLeftMenuViewTags = mainView.findViewById(R.id.tasks_leftmenu_view_tags);
 		buttonLeftMenuViewPlaces = mainView.findViewById(R.id.tasks_leftmenu_view_places);
+		buttonLeftMenuSynchronization = mainView.findViewById(R.id.tasks_leftmenu_synchronization);
 
 		categories_view = (ListView) mainView.findViewById(R.id.tasks_leftmenu_categories_list);
 		tags_view = (ListView) mainView.findViewById(R.id.tasks_leftmenu_tags_list);
@@ -81,6 +83,13 @@ public class TasksActivityLeftMenuLayout {
 	 */
 	public View getButtonLeftMenuViewPlaces() {
 		return buttonLeftMenuViewPlaces;
+	}
+
+	/**
+	 * @return the buttonLeftMenuSynchronization
+	 */
+	public View getButtonLeftMenuSynchronization() {
+		return buttonLeftMenuSynchronization;
 	}
 
 	/**

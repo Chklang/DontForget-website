@@ -1,6 +1,5 @@
 package fr.chklang.dontforget.android.adapter;
 
-import java.util.Collection;
 import java.util.List;
 
 import android.content.Context;
@@ -13,10 +12,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import fr.chklang.dontforget.android.R;
 import fr.chklang.dontforget.android.business.Category;
-import fr.chklang.dontforget.android.business.Task;
 
 /**
  * 
