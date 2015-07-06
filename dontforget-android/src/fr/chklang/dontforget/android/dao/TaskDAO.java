@@ -155,6 +155,6 @@ public class TaskDAO extends AbstractDAO<Task, Integer> {
 	}
 	
 	public Collection<Task> findAfterLastUpdate(long pDate) {
-		return findByCriterias(Pair.create(COLUMN_LASTUPDATE + ">?", new String[]{Long.toString(pDate)}));
+		return findByCriterias(Pair.create(COLUMN_LASTUPDATE + ">=?", new String[]{Long.toString(pDate)}));
 	}
 }

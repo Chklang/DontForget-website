@@ -46,19 +46,19 @@ public class TaskDTO {
 			} else {
 				throw new AbstractDontForgetException("TaskStatus." + lTempStatus + " don't exists!");
 			}
-			JSONArray lTagsJson = pObject.getJSONArray("tagUuids");
+			JSONArray lTagsJson = pObject.getJSONArray("tags");
 			Collection<String> lTags = new ArrayList<String>();
 			for (int i = 0; i < lTagsJson.length(); i++) {
 				lTags.add(lTagsJson.getString(i));
 			}
 			tagUuids = lTags;
-			JSONArray lPlacesJson = pObject.getJSONArray("placeUuids");
+			JSONArray lPlacesJson = pObject.getJSONArray("places");
 			Collection<String> lPlaces = new ArrayList<String>();
 			for (int i = 0; i < lPlacesJson.length(); i++) {
 				lPlaces.add(lPlacesJson.getString(i));
 			}
 			placeUuids = lPlaces;
-			categoryUuid = pObject.getString("categoryUuid");
+			categoryUuid = pObject.getString("category");
 			uuid = pObject.getString("uuid");
 			lastUpdate = pObject.getLong("lastUpdate");
 		} catch (Exception e) {

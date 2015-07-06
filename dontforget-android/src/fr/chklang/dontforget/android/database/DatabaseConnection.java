@@ -140,6 +140,26 @@ public class DatabaseConnection extends SQLiteOpenHelper {
 		db.execSQL(lRenameTableToken);
 	}
 	
+	private void v4(SQLiteDatabase db) {
+		String lTableCategory = "CREATE TABLE \"t_category_copy\" ("
+				+ "\"idCategory\" INTEGER PRIMARY KEY NOT NULL,"
+				+ "\"name\" VARCHAR NOT NULL,"
+				+ "\"lastUpdate\" INTEGER NOT NULL,"
+				+ "\"uuid\" VARCHAR)";
+		String lCopyCategoryData = "INSERT INTO t_category_copy ("+
+				"idCategory, name, lastUpdate, uuid"+
+			") SELECT "+
+				"idCategory, name, lastUpdate, uuid "+
+			"FROM t_category";
+		String lDeleteOldTableCategorys = "DROP TABLE t_category";
+		String lRenameTableCategory = "ALTER TABLE t_category_copy RENAME TO t_category";
+		
+		db.execSQL(lTableCategory);
+		db.execSQL(lCopyCategoryData);
+		db.execSQL(lDeleteOldTableCategorys);
+		db.execSQL(lRenameTableCategory);
+	}
+	
 	private void upgrade(SQLiteDatabase db, int oldVersion) {
 		switch (oldVersion) {
 		case 0 :
@@ -148,6 +168,8 @@ public class DatabaseConnection extends SQLiteOpenHelper {
 			v2(db);
 		case 2 :
 			v3(db);
+		case 3 :
+			v4(db);
 		default :
 			break;
 		}

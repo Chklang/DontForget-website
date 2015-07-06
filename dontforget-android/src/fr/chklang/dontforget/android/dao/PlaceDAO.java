@@ -114,6 +114,6 @@ public class PlaceDAO extends AbstractDAO<Place, Integer> {
 	}
 	
 	public Collection<Place> findAfterLastUpdate(long pDate) {
-		return findByCriterias(Pair.create(COLUMN_LASTUPDATE + ">?", new String[]{Long.toString(pDate)}));
+		return findByCriterias(Pair.create(COLUMN_LASTUPDATE + ">=?", new String[]{Long.toString(pDate)}));
 	}
 }

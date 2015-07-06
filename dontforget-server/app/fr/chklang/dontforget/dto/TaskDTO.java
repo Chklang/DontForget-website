@@ -4,8 +4,8 @@
 package fr.chklang.dontforget.dto;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.stream.Stream;
+import java.util.Arrays;
+import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,9 +29,9 @@ public class TaskDTO extends ObjectNode {
 	
 	private final TaskStatus status;
 	
-	private final Stream<String> tags;
+	private final List<String> tags;
 	
-	private final Stream<String> places;
+	private final List<String> places;
 	
 	private final String category;
 	
@@ -42,16 +42,14 @@ public class TaskDTO extends ObjectNode {
 		uuid = pJson.get("uuid").asText();
 		text = pJson.get("text").asText();
 		status = TaskStatus.valueOf(pJson.get("status").asText());
-		Collection<String> lTags = new ArrayList<>();
+		tags = new ArrayList<>();
 		pJson.get("tagUuids").forEach((pNode) -> {
-			lTags.add(pNode.asText());
+			tags.add(pNode.asText());
 		});
-		tags = lTags.stream();
-		Collection<String> lPlaces = new ArrayList<>();
+		places = new ArrayList<>();
 		pJson.get("placeUuids").forEach((pNode) -> {
-			lTags.add(pNode.asText());
+			places.add(pNode.asText());
 		});
-		places = lPlaces.stream();
 		category = pJson.get("categoryUuid").asText();
 		lastUpdate = pJson.get("lastUpdate").asLong();
 		build();
@@ -63,13 +61,13 @@ public class TaskDTO extends ObjectNode {
 		text = pTask.getText();
 		status = pTask.getStatus();
 		
-		tags = pTask.getTags().stream().map((pTag) -> {
+		tags = Arrays.asList(pTask.getTags().stream().map((pTag) -> {
 			return pTag.getUuid();
-		});
+		}).toArray(String[]::new));
 		
-		places = pTask.getPlaces().stream().map((pPlace) -> {
+		places = Arrays.asList(pTask.getPlaces().stream().map((pPlace) -> {
 			return pPlace.getUuid();
-		});
+		}).toArray(String[]::new));
 		
 		category = pTask.getCategory().getUuid();
 		
@@ -120,13 +118,13 @@ public class TaskDTO extends ObjectNode {
 	/**
 	 * @return the tags
 	 */
-	public Stream<String> getTags() {
+	public List<String> getTags() {
 		return tags;
 	}
 	/**
 	 * @return the places
 	 */
-	public Stream<String> getPlaces() {
+	public List<String> getPlaces() {
 		return places;
 	}
 	/**

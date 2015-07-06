@@ -102,6 +102,6 @@ public class CategoryDAO extends AbstractDAO<Category, Integer> {
 	}
 	
 	public Collection<Category> findAfterLastUpdate(long pDate) {
-		return findByCriterias(Pair.create(COLUMN_LASTUPDATE + ">?", new String[]{Long.toString(pDate)}));
+		return findByCriterias(Pair.create(COLUMN_LASTUPDATE + ">=?", new String[]{Long.toString(pDate)}));
 	}
 }

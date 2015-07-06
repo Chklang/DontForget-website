@@ -29,11 +29,16 @@ public class ConnectionActivity extends Activity {
 	private EditText connection_password;
 	private Button connection_send;
 	private Button connection_skip;
+	
+	private int tokenId = -1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_connection);
+		
+		Intent lIntent = getIntent();
+		tokenId = lIntent.getIntExtra("tokenId", -1);
 
 		connection_protocol = (Spinner) this.findViewById(R.id.connection_protocol);
 		connection_host = (EditText) this.findViewById(R.id.connection_host);
@@ -56,6 +61,32 @@ public class ConnectionActivity extends Activity {
 				goToTasks();
 			}
 		});
+		
+		if (tokenId != -1) {
+			//Load token information
+			DatabaseManager.transaction(this, new DatabaseManager.Transaction() {
+				@Override
+				public void execute() {
+					Token lToken = Token.dao.get(tokenId);
+					if (lToken == null) {
+						return;
+					}
+					int lNbElementsProtocol = connection_protocol.getCount();
+					for (int  i = 0; i < lNbElementsProtocol; i++) {
+						Object lValue = connection_protocol.getItemAtPosition(i);
+						String lValueString = String.valueOf(lValue);
+						if (lToken.getProtocol().equals(lValueString)) {
+							connection_protocol.setSelection(i);
+							break;
+						}
+					}
+					connection_host.setText(lToken.getHost());
+					connection_port.setText(Integer.toString(lToken.getPort()));
+					connection_context.setText(lToken.getContext());
+					connection_login.setText(lToken.getPseudo());
+				}
+			});
+		}
 	}
 
 	private void connection() {

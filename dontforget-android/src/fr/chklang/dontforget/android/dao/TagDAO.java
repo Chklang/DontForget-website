@@ -114,6 +114,6 @@ public class TagDAO extends AbstractDAO<Tag, Integer> {
 	}
 	
 	public Collection<Tag> findAfterLastUpdate(long pDate) {
-		return findByCriterias(Pair.create(COLUMN_LASTUPDATE + ">?", new String[]{Long.toString(pDate)}));
+		return findByCriterias(Pair.create(COLUMN_LASTUPDATE + ">=?", new String[]{Long.toString(pDate)}));
 	}
 }

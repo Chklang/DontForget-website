@@ -1,6 +1,7 @@
 package fr.chklang.dontforget.dto;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -25,63 +26,53 @@ public class SynchronizationDTO extends ObjectNode {
 	
 	private static final ObjectMapper mapper = new ObjectMapper();
 	
-	private final Stream<TaskDTO> tasks;
-	private final Stream<TagDTO> tags;
-	private final Stream<PlaceDTO> places;
-	private final Stream<CategoryDTO> categories;
+	private final Collection<TaskDTO> tasks;
+	private final Collection<TagDTO> tags;
+	private final Collection<PlaceDTO> places;
+	private final Collection<CategoryDTO> categories;
 	private final UserDTO user;
 
-	private final Stream<String> uuidTasksToDelete;
-	private final Stream<String> uuidTagsToDelete;
-	private final Stream<String> uuidPlacesToDelete;
-	private final Stream<String> uuidCategoriesToDelete;
+	private final Collection<String> uuidTasksToDelete;
+	private final Collection<String> uuidTagsToDelete;
+	private final Collection<String> uuidPlacesToDelete;
+	private final Collection<String> uuidCategoriesToDelete;
 	
 	public SynchronizationDTO(JsonNode pJson) {
 		super(mapper.getNodeFactory());
-		Collection<TaskDTO> lTasks = new ArrayList<>();
+		tasks = new ArrayList<>();
 		pJson.get("tasks").forEach((pJsonNode) -> {
-			lTasks.add(new TaskDTO(pJsonNode));
+			tasks.add(new TaskDTO(pJsonNode));
 		});
-		Collection<TagDTO> lTags = new ArrayList<>();
+		tags = new ArrayList<>();
 		pJson.get("tags").forEach((pJsonNode) -> {
-			lTags.add(new TagDTO(pJsonNode));
+			tags.add(new TagDTO(pJsonNode));
 		});
-		Collection<PlaceDTO> lPlaces = new ArrayList<>();
+		places = new ArrayList<>();
 		pJson.get("places").forEach((pJsonNode) -> {
-			lPlaces.add(new PlaceDTO(pJsonNode));
+			places.add(new PlaceDTO(pJsonNode));
 		});
-		Collection<CategoryDTO> lCategories = new ArrayList<>();
+		categories = new ArrayList<>();
 		pJson.get("categories").forEach((pJsonNode) -> {
-			lCategories.add(new CategoryDTO(pJsonNode));
+			categories.add(new CategoryDTO(pJsonNode));
 		});
 		
-		Collection<String> lUuidCategoriesToDelete = new ArrayList<>();
+		uuidCategoriesToDelete = new ArrayList<>();
 		pJson.get("uuidCategoriesToDelete").forEach((pJsonNode) -> {
-			lUuidCategoriesToDelete.add(pJsonNode.asText());
+			uuidCategoriesToDelete.add(pJsonNode.asText());
 		});
-		Collection<String> lUuidTagsToDelete = new ArrayList<>();
+		uuidTagsToDelete = new ArrayList<>();
 		pJson.get("uuidTagsToDelete").forEach((pJsonNode) -> {
-			lUuidTagsToDelete.add(pJsonNode.asText());
+			uuidTagsToDelete.add(pJsonNode.asText());
 		});
-		Collection<String> lUuidPlacesToDelete = new ArrayList<>();
+		uuidPlacesToDelete = new ArrayList<>();
 		pJson.get("uuidPlacesToDelete").forEach((pJsonNode) -> {
-			lUuidPlacesToDelete.add(pJsonNode.asText());
+			uuidPlacesToDelete.add(pJsonNode.asText());
 		});
-		Collection<String> lUuidTasksToDelete = new ArrayList<>();
+		uuidTasksToDelete = new ArrayList<>();
 		pJson.get("uuidTasksToDelete").forEach((pJsonNode) -> {
-			lUuidTasksToDelete.add(pJsonNode.asText());
+			uuidTasksToDelete.add(pJsonNode.asText());
 		});
-		
-		tasks = lTasks.stream();
-		tags = lTags.stream();
-		places = lPlaces.stream();
-		categories = lCategories.stream();
-		
-		uuidTasksToDelete = lUuidTasksToDelete.stream();
-		uuidTagsToDelete = lUuidTagsToDelete.stream();
-		uuidPlacesToDelete = lUuidPlacesToDelete.stream();
-		uuidCategoriesToDelete = lUuidCategoriesToDelete.stream();
-		
+
 		if (pJson.has("user")) {
 			user = new UserDTO(pJson.get("user"));
 		} else {
@@ -94,58 +85,58 @@ public class SynchronizationDTO extends ObjectNode {
 	public SynchronizationDTO(Stream<Task> pTasks, Stream<Tag> pTags, Stream<Place> pPlaces, Stream<Category> pCategories, User pUser, Stream<CategoryToDelete> pUuidCategoriesToDelete, Stream<PlaceToDelete> pUuidPlacesToDelete, Stream<TagToDelete> pUuidTagsToDelete, Stream<TaskToDelete> pUuidTasksToDelete) {
 		super(mapper.getNodeFactory());
 		
-		tasks = pTasks.map(new Function<Task, TaskDTO>(){
+		tasks = Arrays.asList(pTasks.map(new Function<Task, TaskDTO>(){
 			@Override
 			public TaskDTO apply(Task arg0) {
 				return new TaskDTO(arg0);
 			}
-		});
+		}).toArray(TaskDTO[]::new));
 		
-		tags = pTags.map(new Function<Tag, TagDTO>(){
+		tags = Arrays.asList(pTags.map(new Function<Tag, TagDTO>(){
 			@Override
 			public TagDTO apply(Tag arg0) {
 				return new TagDTO(arg0);
 			}
-		});
+		}).toArray(TagDTO[]::new));
 		
-		places = pPlaces.map(new Function<Place, PlaceDTO>(){
+		places = Arrays.asList(pPlaces.map(new Function<Place, PlaceDTO>(){
 			@Override
 			public PlaceDTO apply(Place arg0) {
 				return new PlaceDTO(arg0);
 			}
-		});
+		}).toArray(PlaceDTO[]::new));
 		
-		categories = pCategories.map(new Function<Category, CategoryDTO>(){
+		categories = Arrays.asList(pCategories.map(new Function<Category, CategoryDTO>(){
 			@Override
 			public CategoryDTO apply(Category arg0) {
 				return new CategoryDTO(arg0);
 			}
-		});
+		}).toArray(CategoryDTO[]::new));
 		
-		uuidCategoriesToDelete = pUuidCategoriesToDelete.map(new Function<CategoryToDelete, String>(){
+		uuidCategoriesToDelete = Arrays.asList(pUuidCategoriesToDelete.map(new Function<CategoryToDelete, String>(){
 			@Override
 			public String apply(CategoryToDelete arg0) {
 				return arg0.getUuidCategory();
 			}
-		});
-		uuidTagsToDelete = pUuidTagsToDelete.map(new Function<TagToDelete, String>(){
+		}).toArray(String[]::new));
+		uuidTagsToDelete = Arrays.asList(pUuidTagsToDelete.map(new Function<TagToDelete, String>(){
 			@Override
 			public String apply(TagToDelete arg0) {
 				return arg0.getUuidTag();
 			}
-		});
-		uuidPlacesToDelete = pUuidPlacesToDelete.map(new Function<PlaceToDelete, String>(){
+		}).toArray(String[]::new));
+		uuidPlacesToDelete = Arrays.asList(pUuidPlacesToDelete.map(new Function<PlaceToDelete, String>(){
 			@Override
 			public String apply(PlaceToDelete arg0) {
 				return arg0.getUuidPlace();
 			}
-		});
-		uuidTasksToDelete = pUuidTasksToDelete.map(new Function<TaskToDelete, String>(){
+		}).toArray(String[]::new));
+		uuidTasksToDelete = Arrays.asList(pUuidTasksToDelete.map(new Function<TaskToDelete, String>(){
 			@Override
 			public String apply(TaskToDelete arg0) {
 				return arg0.getUuidTask();
 			}
-		});
+		}).toArray(String[]::new));
 		
 		if (pUser == null) {
 			user = null;
@@ -214,28 +205,28 @@ public class SynchronizationDTO extends ObjectNode {
 	/**
 	 * @return the tasks
 	 */
-	public Stream<TaskDTO> getTasks() {
+	public Collection<TaskDTO> getTasks() {
 		return tasks;
 	}
 
 	/**
 	 * @return the tags
 	 */
-	public Stream<TagDTO> getTags() {
+	public Collection<TagDTO> getTags() {
 		return tags;
 	}
 
 	/**
 	 * @return the places
 	 */
-	public Stream<PlaceDTO> getPlaces() {
+	public Collection<PlaceDTO> getPlaces() {
 		return places;
 	}
 
 	/**
 	 * @return the categories
 	 */
-	public Stream<CategoryDTO> getCategories() {
+	public Collection<CategoryDTO> getCategories() {
 		return categories;
 	}
 
@@ -249,28 +240,28 @@ public class SynchronizationDTO extends ObjectNode {
 	/**
 	 * @return the uuidTasksToDelete
 	 */
-	public Stream<String> getUuidTasksToDelete() {
+	public Collection<String> getUuidTasksToDelete() {
 		return uuidTasksToDelete;
 	}
 
 	/**
 	 * @return the uuidTagsToDelete
 	 */
-	public Stream<String> getUuidTagsToDelete() {
+	public Collection<String> getUuidTagsToDelete() {
 		return uuidTagsToDelete;
 	}
 
 	/**
 	 * @return the uuidPlacesToDelete
 	 */
-	public Stream<String> getUuidPlacesToDelete() {
+	public Collection<String> getUuidPlacesToDelete() {
 		return uuidPlacesToDelete;
 	}
 
 	/**
 	 * @return the uuidCategoriesToDelete
 	 */
-	public Stream<String> getUuidCategoriesToDelete() {
+	public Collection<String> getUuidCategoriesToDelete() {
 		return uuidCategoriesToDelete;
 	}
 }

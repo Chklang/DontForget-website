@@ -14,7 +14,7 @@ import android.database.sqlite.SQLiteDatabase;
  */
 public class DatabaseManager {
 
-	private static int VERSION = 3;
+	private static int VERSION = 4;
 
 	private static ThreadLocal<DatabaseConnection> connection = new InheritableThreadLocal<DatabaseConnection>();
 	

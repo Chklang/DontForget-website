@@ -107,6 +107,7 @@ public abstract class AbstractDAO<T extends AbstractBusinessObject, Key> {
 		pCursor.moveToFirst();
 		
 		T lResult = cursorToObjectWithoutControl(pCursor);
+		lResult.setAlreadyIntoDB(true);
 		
 		pCursor.close();
 		

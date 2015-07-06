@@ -40,19 +40,25 @@ public class TokensRest extends AbstractRest {
 		});
 	}
 	
-	public static Result<Boolean> connexion(final ServerConfiguration pConfiguration, final Token pToken, final String pDeviceId) {
-		return request(new Callable<Boolean>() {
+	public static enum ConnectionStatus {
+		OK, UNAUTHORIZED, FAIL
+	}
+	
+	public static Result<ConnectionStatus> connexion(final ServerConfiguration pConfiguration, final Token pToken, final String pDeviceId) {
+		return request(new Callable<ConnectionStatus>() {
 			@Override
-			public Boolean call() throws Exception {
+			public ConnectionStatus call() throws Exception {
 				JSONObject lContent = new JSONObject();
 				lContent.put("pseudo", pToken.getPseudo());
 				lContent.put("token", pToken.getToken());
 				lContent.put("deviceId", pDeviceId);
 				HttpResponse lResponse = post(pConfiguration, "/rest/tokens/login", lContent);
 				if (lResponse.getStatusLine().getStatusCode() == 200) {
-					return true;
+					return ConnectionStatus.OK;
+				} else if (lResponse.getStatusLine().getStatusCode() == 401) {
+					return ConnectionStatus.UNAUTHORIZED;
 				} else {
-					return false;
+					return ConnectionStatus.FAIL;
 				}
 			}
 		});

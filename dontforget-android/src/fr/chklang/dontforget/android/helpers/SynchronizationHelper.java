@@ -31,6 +31,7 @@ import fr.chklang.dontforget.android.dto.TaskDTO;
 import fr.chklang.dontforget.android.rest.AbstractRest.Result;
 import fr.chklang.dontforget.android.rest.SynchronizationRest;
 import fr.chklang.dontforget.android.rest.TokensRest;
+import fr.chklang.dontforget.android.rest.TokensRest.ConnectionStatus;
 
 /**
  * @author S0075724
@@ -59,8 +60,8 @@ public class SynchronizationHelper {
 		// Connect to servers
 		for (Token lToken : lTokens) {
 			ServerConfiguration lServerConfiguration = lToken.toServerConfiguration();
-			Result<Boolean> lResult = TokensRest.connexion(lServerConfiguration, lToken, ConfigurationHelper.getDeviceId());
-			if (lResult.get().booleanValue()) {
+			Result<ConnectionStatus> lResult = TokensRest.connexion(lServerConfiguration, lToken, ConfigurationHelper.getDeviceId());
+			if (lResult.get() == ConnectionStatus.OK) {
 				lTokensWithServersConfiguration.put(lToken, lServerConfiguration);
 			}
 		}
@@ -101,11 +102,15 @@ public class SynchronizationHelper {
 			updateLocalWithSynchronizationDTODeleteTagsPlacesAndCategories(lEntry.first, lEntry.second, currentTime);
 		}
 
+		//Correction of doubloons
+		correctionDoubloons();
+		
 		Collection<Pair<Token, Result<Boolean>>> lReUpdateServer = new ArrayList<Pair<Token, Result<Boolean>>>();
 		// Now, update each servers with the updated data
 		for (Pair<Token, SynchronizationDTO> lEntry : lSynchronizations) {
 			SynchronizationDTO lSynchronizationDTOToSave = getUpdateServerWithSynchronizationDTO(lEntry.first, lEntry.second);
-			Result<Boolean> lPromesse = updateServer(lEntry.first, lSynchronizationDTOToSave);
+			ServerConfiguration lServerConfiguration = lTokensWithServersConfiguration.get(lEntry.first);
+			Result<Boolean> lPromesse = updateServer(lServerConfiguration, lEntry.first, lSynchronizationDTOToSave);
 			lReUpdateServer.add(Pair.create(lEntry.first, lPromesse));
 		}
 
@@ -125,18 +130,188 @@ public class SynchronizationHelper {
 		//Delete old entries into logs
 		cleanObjectsDeleted();
 	}
+	
+	private interface ICorrectionDoubloons<T> {
+		Collection<T> getAll();
+		
+		String getName(T pObject);
+		
+		String getUuid(T pObject);
+		
+		void delete (T pObject);
+		
+		Collection<Task> getTasksOfType(T pObject);
+		
+		void updateAndSaveTask(Task pTaskToUpdate, T pObjectBefore, T pObjectAfter);
+	}
+	
+	private static void correctionDoubloons() {
+		//Categories
+		correctionDoubloons(new ICorrectionDoubloons<Category>() {
+			@Override
+			public Collection<Category> getAll() {
+				return Category.dao.getAll();
+			}
+			@Override
+			public String getName(Category pObject) {
+				return pObject.getName();
+			}
+
+			@Override
+			public String getUuid(Category pObject) {
+				return pObject.getUuid();
+			}
+
+			@Override
+			public void delete(Category pObject) {
+				CategoryToDelete lCategoryToDelete = new CategoryToDelete();
+				lCategoryToDelete.setDateDeletion(System.currentTimeMillis());
+				lCategoryToDelete.setUuidCategory(pObject.getUuid());
+				CategoryToDelete.dao.save(lCategoryToDelete);
+				
+				Category.dao.delete(pObject.getIdCategory());
+			}
+
+			@Override
+			public Collection<Task> getTasksOfType(Category pObject) {
+				return Task.dao.findByCategory(pObject);
+			}
+
+			@Override
+			public void updateAndSaveTask(Task pTaskToUpdate, Category pObjectBefore, Category pObjectAfter) {
+				pTaskToUpdate.setIdCategory(pObjectAfter.getIdCategory());
+				pTaskToUpdate.setLastUpdate(System.currentTimeMillis());
+				Task.dao.save(pTaskToUpdate);
+			}
+		});
+		
+		//Places
+		correctionDoubloons(new ICorrectionDoubloons<Place>() {
+			@Override
+			public Collection<Place> getAll() {
+				return Place.dao.getAll();
+			}
+			@Override
+			public String getName(Place pObject) {
+				return pObject.getName();
+			}
+
+			@Override
+			public String getUuid(Place pObject) {
+				return pObject.getUuid();
+			}
+
+			@Override
+			public void delete(Place pObject) {
+				PlaceToDelete lPlaceToDelete = new PlaceToDelete();
+				lPlaceToDelete.setDateDeletion(System.currentTimeMillis());
+				lPlaceToDelete.setUuidPlace(pObject.getUuid());
+				PlaceToDelete.dao.save(lPlaceToDelete);
+				
+				Place.dao.delete(pObject.getIdPlace());
+			}
+
+			@Override
+			public Collection<Task> getTasksOfType(Place pObject) {
+				return Task.dao.findByPlace(pObject);
+			}
+
+			@Override
+			public void updateAndSaveTask(Task pTaskToUpdate, Place pObjectBefore, Place pObjectAfter) {
+				Task.dao.removePlaceFromTask(pTaskToUpdate, pObjectBefore);
+				Task.dao.addPlaceToTask(pTaskToUpdate, pObjectAfter);
+				pTaskToUpdate.setLastUpdate(System.currentTimeMillis());
+				Task.dao.save(pTaskToUpdate);
+			}
+		});
+		
+		//Tags
+		correctionDoubloons(new ICorrectionDoubloons<Tag>() {
+			@Override
+			public Collection<Tag> getAll() {
+				return Tag.dao.getAll();
+			}
+			@Override
+			public String getName(Tag pObject) {
+				return pObject.getName();
+			}
+
+			@Override
+			public String getUuid(Tag pObject) {
+				return pObject.getUuid();
+			}
+
+			@Override
+			public void delete(Tag pObject) {
+				TagToDelete lTagToDelete = new TagToDelete();
+				lTagToDelete.setDateDeletion(System.currentTimeMillis());
+				lTagToDelete.setUuidTag(pObject.getUuid());
+				TagToDelete.dao.save(lTagToDelete);
+				
+				Tag.dao.delete(pObject.getIdTag());
+			}
+
+			@Override
+			public Collection<Task> getTasksOfType(Tag pObject) {
+				return Task.dao.findByTag(pObject);
+			}
+
+			@Override
+			public void updateAndSaveTask(Task pTaskToUpdate, Tag pObjectBefore, Tag pObjectAfter) {
+				Task.dao.removeTagFromTask(pTaskToUpdate, pObjectBefore);
+				Task.dao.addTagToTask(pTaskToUpdate, pObjectAfter);
+				pTaskToUpdate.setLastUpdate(System.currentTimeMillis());
+				Task.dao.save(pTaskToUpdate);
+			}
+		});
+	}
+	
+	private static <T> void correctionDoubloons(ICorrectionDoubloons<T> pConfig) {
+		Map<String, Collection<T>> lMapTypeNameTypes = new HashMap<String, Collection<T>>();
+		for (T lType : pConfig.getAll()) {
+			Collection<T> lTypeWithSameName = lMapTypeNameTypes.get(pConfig.getName(lType));
+			if (lTypeWithSameName == null) {
+				lTypeWithSameName = new ArrayList<T>();
+				lMapTypeNameTypes.put(pConfig.getName(lType), lTypeWithSameName);
+			}
+			lTypeWithSameName.add(lType);
+		}
+		
+		//Check if there is some doubloons
+		for (Entry<String, Collection<T>> lEntry : lMapTypeNameTypes.entrySet()) {
+			if (lEntry.getValue().size() > 1) {
+				//doubloons
+				String lUuidToKeep = null;
+				T lTypeToKeep = null;
+				for (T lType : lEntry.getValue()) {
+					if (lUuidToKeep == null) {
+						lUuidToKeep = pConfig.getUuid(lType);
+						lTypeToKeep = lType;
+					} else if (AbstractStringComparatorByAsciiOrder.compareStatic(lUuidToKeep, pConfig.getUuid(lType)) > 0) {
+						lUuidToKeep = pConfig.getUuid(lType);
+						lTypeToKeep = lType;
+					}
+				}
+				for (T lType : lEntry.getValue()) {
+					if (!lUuidToKeep.equals(pConfig.getUuid(lType))) {
+						Collection<Task> lTasks = pConfig.getTasksOfType(lType);
+						for (Task lTask : lTasks) {
+							pConfig.updateAndSaveTask(lTask, lType, lTypeToKeep);
+						}
+						pConfig.delete(lType);
+					}
+				}
+				
+			}
+		}
+	}
 
 	private static Result<SynchronizationDTO> getSynchronizationDTO(Token pToken, ServerConfiguration pServerConfiguration) {
 		return SynchronizationRest.connexion(pServerConfiguration, pToken.getLastSynchro());
 	}
 
-	private static Result<Boolean> updateServer(Token pToken, SynchronizationDTO pSynchronizationDTO) {
-		String lProtocol = pToken.getProtocol();
-		String lHost = pToken.getHost();
-		int lPort = pToken.getPort();
-		String lContext = pToken.getContext();
-		ServerConfiguration lServerConfiguration = new ServerConfiguration(lProtocol, lHost, lPort, lContext);
-		return SynchronizationRest.update(lServerConfiguration, pSynchronizationDTO);
+	private static Result<Boolean> updateServer(ServerConfiguration pServerConfiguration, Token pToken, SynchronizationDTO pSynchronizationDTO) {
+		return SynchronizationRest.update(pServerConfiguration, pSynchronizationDTO);
 	}
 
 	private static void updateLocalWithSynchronizationDTOCategoriesTagsAndPlaces(SynchronizationDTO pSynchronizationDTO) {
@@ -208,7 +383,6 @@ public class SynchronizationHelper {
 	private static void updateLocalWithSynchronizationDTOTasks(SynchronizationDTO pSynchronizationDTO) {
 		// Update/create tasks
 		for (TaskDTO lTaskDTO : pSynchronizationDTO.getTasks()) {
-			boolean lIsUpdateLinks = false;
 			Task lTask = Task.dao.getByUuid(lTaskDTO.getUuid());
 			if (lTask == null) {
 				// Create it
@@ -224,7 +398,6 @@ public class SynchronizationHelper {
 				lTask.setLastUpdate(lTaskDTO.getLastUpdate());
 				lTask.setUuid(lTaskDTO.getUuid());
 				Task.dao.save(lTask);
-				lIsUpdateLinks = true;
 			} else {
 				// Update it
 				if (lTask.getLastUpdate() < lTaskDTO.getLastUpdate()) {
@@ -240,13 +413,7 @@ public class SynchronizationHelper {
 					lTask.setLastUpdate(lTaskDTO.getLastUpdate());
 					lTask.setUuid(lTaskDTO.getUuid());
 					Task.dao.save(lTask);
-					lIsUpdateLinks = true;
 				}
-			}
-
-			if (lIsUpdateLinks) {
-				// So we mustn't update it
-				continue;
 			}
 
 			// Attach tags
